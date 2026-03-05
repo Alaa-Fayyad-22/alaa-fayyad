@@ -1,0 +1,88 @@
+{
+  "nav": {
+    "about": "About",
+    "skills": "Skills",
+    "projects": "Projects",
+    "experience": "Experience",
+    "contact": "Contact",
+    "hire": "Hire Me",
+    "resume": "Resume"
+  },
+  "hero": {
+    "greeting": "Hello, I'm",
+    "name": "Alaa Fayyad",
+    "role1": "Full Stack Developer",
+    "role2": "UI/UX Designer",
+    "role3": "Product Builder",
+    "description": "I craft digital experiences that blend elegant design with powerful engineering. From pixel-perfect interfaces to scalable backends — I build products that people love.",
+    "cta_work": "View My Work",
+    "cta_contact": "Let's Talk",
+    "available": "Available for new projects",
+    "years": "3+",
+    "years_label": "Years Experience",
+    "projects_count": "25+",
+    "projects_label": "Projects Delivered",
+    "clients": "15+",
+    "clients_label": "Happy Clients"
+  },
+  "about": {
+    "label": "About Me",
+    "title": "Bridging Design & Engineering",
+    "bio1": "I'm a Full Stack Developer and UI/UX Designer with 3+ years of experience building products that users actually enjoy using. I believe the best digital products are born at the intersection of clean code and thoughtful design.",
+    "bio2": "Based in Lebanon, I work with startups and companies across the MENA region and beyond, helping them turn ideas into scalable, beautiful digital products.",
+    "bio3": "When I'm not coding or designing, I'm exploring new technologies, contributing to open source, and mentoring junior developers.",
+    "download_cv": "Download CV",
+    "fact1_title": "Clean Code",
+    "fact1_desc": "I write maintainable, scalable code following best practices.",
+    "fact2_title": "Design-Driven",
+    "fact2_desc": "Every pixel matters. I obsess over user experience and visual details.",
+    "fact3_title": "Fast Delivery",
+    "fact3_desc": "I respect deadlines and deliver production-ready work on time.",
+    "fact4_title": "Full Ownership",
+    "fact4_desc": "From design to deployment, I handle the full product lifecycle."
+  },
+  "skills": {
+    "label": "My Skills",
+    "title": "What I Work With",
+    "subtitle": "A carefully chosen stack for building modern, scalable products",
+    "frontend": "Frontend",
+    "backend": "Backend",
+    "design": "Design & Tools",
+    "databases": "Databases & Cloud"
+  },
+  "projects": {
+    "label": "Projects",
+    "title": "Selected Work",
+    "subtitle": "Real products built for real users — each project solves a genuine problem",
+    "view_live": "Live Demo",
+    "view_code": "GitHub",
+    "view_all": "View All Projects"
+  },
+  "experience": {
+    "label": "Experience",
+    "title": "Career Journey",
+    "subtitle": "Building products across industries and geographies",
+    "present": "Present"
+  },
+  "contact": {
+    "label": "Contact",
+    "title": "Let's Build Something",
+    "subtitle": "Have a project in mind? I'd love to hear about it.",
+    "name": "Your Name",
+    "email": "Your Email",
+    "subject": "Subject",
+    "message": "Your Message",
+    "send": "Send Message",
+    "sending": "Sending...",
+    "success": "Message sent! I will reply within 24 hours.",
+    "error": "Something went wrong. Please try again.",
+    "or_reach": "Or reach me directly",
+    "response_time": "Usually responds within 24 hours",
+    "location": "Beirut, Lebanon",
+    "location_label": "Location"
+  },
+  "footer": {
+    "built": "Built with Next.js by Ahmed Al-Rashidi",
+    "rights": "All rights reserved."
+  }
+}
