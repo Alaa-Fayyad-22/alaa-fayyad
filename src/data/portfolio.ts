@@ -87,40 +87,40 @@ export const projects = [
 
 export const experiences = [
   {
-    role: "Senior Full Stack Developer",
-    roleAr: "مطوّر Full Stack أول",
-    company: "TechVentures MENA",
-    companyAr: "تك فنتشرز الشرق الأوسط",
-    period: "2023 – Present",
-    periodAr: "2023 – حتى الآن",
-    description: "Lead engineer on a team of 5, architecting and building core product features for a B2B SaaS platform serving 500+ companies. Reduced load time by 60% through performance optimizations.",
-    descriptionAr: "مهندس رئيسي في فريق مكوّن من 5 أشخاص، أصمم وأبني الميزات الأساسية لمنصة SaaS تخدم أكثر من 500 شركة. خفّضت زمن التحميل بنسبة 60% عبر تحسينات الأداء.",
-    tech: ["Next.js", "TypeScript", "PostgreSQL", "AWS", "Docker"],
+    role: "Python / Web Developer",
+    roleAr: "مطوّر Python",
+    company: "Softech S.A.R.L.",
+    companyAr: "Softech S.A.R.L.",
+    period: "January 2024 – Present",
+    periodAr: "يناير 2024 – حتى الآن",
+    description: "Developed and maintained backend services using Python with Django and Flask. Designed and integrated RESTful and third-party APIs. Automated data processing, validation, and scraping workflows. Collaborated with cross-functional teams to deliver scalable web applications.",
+    descriptionAr: "طوّرت وصنت خدمات الواجهة الخلفية باستخدام Python مع Django و Flask. صمّمت ودمجت RESTful APIs وواجهات برمجية خارجية. أتمتت سير عمل معالجة البيانات والتحقق منها وجمعها. تعاونت مع الفرق لتسليم تطبيقات ويب قابلة للتوسع.",
+    tech: ["Python", "Django", "Flask", "REST APIs", "Web Scraping"],
     type: "full-time"
-  },
+},
   {
-    role: "UI/UX Designer & Frontend Developer",
-    roleAr: "مصمم UI/UX ومطوّر Frontend",
-    company: "Creative Studio LB",
-    companyAr: "كريتيف ستوديو لبنان",
-    period: "2022 – 2023",
-    periodAr: "2022 – 2023",
-    description: "Designed and developed 12+ client projects across various industries. Established design system and component library used across all projects, reducing development time by 40%.",
-    descriptionAr: "صمّمت وطوّرت أكثر من 12 مشروعاً للعملاء في قطاعات متنوعة. أنشأت نظام تصميم ومكتبة مكوّنات استُخدمت في جميع المشاريع مما قلّص وقت التطوير بنسبة 40%.",
-    tech: ["React", "Figma", "Node.js", "MongoDB", "Tailwind CSS"],
+    role: "Web Developer & UI/UX Designer",
+    roleAr: "مطوّر ومصمم UI/UX",
+    company: "Freelance",
+    companyAr: "عمل حر",
+    period: "January 2022 – Present",
+    periodAr: "يناير 2022 – حتى الآن",
+    description: "Independently designed and developed full-stack web applications from concept to production-ready state. Built a personal design system and reusable component library, ensuring consistency and efficiency across all projects.",
+    descriptionAr: "صمّمت وطوّرت تطبيقات ويب متكاملة بشكل مستقل من الفكرة حتى مرحلة الإنتاج. بنيت نظام تصميم خاص ومكتبة مكوّنات قابلة لإعادة الاستخدام لضمان الاتساق والكفاءة في جميع المشاريع.",
+    tech: ["Next.js", "Figma", "C# ASP.NET", "PostgreSQL", "MySQL", "Laravel"],
     type: "full-time"
   },
   {
     role: "Junior Web Developer",
     roleAr: "مطوّر ويب مبتدئ",
-    company: "Freelance",
-    companyAr: "عمل حر",
-    period: "2021 – 2022",
-    periodAr: "2021 – 2022",
-    description: "Built and delivered 10+ websites and web applications for small businesses and entrepreneurs. Specialized in responsive design, WordPress development, and custom React applications.",
-    descriptionAr: "بنيت وسلّمت أكثر من 10 مواقع وتطبيقات ويب للشركات الصغيرة والمؤسسين. تخصّصت في التصميم المتجاوب وتطوير WordPress وتطبيقات React المخصصة.",
-    tech: ["React", "WordPress", "PHP", "MySQL", "CSS3"],
-    type: "freelance"
+    company: "Multiframes S.A.R.L",
+    companyAr: "Multiframes S.A.R.L",
+    period: "February 2023 – August 2023",
+    periodAr: "فبراير 2023 – أغسطس 2023",
+    description: "Contributed to the development and maintenance of web applications using C# and ASP.NET for back-end functionality. Implemented front-end updates with HTML and CSS, and managed databases via phpMyAdmin. Handled data entry and content management through a CMS to ensure data accuracy and streamline operations.",
+    descriptionAr: "أسهمت في تطوير وصيانة تطبيقات الويب باستخدام C# و ASP.NET للواجهة الخلفية. نفّذت تحديثات الواجهة الأمامية بـ HTML و CSS، وأدرت قواعد البيانات عبر phpMyAdmin. تولّيت إدخال البيانات وإدارة المحتوى عبر نظام CMS لضمان دقة البيانات وتسهيل العمليات.",
+    tech: ["C#", "ASP.NET", "MySQL", "HTML", "CSS"],
+    type: "full-time"
   }
 ];
 
@@ -132,7 +132,7 @@ export const skillCategories = [
       { name: "TypeScript", level: 88 },
       { name: "Tailwind CSS", level: 95 },
       { name: "React Native", level: 78 },
-      { name: "Framer Motion", level: 82 }
+      { name: "JavaScript", level: 82 }
     ]
   },
   {
@@ -141,8 +141,8 @@ export const skillCategories = [
       { name: "Node.js / Express", level: 88 },
       { name: "Python / FastAPI", level: 80 },
       { name: "REST APIs", level: 92 },
-      { name: "GraphQL", level: 75 },
-      { name: "WebSockets", level: 78 }
+      { name: "Laravel", level: 75 },
+      { name: "ASP.NET", level: 78 }
     ]
   },
   {
@@ -160,7 +160,7 @@ export const skillCategories = [
     skills: [
       { name: "PostgreSQL", level: 85 },
       { name: "MongoDB", level: 82 },
-      { name: "Redis", level: 75 },
+      { name: "MySQL", level: 75 },
       { name: "AWS / Vercel", level: 80 },
       { name: "Docker", level: 72 }
     ]

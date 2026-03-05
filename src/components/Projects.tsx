@@ -3,142 +3,156 @@ import { useTranslation } from '../hooks/useTranslation';
 import { projects } from '../data/portfolio';
 import { ExternalLink, Github, ArrowRight } from 'lucide-react';
 
-const categories = ['all', 'web', 'mobile', 'design'] as const;
+const categories = ['all','web','mobile','design'] as const;
 type Category = typeof categories[number];
+
+const projectColors: Record<string, string> = {
+  'from-violet-500 to-indigo-600':  'linear-gradient(135deg,#7c3aed,#4f46e5)',
+  'from-blue-500 to-cyan-600':      'linear-gradient(135deg,#3b82f6,#0891b2)',
+  'from-emerald-500 to-teal-600':   'linear-gradient(135deg,#10b981,#0d9488)',
+  'from-orange-500 to-pink-600':    'linear-gradient(135deg,#f97316,#db2777)',
+  'from-pink-500 to-rose-600':      'linear-gradient(135deg,#ec4899,#e11d48)',
+  'from-amber-500 to-orange-600':   'linear-gradient(135deg,#f59e0b,#ea580c)',
+};
 
 export default function Projects() {
   const { t, isRTL } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
-  const [activeFilter, setActiveFilter] = useState<Category>('all');
-  const [hoveredId, setHoveredId] = useState<number | null>(null);
+  const [filter, setFilter] = useState<Category>('all');
+  const [hovered, setHovered] = useState<number|null>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('revealed'); });
-    }, { threshold: 0.05 });
+    const observer = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('revealed'); }),
+      { threshold: 0.05 }
+    );
     ref.current?.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
-  const filtered = activeFilter === 'all'
-    ? projects
-    : projects.filter(p => p.category === activeFilter);
-
-  const filterLabels: Record<Category, string> = {
-    all: isRTL ? 'الكل' : 'All',
-    web: isRTL ? 'تطبيقات ويب' : 'Web Apps',
-    mobile: isRTL ? 'موبايل' : 'Mobile',
-    design: isRTL ? 'تصميم' : 'Design',
+  const ar: React.CSSProperties = isRTL ? { fontFamily: 'Cairo, sans-serif' } : {};
+  const filtered = filter === 'all' ? projects : projects.filter(p => p.category === filter);
+  const labels: Record<Category,string> = {
+    all: isRTL?'الكل':'All', web: isRTL?'تطبيقات ويب':'Web Apps',
+    mobile: isRTL?'موبايل':'Mobile', design: isRTL?'تصميم':'Design',
   };
 
   return (
-    <section id="projects" ref={ref} className="py-32 relative" dir={isRTL ? 'rtl' : 'ltr'}>
+    <section id="projects" ref={ref} dir={isRTL ? 'rtl' : 'ltr'}
+      style={{ padding:'96px 0', background:'var(--bg)', color:'var(--text)', position:'relative' }}>
 
-      {/* bg glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute w-96 h-96 rounded-full opacity-10 blur-[120px]"
-          style={{ background: 'radial-gradient(circle, #6366f1, transparent)', bottom: '10%', left: '-5%' }} />
+      <div style={{ position:'absolute', inset:0, overflow:'hidden', pointerEvents:'none' }}>
+        <div style={{ position:'absolute', width:500, height:500, borderRadius:'50%',
+          background:'radial-gradient(circle, rgba(99,102,241,0.1), transparent)',
+          filter:'blur(100px)', bottom:'10%', left:'-5%' }} />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-6">
-        {/* Header */}
-        <div className="reveal text-center mb-4">
-          <span className="text-xs font-mono uppercase tracking-widest" style={{ color: 'var(--primary)' }}>
+      <div style={{ maxWidth:1200, margin:'0 auto', padding:'0 24px', position:'relative' }}>
+
+        <div className="reveal" style={{ textAlign:'center', marginBottom:8 }}>
+          <div className="reveal" style={{ textAlign: 'center', marginBottom: 8 }}>
+          <span style={{ fontSize: '1rem', fontWeight:1000, fontFamily: 'bold', letterSpacing: '0.05em',
+            textTransform: 'uppercase', color: 'var(--primary)' }}>
             {t.projects.label}
           </span>
         </div>
-        <h2 className="reveal font-display font-bold text-4xl md:text-5xl text-center mb-4 gradient-text"
-          style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif' }}>
-          {t.projects.title}
-        </h2>
-        <p className="reveal text-center mb-10 max-w-xl mx-auto"
-          style={{ color: 'var(--text-muted)', fontFamily: isRTL ? 'Cairo, sans-serif' : undefined }}>
-          {t.projects.subtitle}
-        </p>
+
+        </div>
+        <h2 className="reveal gradient-text" style={{
+          textAlign:'center', marginBottom:12,
+          fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif',
+          fontWeight:800, fontSize:'clamp(1.8rem,4vw,3rem)',
+        }}>{t.projects.title}</h2>
+        <p className="reveal" style={{ textAlign:'center', marginBottom:40,
+          color:'var(--text-muted)', ...ar }}>{t.projects.subtitle}</p>
 
         {/* Filters */}
-        <div className="reveal flex flex-wrap justify-center gap-3 mb-12">
+        <div className="reveal" style={{ display:'flex', flexWrap:'wrap',
+          justifyContent:'center', gap:10, marginBottom:48 }}>
           {categories.map(cat => (
-            <button key={cat} onClick={() => setActiveFilter(cat)}
-              className="px-5 py-2 rounded-full text-sm font-medium transition-all"
-              style={{
-                fontFamily: isRTL ? 'Cairo, sans-serif' : undefined,
-                background: activeFilter === cat ? 'var(--gradient)' : 'transparent',
-                color: activeFilter === cat ? 'white' : 'var(--text-muted)',
-                border: `1px solid ${activeFilter === cat ? 'transparent' : 'var(--border)'}`,
-              }}>
-              {filterLabels[cat]}
-            </button>
+            <button key={cat} onClick={() => setFilter(cat)} style={{
+              padding:'8px 22px', borderRadius:999, fontSize:'0.85rem',
+              fontWeight:600, cursor:'pointer', transition:'all 0.2s', ...ar,
+              background: filter===cat ? 'var(--gradient)' : 'var(--surface)',
+              color: filter===cat ? '#fff' : 'var(--text-muted)',
+              border: `1px solid ${filter===cat ? 'transparent' : 'var(--border)'}`,
+            }}>{labels[cat]}</button>
           ))}
         </div>
 
-        {/* Projects Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((project, i) => (
-            <div key={project.id}
-              className="reveal glass rounded-2xl overflow-hidden border hover:scale-[1.02] transition-all duration-300 group"
-              style={{ borderColor: 'var(--border)', animationDelay: `${i * 0.08}s` }}
-              onMouseEnter={() => setHoveredId(project.id)}
-              onMouseLeave={() => setHoveredId(null)}>
-
-              {/* Project image / gradient placeholder */}
-              <div className={`relative h-48 bg-gradient-to-br ${project.color} flex items-center justify-center overflow-hidden`}>
-                <div className="absolute inset-0 opacity-20"
-                  style={{ backgroundImage: 'radial-gradient(circle at 30% 40%, white 0%, transparent 60%)' }} />
-                <span className="text-5xl relative z-10 group-hover:scale-110 transition-transform duration-300">
-                  {project.category === 'web' ? '🌐' : project.category === 'mobile' ? '📱' : '🎨'}
+        {/* Grid */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))', gap:20 }}>
+          {filtered.map((p, i) => (
+            <div key={p.id} className="reveal"
+              style={{
+                borderRadius:20, overflow:'hidden',
+                background:'var(--surface)', border:'1px solid var(--border)',
+                transition:'transform 0.25s, box-shadow 0.25s',
+                animationDelay:`${i*0.07}s`,
+                transform: hovered===p.id ? 'translateY(-6px)' : 'translateY(0)',
+                boxShadow: hovered===p.id ? '0 16px 40px rgba(0,0,0,0.12)' : 'none',
+              }}
+              onMouseEnter={() => setHovered(p.id)}
+              onMouseLeave={() => setHovered(null)}
+            >
+              {/* Image */}
+              <div style={{ height:180, position:'relative',
+                background: projectColors[p.color] || 'linear-gradient(135deg,#6366f1,#a855f7)',
+                display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <span style={{ fontSize:48, position:'relative', zIndex:1 }}>
+                  {p.category==='web'?'🌐':p.category==='mobile'?'📱':'🎨'}
                 </span>
-
-                {/* Hover overlay */}
-                <div className={`absolute inset-0 flex items-center justify-center gap-4 transition-all duration-300 ${
-                  hoveredId === project.id ? 'opacity-100' : 'opacity-0'
-                }`} style={{ background: 'rgba(0,0,0,0.6)' }}>
-                  <a href={project.live} target="_blank" rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full bg-white flex items-center justify-center hover:scale-110 transition-transform">
-                    <ExternalLink size={16} className="text-gray-900" />
+                {/* hover overlay */}
+                <div style={{
+                  position:'absolute', inset:0, display:'flex',
+                  alignItems:'center', justifyContent:'center', gap:12,
+                  background:'rgba(0,0,0,0.55)',
+                  opacity: hovered===p.id ? 1 : 0,
+                  transition:'opacity 0.2s', zIndex:2,
+                }}>
+                  <a href={p.live} target="_blank" rel="noopener noreferrer"
+                    style={{ width:40, height:40, borderRadius:'50%', background:'#fff',
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      textDecoration:'none', color:'#111' }}>
+                    <ExternalLink size={16}/>
                   </a>
-                  <a href={project.github} target="_blank" rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-full bg-white flex items-center justify-center hover:scale-110 transition-transform">
-                    <Github size={16} className="text-gray-900" />
+                  <a href={p.github} target="_blank" rel="noopener noreferrer"
+                    style={{ width:40, height:40, borderRadius:'50%', background:'#fff',
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      textDecoration:'none', color:'#111' }}>
+                    <Github size={16}/>
                   </a>
                 </div>
               </div>
 
-              {/* Content */}
-              <div className="p-6">
-                <h3 className="font-display font-bold text-xl mb-2"
-                  style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif' }}>
-                  {isRTL ? project.titleAr : project.title}
+              {/* Body */}
+              <div style={{ padding:'20px 22px 22px' }}>
+                <h3 style={{ fontFamily: isRTL?'Cairo, sans-serif':'Syne, sans-serif',
+                  fontWeight:700, fontSize:'1.05rem', marginBottom:8, color:'var(--text)' }}>
+                  {isRTL ? p.titleAr : p.title}
                 </h3>
-                <p className="text-sm leading-relaxed mb-4"
-                  style={{ color: 'var(--text-muted)', fontFamily: isRTL ? 'Cairo, sans-serif' : undefined }}>
-                  {isRTL ? project.descriptionAr : project.description}
+                <p style={{ fontSize:'0.85rem', lineHeight:1.7, color:'var(--text-muted)',
+                  marginBottom:14, ...ar }}>
+                  {isRTL ? p.descriptionAr : p.description}
                 </p>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {project.tags.map(tag => (
-                    <span key={tag} className="px-2.5 py-1 rounded-full text-xs font-mono"
-                      style={{ background: 'var(--surface-2)', color: 'var(--primary)' }}>
-                      {tag}
-                    </span>
+                <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:16 }}>
+                  {p.tags.map(tag => (
+                    <span key={tag} style={{ fontSize:'0.7rem', fontFamily:'monospace',
+                      padding:'3px 10px', borderRadius:999,
+                      background:'var(--surface-2)', color:'var(--primary)',
+                      border:'1px solid var(--border)' }}>{tag}</span>
                   ))}
                 </div>
-
-                {/* Links */}
-                <div className="flex items-center gap-4">
-                  <a href={project.live} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-sm font-medium hover:opacity-100 transition-opacity group"
-                    style={{ color: 'var(--primary)' }}>
-                    <ExternalLink size={14} />
-                    {t.projects.view_live}
-                    <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                <div style={{ display:'flex', gap:20 }}>
+                  <a href={p.live} target="_blank" rel="noopener noreferrer"
+                    style={{ display:'flex', alignItems:'center', gap:4, fontSize:'0.82rem',
+                      fontWeight:600, color:'var(--primary)', textDecoration:'none', ...ar }}>
+                    <ExternalLink size={13}/> {t.projects.view_live} <ArrowRight size={12}/>
                   </a>
-                  <a href={project.github} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-sm font-medium transition-opacity"
-                    style={{ color: 'var(--text-muted)' }}>
-                    <Github size={14} />
-                    {t.projects.view_code}
+                  <a href={p.github} target="_blank" rel="noopener noreferrer"
+                    style={{ display:'flex', alignItems:'center', gap:4, fontSize:'0.82rem',
+                      color:'var(--text-muted)', textDecoration:'none', ...ar }}>
+                    <Github size={13}/> {t.projects.view_code}
                   </a>
                 </div>
               </div>
@@ -146,13 +160,15 @@ export default function Projects() {
           ))}
         </div>
 
-        {/* View all */}
-        <div className="reveal mt-12 text-center">
+        <div className="reveal" style={{ marginTop:48, textAlign:'center' }}>
           <a href="https://github.com" target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold glass border hover:scale-105 transition-all"
-            style={{ borderColor: 'var(--border)', fontFamily: isRTL ? 'Cairo, sans-serif' : undefined }}>
-            {t.projects.view_all}
-            <ArrowRight size={16} className={isRTL ? 'rotate-180' : ''} />
+            style={{ display:'inline-flex', alignItems:'center', gap:8,
+              padding:'12px 28px', borderRadius:999, fontWeight:600,
+              background:'var(--surface)', border:'1px solid var(--border)',
+              color:'var(--text)', textDecoration:'none', transition:'transform 0.2s', ...ar }}
+            onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.transform='scale(1.05)'}
+            onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.transform='scale(1)'}>
+            {t.projects.view_all} <ArrowRight size={15}/>
           </a>
         </div>
       </div>

@@ -5,20 +5,55 @@ export default function Footer() {
   const { t, isRTL } = useTranslation();
 
   return (
-    <footer className="py-8 border-t" style={{ borderColor: 'var(--border)' }} dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-        <p className="text-sm flex items-center gap-1.5" style={{ color: 'var(--text-muted)',
-          fontFamily: isRTL ? 'Cairo, sans-serif' : undefined }}>
-          {t.footer.built}
-          <Heart size={13} className="text-red-400 fill-red-400 inline mx-0.5" />
-          · © {new Date().getFullYear()} · {t.footer.rights}
-        </p>
-        <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="w-10 h-10 rounded-full glass border flex items-center justify-center hover:scale-110 hover:border-primary-400 transition-all"
-          style={{ borderColor: 'var(--border)' }}>
-          <ArrowUp size={16} style={{ color: 'var(--primary)' }} />
-        </button>
-      </div>
-    </footer>
+    <footer style={{
+  padding: '32px 0',
+  borderTop: '1px solid var(--border)',
+  background: 'var(--bg)',
+}} dir={isRTL ? 'rtl' : 'ltr'}>
+  <div style={{
+    maxWidth: 1280, margin: '0 auto', padding: '0 24px',
+    display: 'flex', flexWrap: 'wrap',
+    alignItems: 'center', justifyContent: 'center', gap: 16,
+  }}>
+    <p style={{
+      fontSize: '0.875rem', color: 'var(--text-muted)',
+      display: 'flex', alignItems: 'center', gap: 6,
+      fontFamily: isRTL ? 'Cairo, sans-serif' : undefined,
+      textAlign: 'center',
+    }}>
+      {t.footer.built}
+      · © {new Date().getFullYear()} · {t.footer.rights}
+    </p>
+    <button onClick={() => {
+  const start = document.documentElement.scrollTop;
+  const duration = 1000;
+  const startTime = performance.now();
+  const ease = (t: number) => t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+  const step = (now: number) => {
+    const progress = Math.min((now - startTime) / duration, 1);
+    document.documentElement.scrollTop = start * (1 - ease(progress));
+    if (progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}}
+
+      style={{
+        width: 40, height: 40, borderRadius: '50%',
+        background: 'var(--surface)', border: '1px solid var(--border)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer', transition: 'transform 0.2s, border-color 0.2s',
+      }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.1)';
+        (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--primary)';
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
+        (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
+      }}>
+      <ArrowUp size={16} color="var(--primary)" />
+    </button>
+  </div>
+</footer>
   );
 }

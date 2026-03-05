@@ -3,11 +3,15 @@ import { useTranslation } from '../hooks/useTranslation';
 import { skillCategories } from '../data/portfolio';
 
 const techIcons: Record<string, string> = {
-  'React / Next.js': '⚛️', 'TypeScript': '🔷', 'Tailwind CSS': '🎨', 'React Native': '📱',
-  'Framer Motion': '✨', 'Node.js / Express': '🟢', 'Python / FastAPI': '🐍', 'REST APIs': '🔗',
-  'GraphQL': '◈', 'WebSockets': '⚡', 'Figma': '🎯', 'UI/UX Design': '🖌️',
-  'Design Systems': '🏗️', 'Prototyping': '🔮', 'Adobe XD': '🎭', 'PostgreSQL': '🐘',
-  'MongoDB': '🍃', 'Redis': '🔴', 'AWS / Vercel': '☁️', 'Docker': '🐳',
+  'React / Next.js':'⚛️','TypeScript':'🔷','Tailwind CSS':'🎨','React Native':'📱',
+  'Framer Motion':'✨','Node.js / Express':'🟢','Python / FastAPI':'🐍','REST APIs':'🔗',
+  'GraphQL':'◈','WebSockets':'⚡','Figma':'🎯','UI/UX Design':'🖌️',
+  'Design Systems':'🏗️','Prototyping':'🔮','Adobe XD':'🎭','PostgreSQL':'🐘',
+  'MongoDB':'🍃','Redis':'🔴','AWS / Vercel':'☁️','Docker':'🐳',
+};
+
+const catColors: Record<string, string> = {
+  frontend:'#6366f1', backend:'#10b981', design:'#ec4899', databases:'#f59e0b',
 };
 
 export default function Skills() {
@@ -15,97 +19,84 @@ export default function Skills() {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('revealed');
-          // Animate skill bars
-          e.target.querySelectorAll('.skill-bar-fill').forEach((bar) => {
-            bar.classList.add('animated');
-          });
-        }
-      });
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('revealed'); });
     }, { threshold: 0.1 });
-
     ref.current?.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     return () => observer.disconnect();
   }, []);
 
-  const categoryLabels: Record<string, string> = {
-    frontend: t.skills.frontend,
-    backend: t.skills.backend,
-    design: t.skills.design,
-    databases: t.skills.databases,
-  };
-
-  const categoryColors: Record<string, string> = {
-    frontend: 'from-violet-500 to-indigo-600',
-    backend: 'from-emerald-500 to-teal-600',
-    design: 'from-pink-500 to-rose-600',
-    databases: 'from-orange-500 to-amber-600',
+  const ar: React.CSSProperties = isRTL ? { fontFamily: 'Cairo, sans-serif' } : {};
+  const labels: Record<string,string> = {
+    frontend: t.skills.frontend, backend: t.skills.backend,
+    design: t.skills.design, databases: t.skills.databases,
   };
 
   return (
-    <section id="skills" ref={ref} className="py-32 relative" dir={isRTL ? 'rtl' : 'ltr'}
-      style={{ background: 'var(--bg-secondary)' }}>
+    <section id="skills" ref={ref} dir={isRTL ? 'rtl' : 'ltr'}
+      style={{ padding: '96px 0', background: 'var(--bg-secondary)', color: 'var(--text)', position: 'relative' }}>
 
-      {/* bg decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute w-96 h-96 rounded-full opacity-10 blur-[100px]"
-          style={{ background: 'radial-gradient(circle, #a855f7, transparent)', top: '20%', right: '-5%' }} />
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', width: 500, height: 500, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(168,85,247,0.12), transparent)',
+          filter: 'blur(80px)', top: '10%', right: '-5%' }} />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-6">
-        {/* Header */}
-        <div className="reveal text-center mb-4">
-          <span className="text-xs font-mono uppercase tracking-widest" style={{ color: 'var(--primary)' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', position: 'relative' }}>
+
+        <div className="reveal" style={{ textAlign: 'center', marginBottom: 8 }}>
+          <span style={{ fontSize: '1rem', fontWeight:1000, fontFamily: 'bold', letterSpacing: '0.05em',
+            textTransform: 'uppercase', color: 'var(--primary)' }}>
             {t.skills.label}
           </span>
         </div>
-        <h2 className="reveal font-display font-bold text-4xl md:text-5xl text-center mb-4 gradient-text"
-          style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif' }}>
-          {t.skills.title}
-        </h2>
-        <p className="reveal text-center mb-16 max-w-xl mx-auto"
-          style={{ color: 'var(--text-muted)', fontFamily: isRTL ? 'Cairo, sans-serif' : undefined }}>
-          {t.skills.subtitle}
-        </p>
 
-        {/* Skills Grid */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <h2 className="reveal gradient-text" style={{
+          textAlign: 'center', marginBottom: 12,
+          fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif',
+          fontWeight: 800, fontSize: 'clamp(1.8rem,4vw,3rem)',
+        }}>{t.skills.title}</h2>
+        <p className="reveal" style={{ textAlign: 'center',
+          color: 'var(--text-muted)', maxWidth: 520, margin: '0 auto 56px', ...ar }}>{t.skills.subtitle}</p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px,1fr))', gap: 20 }}>
           {skillCategories.map((cat, ci) => (
-            <div key={cat.key} className="reveal glass rounded-2xl p-6 border"
-              style={{ borderColor: 'var(--border)', animationDelay: `${ci * 0.1}s` }}>
-
+            <div key={cat.key} className="reveal" style={{
+              padding: '28px', borderRadius: 20,
+              background: 'var(--surface)', border: '1px solid var(--border)',
+              animationDelay: `${ci * 0.1}s`,
+            }}>
               {/* Category header */}
-              <div className="flex items-center gap-3 mb-6">
-                <div className={`w-2 h-6 rounded-full bg-gradient-to-b ${categoryColors[cat.key]}`} />
-                <h3 className="font-display font-bold text-lg"
-                  style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif' }}>
-                  {categoryLabels[cat.key]}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
+                <div style={{ width: 4, height: 22, borderRadius: 2, background: catColors[cat.key] }} />
+                <h3 style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif',
+                  fontWeight: 700, fontSize: '1rem', color: 'var(--text)' }}>
+                  {labels[cat.key]}
                 </h3>
               </div>
 
-              {/* Skills */}
-              <div className="space-y-4">
+              {/* Skills as tags */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                 {cat.skills.map((skill, si) => (
-                  <div key={si}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-base">{techIcons[skill.name] || '⚙️'}</span>
-                        <span className="text-sm font-medium"
-                          style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : undefined }}>
-                          {skill.name}
-                        </span>
-                      </div>
-                      <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
-                        {skill.level}%
-                      </span>
-                    </div>
-                    <div className="skill-bar">
-                      <div className="skill-bar-fill"
-                        style={{ width: `${skill.level}%` }} />
-                    </div>
+                  <div key={si} style={{
+                    display: 'flex', alignItems: 'center', gap: 7,
+                    padding: '8px 14px', borderRadius: 999,
+                    background: 'var(--surface-2)', border: '1px solid var(--border)',
+                    transition: 'transform 0.2s, border-color 0.2s',
+                    cursor: 'default',
+                  }}
+                    onMouseEnter={e => {
+                      (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+                      (e.currentTarget as HTMLDivElement).style.borderColor = catColors[cat.key];
+                    }}
+                    onMouseLeave={e => {
+                      (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
+                      (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border)';
+                    }}
+                  >
+                    <span style={{ fontSize: '0.9rem' }}>{techIcons[skill.name] || '⚙️'}</span>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 500,
+                      color: 'var(--text)', ...ar }}>{skill.name}</span>
                   </div>
                 ))}
               </div>
@@ -113,18 +104,18 @@ export default function Skills() {
           ))}
         </div>
 
-        {/* Tech logo cloud */}
-        <div className="reveal mt-16 text-center">
-          <p className="text-sm mb-6" style={{ color: 'var(--text-muted)',
-            fontFamily: isRTL ? 'Cairo, sans-serif' : undefined }}>
+        {/* Also working with */}
+        <div className="reveal" style={{ marginTop: 56, textAlign: 'center' }}>
+          <p style={{ fontSize: '1.02rem', marginBottom: 16, color: 'var(--text-muted)', ...ar }}>
             {isRTL ? 'أعمل أيضاً مع' : 'Also working with'}
           </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {['Git', 'Linux', 'Nginx', 'CI/CD', 'Tailwind', 'Prisma', 'Zustand', 'React Query', 'Zod', 'Jest'].map(tech => (
-              <span key={tech} className="px-4 py-2 rounded-full text-sm glass border"
-                style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
-                {tech}
-              </span>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 10 }}>
+            {['Git', 'Supabase', 'PostgreSQL', 'MySQL', 'phpMyAdmin', 'CMS', 'API Integration', 'Data Automation', 'Web Scraping'].map(tech => (
+              <span key={tech} style={{
+                padding: '6px 16px', borderRadius: 999, fontSize: '0.8rem',
+                background: 'var(--surface)', border: '1px solid var(--border)',
+                color: 'var(--text-muted)',
+              }}>{tech}</span>
             ))}
           </div>
         </div>

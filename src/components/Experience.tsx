@@ -30,12 +30,13 @@ export default function Experience() {
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px' }}>
 
         {/* ── Header ── */}
-        <div className="reveal" style={{ textAlign: 'center', marginBottom: '8px' }}>
-          <span style={{ fontSize: '0.7rem', fontFamily: 'monospace', letterSpacing: '0.15em',
+        <div className="reveal" style={{ textAlign: 'center', marginBottom: 8 }}>
+          <span style={{ fontSize: '1rem', fontWeight:1000, fontFamily: 'bold', letterSpacing: '0.05em',
             textTransform: 'uppercase', color: 'var(--primary)' }}>
             {t.experience.label}
           </span>
         </div>
+
         <h2
           className="reveal gradient-text"
           style={{

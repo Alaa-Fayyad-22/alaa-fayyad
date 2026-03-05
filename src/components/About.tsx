@@ -31,7 +31,7 @@ export default function About() {
 
         {/* Label */}
         <div className="reveal" style={{ textAlign: 'center', marginBottom: 8 }}>
-          <span style={{ fontSize: '0.7rem', fontFamily: 'monospace', letterSpacing: '0.15em',
+          <span style={{ fontSize: '1rem', fontWeight:1000, fontFamily: 'bold', letterSpacing: '0.05em',
             textTransform: 'uppercase', color: 'var(--primary)' }}>
             {t.about.label}
           </span>

@@ -15,6 +15,13 @@ export default function Document() {
           img, video { max-width: 100%; display: block; }
           input, button, textarea, select { font: inherit; }
 
+          * {
+              -webkit-user-select: none;
+              -moz-user-select: none;
+              -ms-user-select: none;
+              user-select: none;
+            }
+
           html {
             scroll-behavior: smooth !important;
             -webkit-font-smoothing: antialiased;
@@ -41,7 +48,7 @@ export default function Document() {
             background-color: var(--bg);
             color: var(--text);
             transition: background-color 0.3s ease, color 0.3s ease;
-            overflow-x: hidden;
+            overflow-x: clip;
           }
 
           ::-webkit-scrollbar { width: 6px; }
@@ -106,7 +113,7 @@ export default function Document() {
             height: 6px;
             border-radius: 3px;
             background: var(--border);
-            overflow: hidden;
+            overflow: clip;
           }
           .skill-bar-fill {
             height: 100%;
