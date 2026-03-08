@@ -24,7 +24,7 @@ export default function Document() {
 
           html {
             scroll-behavior: smooth !important;
-            -webkit-font-smoothing: antialiased;
+            -webkit-font-smoothing: smooth;
           }
 
           :root {
@@ -49,6 +49,7 @@ export default function Document() {
             color: var(--text);
             transition: background-color 0.3s ease, color 0.3s ease;
             overflow-x: clip;
+            -webkit-overflow-scrolling: touch;
           }
 
           ::-webkit-scrollbar { width: 6px; }
