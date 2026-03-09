@@ -10,6 +10,7 @@ import Contact from '../components/Contact';
 import Footer from '../components/Footer';
 import CustomCursor from '../components/CustomCursor';
 import { useTranslation } from '../hooks/useTranslation';
+import { Analytics } from "@vercel/analytics/next"
 
 export default function Home() {
   const { isRTL, locale } = useTranslation();
@@ -44,6 +45,8 @@ export default function Home() {
         </main>
         <Footer />
       </div>
+      
+    <Analytics/>
     </>
   );
 }

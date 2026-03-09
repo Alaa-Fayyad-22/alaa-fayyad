@@ -6,13 +6,11 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 
 async function validateEmail(email: string): Promise<string | null> {
-  // Level 1 — format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) return 'Invalid email format';
 
   const domain = email.split('@')[1].toLowerCase();
 
-  // Level 2 — disposable/fake domains
   const blocked = [
     'mailinator.com','guerrillamail.com','tempmail.com','throwaway.email',
     'fakeinbox.com','sharklasers.com','yopmail.com','trashmail.com',
@@ -21,7 +19,6 @@ async function validateEmail(email: string): Promise<string | null> {
   ];
   if (blocked.includes(domain)) return 'Please use a real email address';
 
-  // Level 3 — DNS MX check
   try {
     const records = await dns.resolveMx(domain);
     if (!records || records.length === 0) return 'Email domain does not exist';
@@ -31,7 +28,6 @@ async function validateEmail(email: string): Promise<string | null> {
 
   return null;
 }
-
 
 async function getGeoData(ip: string) {
   try {
@@ -50,10 +46,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (!name || !email || !details)
     return res.status(400).json({ error: 'Required fields missing' });
 
-    const emailError = await validateEmail(email);
+  const emailError = await validateEmail(email);
   if (emailError) return res.status(400).json({ error: emailError });
-
-
 
   const ip =
     req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
@@ -78,7 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     await resend.emails.send({
-      from: `${name} <${email}>`,
+      from: `${name} <onboarding@resend.dev>`,
       to: 'alaafayyadp1@gmail.com',
       replyTo: email,
       subject: `[Quote Request] ${projectType || 'New Project'} — ${name}`,
