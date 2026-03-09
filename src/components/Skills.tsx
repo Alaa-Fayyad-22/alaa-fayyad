@@ -7,7 +7,10 @@ const techIcons: Record<string, string> = {
   'Framer Motion':'✨','Node.js / Express':'🟢','Python / FastAPI':'🐍','REST APIs':'🔗',
   'GraphQL':'◈','WebSockets':'⚡','Figma':'🎯','UI/UX Design':'🖌️',
   'Design Systems':'🏗️','Prototyping':'🔮','Adobe XD':'🎭','PostgreSQL':'🐘',
-  'MongoDB':'🍃','Redis':'🔴','AWS / Vercel':'☁️','Docker':'🐳',
+  'MongoDB':'🍃','Redis':'🔴','AWS / Vercel':'☁️','Docker':'🐳', 
+  'C# / ASP.NET': '🔵', 
+  'JavaScript': '🟡',
+  'MySQL': '🗄️',
 };
 
 const catColors: Record<string, string> = {

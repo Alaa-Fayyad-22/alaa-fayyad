@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
-import { Download, Code2, Palette, Zap, Package } from 'lucide-react';
+import { Download, Code2, Palette, Zap, Package, View, Eye } from 'lucide-react';
 
 export default function About() {
   const { t, isRTL } = useTranslation();
@@ -109,7 +109,7 @@ export default function About() {
               {/* View button */}
               <a href="/Alaa_Fayyad_Resume.pdf" target="_blank" rel="noopener noreferrer"
                 className="btn-outline" style={{ ...ar, width: 'fit-content' }}>
-                <Download size={16} />
+                <Eye size={16} />
                 {isRTL ? 'عرض السيرة الذاتية' : 'View CV'}
               </a>
               {/* Download button */}
