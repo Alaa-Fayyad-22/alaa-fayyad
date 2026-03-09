@@ -3,17 +3,20 @@ import { useTranslation } from '../hooks/useTranslation';
 import { Menu, X } from 'lucide-react';
 
 function smoothScroll(id: string) {
-  const scrollEl = document.documentElement.scrollTop > 0
-    ? document.documentElement
-    : document.body;
+  const getScroll = () =>
+    window.pageYOffset !== undefined
+      ? window.pageYOffset
+      : (document.documentElement || document.body).scrollTop;
+
+  const currentScroll = getScroll();
 
   const target = id === 'top' ? 0 : (() => {
     const el = document.getElementById(id);
     if (!el) return 0;
-    return el.getBoundingClientRect().top + scrollEl.scrollTop - 72;
+    return el.getBoundingClientRect().top + currentScroll - 72;
   })();
 
-  const start = scrollEl.scrollTop;
+  const start = currentScroll;
   const distance = target - start;
   const duration = 800;
   const startTime = performance.now();
@@ -22,12 +25,14 @@ function smoothScroll(id: string) {
 
   function step(now: number) {
     const progress = Math.min((now - startTime) / duration, 1);
-    scrollEl.scrollTop = start + distance * ease(progress);
+    const newPos = start + distance * ease(progress);
+    window.scrollTo({ top: newPos, behavior: 'instant' } as any);
     if (progress < 1) requestAnimationFrame(step);
   }
 
   requestAnimationFrame(step);
 }
+
 
 export default function Navbar() {
   const { t, locale, isRTL, toggleLocale } = useTranslation();
