@@ -43,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     await resend.emails.send({
-      from: `${name} <onboarding@resend.dev>`,
+      from: `${name} <${email}>`,
       to: 'alaafayyadp1@gmail.com',
       replyTo: email,
       subject: `[Quote Request] ${projectType || 'New Project'} — ${name}`,
