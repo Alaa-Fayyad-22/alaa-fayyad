@@ -25,13 +25,16 @@ export default function Footer() {
       · © {new Date().getFullYear()} · {t.footer.rights}
     </p>
     <button onClick={() => {
-  const start = document.documentElement.scrollTop;
-  const duration = 1000;
+  const scrollEl = document.documentElement.scrollTop > 0
+    ? document.documentElement
+    : document.body;
+  const start = scrollEl.scrollTop;
+  const duration = 800;
   const startTime = performance.now();
   const ease = (t: number) => t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
   const step = (now: number) => {
     const progress = Math.min((now - startTime) / duration, 1);
-    document.documentElement.scrollTop = start * (1 - ease(progress));
+    scrollEl.scrollTop = start * (1 - ease(progress));
     if (progress < 1) requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
