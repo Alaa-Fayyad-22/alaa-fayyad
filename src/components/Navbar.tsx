@@ -3,23 +3,24 @@ import { useTranslation } from '../hooks/useTranslation';
 import { Menu, X } from 'lucide-react';
 
 function smoothScroll(id: string) {
-  const start = document.documentElement.scrollTop;
   const target = id === 'top' ? 0 : (() => {
     const el = document.getElementById(id);
     if (!el) return 0;
     return el.getBoundingClientRect().top + document.documentElement.scrollTop - 72;
   })();
-  const duration = id === 'top' ? 3000 : 800;
+
+  const start = document.documentElement.scrollTop || document.body.scrollTop;
+  const distance = target - start;
+  const duration = 800;
   const startTime = performance.now();
 
-  function ease(t: number) {
-    return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-  }
+  const ease = (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 
-  function step(currentTime: number) {
-    const elapsed = currentTime - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    document.documentElement.scrollTop = start + (target - start) * ease(progress);
+  function step(now: number) {
+    const progress = Math.min((now - startTime) / duration, 1);
+    const value = start + distance * ease(progress);
+    document.documentElement.scrollTop = value;
+    document.body.scrollTop = value; // iOS Safari fix
     if (progress < 1) requestAnimationFrame(step);
   }
 
