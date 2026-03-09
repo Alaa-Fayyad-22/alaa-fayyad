@@ -27,7 +27,8 @@ export default function Home() {
         <title>Alaa Fayyad | Full Stack Developer & UI/UX Designer</title>
         <meta name="description" content="Portfolio of Alaa Fayyad — Full Stack Developer and UI/UX Designer" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        {/* <link rel="icon" href="/favicon.ico" /> */}
+        <link rel="icon" href="/favicon.png" style={{ borderRadius: '100%' }} />
       </Head>
 
       <div>
