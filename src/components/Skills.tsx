@@ -113,7 +113,7 @@ export default function Skills() {
             {isRTL ? 'أعمل أيضاً مع' : 'Also working with'}
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 10 }}>
-            {['Git', 'Supabase', 'MySQL', 'CMS', 'API Integration', 'Data Automation', 'Web Scraping'].map(tech => (
+            {['Git', 'Supabase', 'CMS', 'API Integration', 'Data Automation', 'Web Scraping'].map(tech => (
               <span key={tech} style={{
                 padding: '6px 16px', borderRadius: 999, fontSize: '0.8rem',
                 background: 'var(--surface)', border: '1px solid var(--border)',
