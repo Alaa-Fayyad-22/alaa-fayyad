@@ -82,13 +82,18 @@ export default function Contact() {
           filter: 'blur(100px)', top: 0, right: '20%' }} />
       </div>
 
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 24px', position: 'relative' }}>
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', width: 500, height: 500, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(168,85,247,0.12), transparent)',
+          filter: 'blur(80px)', top: '10%', right: '-5%' }} />
+      </div>
 
-        {/* Header */}
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', position: 'relative' }}>
+
         <div className="reveal" style={{ textAlign: 'center', marginBottom: 8 }}>
-          <span style={{ fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.12em',
-            textTransform: 'uppercase', color: 'var(--primary)', fontFamily: 'monospace' }}>
-            {t.contact.label}
+          <span style={{ fontSize: '1rem', fontWeight:1000, fontFamily: 'bold', letterSpacing: '0.05em',
+            textTransform: 'uppercase', color: 'var(--primary)' }}>
+            {t.skills.label}
           </span>
         </div>
         <h2 className="reveal gradient-text" style={{

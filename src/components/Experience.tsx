@@ -4,7 +4,7 @@ import { experiences } from '../data/portfolio';
 
 const typeColors: Record<string, { bg: string; text: string; label: string; labelAr: string }> = {
   'full-time': { bg: 'rgba(99,102,241,0.12)', text: '#818cf8', label: 'Full-time', labelAr: 'دوام كامل' },
-  'freelance':  { bg: 'rgba(168,85,247,0.12)', text: '#c084fc', label: 'Freelance',  labelAr: 'عمل حر'    },
+  'freelance':  { bg: 'rgba(168,85,247,0.12)', text: '#c084fc', label: 'Freelance',  labelAr: 'عمل حر' },
 };
 
 export default function Experience() {
@@ -12,54 +12,68 @@ export default function Experience() {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .exp-card-left {
+        opacity: 0;
+        transform: translateX(-60px);
+        transition: opacity 0.7s ease, transform 0.7s ease;
+      }
+      .exp-card-right {
+        opacity: 0;
+        transform: translateX(60px);
+        transition: opacity 0.7s ease, transform 0.7s ease;
+      }
+      .exp-card-left.revealed,
+      .exp-card-right.revealed {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    `;
+    document.head.appendChild(style);
+
     const observer = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('revealed'); }),
-      { threshold: 0.08 }
+      { threshold: 0.1 }
     );
-    ref.current?.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    return () => observer.disconnect();
+    ref.current?.querySelectorAll('.exp-card-left, .exp-card-right, .reveal').forEach(el => observer.observe(el));
+    return () => { observer.disconnect(); document.head.removeChild(style); };
   }, []);
 
   return (
-    <section
-      id="experience"
-      ref={ref}
-      dir={isRTL ? 'rtl' : 'ltr'}
-      style={{ padding: '96px 0', background: 'var(--bg-secondary)' }}
-    >
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '0 24px' }}>
+    <section id="experience" ref={ref} dir={isRTL ? 'rtl' : 'ltr'}
+      style={{ padding: '96px 0', background: 'var(--bg-secondary)' }}>
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', width: 500, height: 500, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(168,85,247,0.12), transparent)',
+          filter: 'blur(80px)', top: '10%', right: '-5%' }} />
+      </div>
 
-        {/* ── Header ── */}
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', position: 'relative' }}>
+
         <div className="reveal" style={{ textAlign: 'center', marginBottom: 8 }}>
           <span style={{ fontSize: '1rem', fontWeight:1000, fontFamily: 'bold', letterSpacing: '0.05em',
             textTransform: 'uppercase', color: 'var(--primary)' }}>
             {t.experience.label}
           </span>
         </div>
-
-        <h2
-          className="reveal gradient-text"
-          style={{
-            textAlign: 'center',
-            fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif',
-            fontWeight: 800, fontSize: 'clamp(2rem, 5vw, 3rem)',
-            marginBottom: '12px',
-          }}
-        >
+        <h2 className="reveal gradient-text" style={{
+          textAlign: 'center',
+          fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif',
+          fontWeight: 800, fontSize: 'clamp(2rem, 5vw, 3rem)',
+          marginBottom: '12px',
+        }}>
           {t.experience.title}
         </h2>
-        <p
-          className="reveal"
-          style={{
-            textAlign: 'center', color: 'var(--text-muted)',
-            fontFamily: isRTL ? 'Cairo, sans-serif' : undefined,
-            marginBottom: '64px', fontSize: '1rem',
-          }}
-        >
+        <p className="reveal" style={{
+          textAlign: 'center', color: 'var(--text-muted)',
+          fontFamily: isRTL ? 'Cairo, sans-serif' : undefined,
+          marginBottom: '64px', fontSize: '1rem',
+        }}>
           {t.experience.subtitle}
         </p>
 
-        {/* ── Timeline ── */}
+        {/* Timeline */}
         <div style={{ position: 'relative' }}>
 
           {/* Vertical line */}
@@ -74,17 +88,17 @@ export default function Experience() {
 
           {experiences.map((exp, i) => {
             const badge = typeColors[exp.type] ?? typeColors['full-time'];
+            // Alternate: even = left, odd = right (flip for RTL)
+            const fromLeft = isRTL ? i % 2 !== 0 : i % 2 === 0;
+            const animClass = fromLeft ? 'exp-card-left' : 'exp-card-right';
+
             return (
-              <div
-                key={i}
-                className="reveal"
-                style={{
-                  position: 'relative',
-                  paddingInlineStart: '60px',
-                  marginBottom: i < experiences.length - 1 ? '40px' : 0,
-                  animationDelay: `${i * 0.15}s`,
-                }}
-              >
+              <div key={i} className={animClass} style={{
+                position: 'relative',
+                paddingInlineStart: '60px',
+                marginBottom: i < experiences.length - 1 ? '40px' : 0,
+                transitionDelay: `${i * 0.1}s`,
+              }}>
                 {/* Dot */}
                 <div style={{
                   position: 'absolute',
@@ -98,14 +112,12 @@ export default function Experience() {
                 }} />
 
                 {/* Card */}
-                <div
-                  className="glass"
-                  style={{
-                    borderRadius: '20px',
-                    padding: '28px 32px',
-                    border: '1px solid var(--border)',
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                  }}
+                <div className="glass" style={{
+                  borderRadius: '20px',
+                  padding: '28px 32px',
+                  border: '1px solid var(--border)',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                }}
                   onMouseEnter={e => {
                     (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)';
                     (e.currentTarget as HTMLDivElement).style.boxShadow = '0 12px 40px rgba(99,102,241,0.15)';
@@ -115,7 +127,7 @@ export default function Experience() {
                     (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
                   }}
                 >
-                  {/* Top row: role + period */}
+                  {/* Top row */}
                   <div style={{
                     display: 'flex', alignItems: 'flex-start',
                     justifyContent: 'space-between', gap: '16px',
@@ -137,7 +149,7 @@ export default function Experience() {
                     </span>
                   </div>
 
-                  {/* Company + type badge */}
+                  {/* Company + badge */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', flexWrap: 'wrap' }}>
                     <span style={{
                       fontSize: '0.95rem', fontWeight: 600, color: 'var(--primary)',

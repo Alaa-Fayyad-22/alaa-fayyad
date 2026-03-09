@@ -32,7 +32,7 @@
     "title": "Bridging Design & Engineering",
     "bio1": "I'm a Full Stack Developer and UI/UX Designer with 3+ years of experience building products that users actually enjoy using. I believe the best digital products are born at the intersection of clean code and thoughtful design.",
     "bio2": "Based in Lebanon, I currently work as a Python and web developer, taking on freelance projects and building solutions across different industries.",
-    "bio3": "When I'm not coding or designing, I'm exploring new technologies, contributing to open source, and mentoring junior developers.",
+    "bio3": "When I'm not coding or designing, I'm exploring new technologies, diving into new frameworks, and constantly pushing to build better, faster, and smarter solutions.",
     "download_cv": "Download CV",
     "fact1_title": "Clean Code",
     "fact1_desc": "I write maintainable, well-structured code that scales with your project.",
@@ -84,7 +84,7 @@
     "location_label": "Location"
   },
   "footer": {
-    "built": "Built with Next.js by Alaa Fayyad",
+    "built": "Alaa Fayyad",
     "rights": "All rights reserved."
   }
 }
