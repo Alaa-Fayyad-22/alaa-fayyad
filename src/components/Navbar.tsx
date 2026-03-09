@@ -18,7 +18,7 @@ function smoothScroll(id: string) {
 
   const start = currentScroll;
   const distance = target - start;
-  const duration = 800;
+  const duration = 1000;
   const startTime = performance.now();
 
   const ease = (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;

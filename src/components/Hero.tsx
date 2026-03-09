@@ -138,9 +138,9 @@ export default function Hero() {
           display: 'flex', flexWrap: 'wrap', gap: 14,
           justifyContent: 'center', marginBottom: 56,
         }}>
-          <a href="#projects" className="btn-primary" style={{ ...ar }}>
+          {/* <a href="#projects" className="btn-primary" style={{ ...ar }}>
             {t.hero.cta_work}
-          </a>
+          </a> */}
           <a href="#contact" className="btn-outline" style={{ ...ar }}>
             {t.hero.cta_contact}
           </a>
