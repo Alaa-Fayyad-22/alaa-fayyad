@@ -134,7 +134,7 @@ export default function Contact() {
 
             {[
               { icon: Mail,   label: 'Email', value: 'alaafayyadp1@gmail.com', href: 'mailto:alaafayyadp1@gmail.com' },
-              { icon: MapPin, label: t.contact.location_label, value: t.contact.location, href: '#' },
+              { icon: MapPin, label: t.contact.location_label, value: t.contact.location },
             ].map(({ icon: Icon, label, value, href }) => (
               <a key={label} href={href} style={{ display: 'flex', alignItems: 'center',
                 gap: 14, textDecoration: 'none' }}>

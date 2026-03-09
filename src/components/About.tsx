@@ -85,15 +85,15 @@ export default function About() {
               </div> */}
 
               {/* Badge: technologies */}
-<div style={{ position: 'absolute', top: -8, left: -8, padding: '8px 14px',
-  borderRadius: 14, background: 'var(--surface)', border: '1px solid var(--border)',
-  textAlign: 'center' }}>
-  <div className="gradient-text" style={{ fontFamily: 'Syne, sans-serif',
-    fontWeight: 800, fontSize: '1.4rem' }}>10+</div>
-  <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', ...ar }}>
-    {isRTL ? 'تقنية' : 'Technologies'}
-  </div>
-</div>
+              <div style={{ position: 'absolute', top: -8, left: -8, padding: '8px 14px',
+                borderRadius: 14, background: 'var(--surface)', border: '1px solid var(--border)',
+                textAlign: 'center' }}>
+                <div className="gradient-text" style={{ fontFamily: 'Syne, sans-serif',
+                  fontWeight: 800, fontSize: '1.4rem' }}>10+</div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', ...ar }}>
+                  {isRTL ? 'تقنية' : 'Technologies'}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -105,8 +105,15 @@ export default function About() {
                 {bio}
               </p>
             ))}
-            <div style={{ marginTop: 8 }}>
-              <a href="/cv.pdf" download className="btn-primary" style={{ ...ar, width: 'fit-content' }}>
+            <div style={{ marginTop: 8, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              {/* View button */}
+              <a href="/Alaa_Fayyad_Resume.pdf" target="_blank" rel="noopener noreferrer"
+                className="btn-outline" style={{ ...ar, width: 'fit-content' }}>
+                <Download size={16} />
+                {isRTL ? 'عرض السيرة الذاتية' : 'View CV'}
+              </a>
+              {/* Download button */}
+              <a href="/Alaa_Fayyad_Resume.pdf" download className="btn-primary" style={{ ...ar, width: 'fit-content' }}>
                 <Download size={16} />
                 {t.about.download_cv}
               </a>
