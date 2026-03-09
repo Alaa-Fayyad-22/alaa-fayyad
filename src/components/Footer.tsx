@@ -22,7 +22,7 @@ export default function Footer() {
       textAlign: 'center',
     }}>
       {t.footer.built}
-      · © {new Date().getFullYear()} · {t.footer.rights}
+      · © {isRTL? new Date().getFullYear().toLocaleString('ar-EG') : new Date().getFullYear()} · {t.footer.rights}
     </p>
     <button onClick={() => {
   const getScroll = () => window.pageYOffset !== undefined

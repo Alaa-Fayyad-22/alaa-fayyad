@@ -10,6 +10,7 @@ export default function Document() {
           href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&family=Cairo:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
+        {new Date().getFullYear().toLocaleString('ar-EG')}
         <style dangerouslySetInnerHTML={{ __html: `
           *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
           img, video { max-width: 100%; display: block; }
@@ -209,7 +210,9 @@ export default function Document() {
 
           .animate-float { animation: float 6s ease-in-out infinite; }
           .animate-blink { animation: blink 1s step-end infinite; }
-        `}} />
+        `}}
+        
+        />
       </Head>
       <body>
         <Main />
