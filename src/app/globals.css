@@ -209,3 +209,10 @@ section[id] {
 /* RTL utilities */
 [dir="rtl"] .ltr-only { display: none; }
 [dir="ltr"] .rtl-only { display: none; }
+
+@media (pointer: coarse) {
+  .cursor-dot,
+  .cursor-ring {
+    display: none;
+  }
+}

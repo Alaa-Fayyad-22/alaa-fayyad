@@ -3,14 +3,14 @@ import { useTranslation } from '../hooks/useTranslation';
 import { skillCategories } from '../data/portfolio';
 
 const techIcons: Record<string, string> = {
-  'React / Next.js':'⚛️','TypeScript':'🔷','Tailwind CSS':'🎨','React Native':'📱',
-  'Framer Motion':'✨','Node.js / Express':'🟢','Python / FastAPI':'🐍','REST APIs':'🔗',
-  'GraphQL':'◈','WebSockets':'⚡','Figma':'🎯','UI/UX Design':'🖌️',
-  'Design Systems':'🏗️','Prototyping':'🔮','Adobe XD':'🎭','PostgreSQL':'🐘',
-  'MongoDB':'🍃','Redis':'🔴','AWS / Vercel':'☁️','Docker':'🐳', 
-  'C# / ASP.NET': '🔵', 
-  'JavaScript': '🟡',
-  'MySQL': '🗄️',
+  'React / Next.js':'','TypeScript':'','Tailwind CSS':'','React Native':'',
+  'Framer Motion':'','Node.js / Express':'','Python / FastAPI':'','REST APIs':'',
+  'GraphQL':'','WebSockets':'','Figma':'','UI/UX Design':'',
+  'Design Systems':'','Prototyping':'','Adobe XD':'','PostgreSQL':'',
+  'MongoDB':'','Redis':'','AWS / Vercel':'','Docker':'', 
+  'C# / ASP.NET': '', 
+  'JavaScript': '',
+  'MySQL': '',
 };
 
 const catColors: Record<string, string> = {
@@ -82,7 +82,7 @@ export default function Skills() {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                 {cat.skills.map((skill, si) => (
                   <div key={si} style={{
-                    display: 'flex', alignItems: 'center', gap: 7,
+                    display: 'flex', alignItems: 'center',
                     padding: '8px 14px', borderRadius: 999,
                     background: 'var(--surface-2)', border: '1px solid var(--border)',
                     transition: 'transform 0.2s, border-color 0.2s',
@@ -97,7 +97,7 @@ export default function Skills() {
                       (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border)';
                     }}
                   >
-                    <span style={{ fontSize: '0.9rem' }}>{techIcons[skill.name] || '⚙️'}</span>
+                    <span style={{ fontSize: '0.9rem' }}>{techIcons[skill.name] }</span>
                     <span style={{ fontSize: '0.82rem', fontWeight: 500,
                       color: 'var(--text)', ...ar }}>{skill.name}</span>
                   </div>
