@@ -5,6 +5,7 @@ export default function CustomCursor() {
   const ringRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (!window.matchMedia('(pointer: fine)').matches) return;
     const onMove = (e: MouseEvent) => {
       if (dotRef.current) {
         dotRef.current.style.left = `${e.clientX - 4}px`;
