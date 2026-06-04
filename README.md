@@ -16,6 +16,8 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+Find the live website at https://alaafayyad.vercel.app
+
 You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
 
 ![CI/CD](https://github.com/Alaa-Fayyad-22/alaa-fayyad/actions/workflows/ci.yml/badge.svg)
