@@ -24,7 +24,7 @@ export default function Footer() {
       {t.footer.built}
       · © {isRTL? new Date().getFullYear().toLocaleString('ar-EG') : new Date().getFullYear()} · {t.footer.rights}
     </p>
-    <button onClick={() => {
+    <button aria-label="arrowUp" onClick={() => {
   const getScroll = () => window.pageYOffset !== undefined
     ? window.pageYOffset
     : (document.documentElement || document.body).scrollTop;

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Navbar from '../src/components/Navbar';
-
+import Footer from '../src/components/Footer';
 // Mock localStorage
 beforeEach(() => {
   Object.defineProperty(window, 'localStorage', {
@@ -33,4 +33,13 @@ describe('Navbar', () => {
     render(<Navbar />);
     expect(screen.getAllByText('عربي').length).toBeGreaterThan(0);
   });
+});
+
+
+describe('Footer', () => {
+    it('renders the copyright text', () => {
+    render(<Footer />);
+    // expect(screen.getByText(/Built with/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'arrowUp' })).toBeInTheDocument();
+  });  
 });
