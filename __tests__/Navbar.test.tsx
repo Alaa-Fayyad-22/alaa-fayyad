@@ -26,7 +26,7 @@ describe('Navbar', () => {
 
   it('renders the hire button', () => {
     render(<Navbar />);
-    expect(screen.getAllByText("Let's Work").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Let's connect").length).toBeGreaterThan(0);
   });
 
   it('renders the language toggle button', () => {
