@@ -67,7 +67,7 @@ export default function Projects() {
           color:'var(--text-muted)', ...ar }}>{t.projects.subtitle}</p>
 
         {/* Filters */}
-        <div className="reveal" style={{ display:'flex', flexWrap:'wrap',
+        {/* <div className="reveal" style={{ display:'flex', flexWrap:'wrap',
           justifyContent:'center', gap:10, marginBottom:48 }}>
           {categories.map(cat => (
             <button key={cat} onClick={() => setFilter(cat)} style={{
@@ -78,13 +78,14 @@ export default function Projects() {
               border: `1px solid ${filter===cat ? 'transparent' : 'var(--border)'}`,
             }}>{labels[cat]}</button>
           ))}
-        </div>
+        </div> */}
 
         {/* Grid */}
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))', gap:20 }}>
           {filtered.map((p, i) => (
             <div key={p.id} className="reveal"
               style={{
+                display:'flex', flexDirection:'column', height:'100%',
                 borderRadius:20, overflow:'hidden',
                 background:'var(--surface)', border:'1px solid var(--border)',
                 transition:'transform 0.25s, box-shadow 0.25s',
@@ -96,7 +97,8 @@ export default function Projects() {
               onMouseLeave={() => setHovered(null)}
             >
               {/* Image */}
-              <div style={{ height:180, position:'relative', overflow:'hidden',
+              <div style={{ flexShrink:0,
+ height:180, position:'relative', overflow:'hidden',
                 background: projectColors[p.color] || 'linear-gradient(135deg,#6366f1,#a855f7)',
                 display:'flex', alignItems:'center', justifyContent:'center' }}>
                 {p.image ? (
@@ -132,7 +134,7 @@ export default function Projects() {
               </div>
 
               {/* Body */}
-              <div style={{ padding:'20px 22px 22px' }}>
+              <div style={{ padding:'20px 22px 22px', display:'flex', flexDirection:'column', flexGrow:1, }}>
                 <h3 style={{ fontFamily: isRTL?'Cairo, sans-serif':'Syne, sans-serif',
                   fontWeight:700, fontSize:'1.05rem', marginBottom:8, color:'var(--text)' }}>
                   {isRTL ? p.titleAr : p.title}
@@ -141,7 +143,9 @@ export default function Projects() {
                   marginBottom:14, ...ar }}>
                   {isRTL ? p.descriptionAr : p.description}
                 </p>
-                <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:16 }}>
+                <div style={{ marginTop:'auto',
+
+ display:'flex', flexWrap:'wrap', gap:6, marginBottom:16 }}>
                   {p.tags.map(tag => (
                     <span key={tag} style={{ fontSize:'0.7rem', fontFamily:'monospace',
                       padding:'3px 10px', borderRadius:999,
