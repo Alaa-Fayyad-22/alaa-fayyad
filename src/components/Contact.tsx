@@ -93,7 +93,7 @@ export default function Contact() {
         <div className="reveal" style={{ textAlign: 'center', marginBottom: 8 }}>
           <span style={{ fontSize: '1rem', fontWeight:1000, fontFamily: 'bold', letterSpacing: '0.05em',
             textTransform: 'uppercase', color: 'var(--primary)' }}>
-            {t.skills.label}
+            {t.contact.label}
           </span>
         </div>
         <h2 className="reveal gradient-text" style={{
