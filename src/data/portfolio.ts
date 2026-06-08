@@ -23,7 +23,7 @@ export const projects = [
   tags: ["React", "TypeScript", "i18n / RTL"],
   category: "web",
   live: "https://alaafayyad.vercel.app",
-  github: "https://github.com/Alaa-Fayyad-22",
+  github: "https://github.com/Alaa-Fayyad-22/alaa-fayyad",
   featured: true,
   color: "from-blue-500 to-cyan-500"
 }
