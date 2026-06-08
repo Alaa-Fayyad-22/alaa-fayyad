@@ -19,7 +19,7 @@ export const projects = [
   titleAr: "الموقع الشخصي",
   description: "The site you're on. A bilingual (English + Arabic, full RTL) single-page portfolio with a custom design-token system, scroll-reveal animations, and a data-driven structure — designed and built from scratch.",
   descriptionAr: "الموقع الذي تتصفّحه الآن. موقع شخصي ثنائي اللغة (إنجليزي وعربي مع دعم كامل للكتابة من اليمين إلى اليسار) مبني بنظام تصميم مخصّص وحركات ظهور سلسة وبنية معتمدة على البيانات — صُمّم وطُوّر من الصفر.",
-  image: "/public/portfolio.png",
+  image: "/portfolio_screen.png",
   tags: ["React", "TypeScript", "i18n / RTL"],
   category: "web",
   live: "https://alaafayyad.vercel.app",
