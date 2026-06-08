@@ -96,12 +96,18 @@ export default function Projects() {
               onMouseLeave={() => setHovered(null)}
             >
               {/* Image */}
-              <div style={{ height:180, position:'relative',
+              <div style={{ height:180, position:'relative', overflow:'hidden',
                 background: projectColors[p.color] || 'linear-gradient(135deg,#6366f1,#a855f7)',
                 display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <span style={{ fontSize:48, position:'relative', zIndex:1 }}>
-                  {p.category==='web'?'🌐':p.category==='mobile'?'📱':'🎨'}
-                </span>
+                {p.image ? (
+                  <img src={p.image} alt={isRTL ? p.titleAr : p.title}
+                    style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                ) : (
+                  <span style={{ fontSize:48 }}>
+                    {p.category==='web'?'🌐':p.category==='mobile'?'📱':'🎨'}
+                  </span>
+                )}
+
                 {/* hover overlay */}
                 <div style={{
                   position:'absolute', inset:0, display:'flex',

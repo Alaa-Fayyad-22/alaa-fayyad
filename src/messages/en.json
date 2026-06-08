@@ -5,7 +5,7 @@
     "projects": "Projects",
     "experience": "Experience",
     "contact": "Contact",
-    "hire": "Let's Work",
+    "hire": "Let's connect",
     "resume": "Resume"
   },
   "hero": {
@@ -14,7 +14,7 @@
     "role1": "Full Stack Developer",
     "role2": "Python Developer",
     "role3": "UI/UX Designer",
-    "role4": "Web Application Builder",
+    "role4": "API Developer",
     "role5": "Automation & Scraping Developer",
     "description": "I craft digital experiences that blend elegant design with powerful engineering. From pixel-perfect interfaces to scalable backends — I build products that people love.",
     "cta_work": "View My Work",

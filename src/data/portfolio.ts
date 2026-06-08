@@ -1,88 +1,32 @@
 export const projects = [
   {
-    id: 1,
-    title: "E-Commerce Platform",
-    titleAr: "منصة تجارة إلكترونية",
-    description: "Full-stack e-commerce solution with real-time inventory, payment integration, and admin dashboard. Scaled to handle 10,000+ daily active users.",
-    descriptionAr: "منصة تجارة إلكترونية متكاملة مع إدارة المخزون الفوري وتكامل الدفع ولوحة تحكم للمشرفين. تخدم أكثر من 10,000 مستخدم يومياً.",
-    image: "/projects/ecommerce.png",
-    tags: ["Next.js", "Node.js", "PostgreSQL", "Stripe", "Redis"],
-    category: "web",
-    live: "https://demo.example.com",
-    github: "https://github.com",
-    featured: true,
-    color: "from-violet-500 to-purple-600"
-  },
-  {
-    id: 2,
-    title: "SaaS Dashboard",
-    titleAr: "لوحة تحكم SaaS",
-    description: "Analytics and project management SaaS with real-time collaboration, custom reporting, and team management features.",
-    descriptionAr: "منصة SaaS للتحليلات وإدارة المشاريع مع تعاون فوري وتقارير مخصصة وإدارة الفرق.",
-    image: "/projects/saas.png",
-    tags: ["React", "TypeScript", "FastAPI", "MongoDB", "WebSockets"],
-    category: "web",
-    live: "https://demo.example.com",
-    github: "https://github.com",
-    featured: true,
-    color: "from-blue-500 to-cyan-500"
-  },
-  {
-    id: 3,
-    title: "Mobile Banking App",
-    titleAr: "تطبيق بنكي موبايل",
-    description: "Secure mobile banking application with biometric auth, instant transfers, and AI-powered expense categorization.",
-    descriptionAr: "تطبيق مصرفي آمن مع المصادقة البيومترية والتحويلات الفورية وتصنيف المصروفات بالذكاء الاصطناعي.",
-    image: "/projects/banking.png",
-    tags: ["React Native", "Node.js", "PostgreSQL", "JWT", "Plaid API"],
-    category: "mobile",
-    live: "https://demo.example.com",
-    github: "http://github.com/Alaa-Fayyad-22",
-    featured: true,
-    color: "from-emerald-500 to-teal-500"
-  },
-  {
-    id: 4,
-    title: "Restaurant Ordering System",
-    titleAr: "نظام طلبات مطعم",
-    description: "Complete restaurant management system with QR menu, live order tracking, kitchen display, and analytics.",
-    descriptionAr: "نظام إدارة مطعم متكامل مع قائمة QR وتتبع الطلبات المباشر وشاشة المطبخ والتحليلات.",
-    image: "/projects/restaurant.png",
-    tags: ["Next.js", "Prisma", "MySQL", "Socket.io", "Tailwind"],
-    category: "web",
-    live: "https://demo.example.com",
-    github: "http://github.com/Alaa-Fayyad-22",
-    featured: false,
-    color: "from-orange-500 to-red-500"
-  },
-  {
-    id: 5,
-    title: "Design System & UI Kit",
-    titleAr: "نظام تصميم وحزمة UI",
-    description: "Comprehensive design system with 100+ components, dark mode, RTL support, Figma library and React implementation.",
-    descriptionAr: "نظام تصميم شامل يضم أكثر من 100 مكوّن مع الوضع الداكن ودعم RTL ومكتبة Figma وتنفيذ React.",
-    image: "/projects/design-system.png",
-    tags: ["Figma", "React", "Storybook", "TypeScript", "CSS Variables"],
-    category: "design",
-    live: "https://demo.example.com",
-    github: "https://github.com",
-    featured: false,
-    color: "from-pink-500 to-rose-500"
-  },
-  {
-    id: 6,
-    title: "Real Estate Platform",
-    titleAr: "منصة عقارية",
-    description: "Property listing and management platform with virtual tours, mortgage calculator, and agent CRM.",
-    descriptionAr: "منصة لإدراج وإدارة العقارات مع جولات افتراضية وحاسبة الرهن العقاري وإدارة علاقات الوكلاء.",
-    image: "/projects/realestate.png",
-    tags: ["Next.js", "Django", "PostgreSQL", "Mapbox", "AWS S3"],
-    category: "web",
-    live: "https://demo.example.com",
-    github: "https://github.com",
-    featured: false,
-    color: "from-indigo-500 to-blue-600"
-  }
+  id: 1,
+  title: "Happidoo",
+  titleAr: "هابيدو",
+  description: "Full-stack site where customers browse and book inflatable rentals — a catalog and photo gallery, a quote-based booking flow with tiered package discounts, and one-tap WhatsApp leads. Owners manage their own inventory through a Supabase-backed admin.",
+  descriptionAr: "موقع متكامل يتيح للعملاء تصفّح وحجز الألعاب النطّاطة — كتالوج ومعرض صور، ونظام حجز عبر طلب عرض سعر مع خصومات حسب الباقة، وتواصل فوري عبر واتساب. يدير المالكون مخزونهم بأنفسهم عبر لوحة تحكم مبنية على Supabase.",
+  image: "/happidoo_screen.png",
+  tags: ["Next.js", "Tailwind CSS", "Supabase"],
+  category: "web",
+  live: "https://www.happidoo.org",
+  github: "https://github.com/Alaa-Fayyad-22/happidoo",
+  featured: true,
+  color: "from-violet-500 to-purple-600"
+},
+{
+  id: 2,
+  title: "Developer Portfolio",
+  titleAr: "الموقع الشخصي",
+  description: "The site you're on. A bilingual (English + Arabic, full RTL) single-page portfolio with a custom design-token system, scroll-reveal animations, and a data-driven structure — designed and built from scratch.",
+  descriptionAr: "الموقع الذي تتصفّحه الآن. موقع شخصي ثنائي اللغة (إنجليزي وعربي مع دعم كامل للكتابة من اليمين إلى اليسار) مبني بنظام تصميم مخصّص وحركات ظهور سلسة وبنية معتمدة على البيانات — صُمّم وطُوّر من الصفر.",
+  image: "/public/portfolio.png",
+  tags: ["React", "TypeScript", "i18n / RTL"],
+  category: "web",
+  live: "https://alaafayyad.vercel.app",
+  github: "https://github.com/Alaa-Fayyad-22",
+  featured: true,
+  color: "from-blue-500 to-cyan-500"
+}
 ];
 
 export const experiences = [
@@ -98,6 +42,19 @@ export const experiences = [
     tech: ["Python", "Django", "Flask", "REST APIs", "Web Scraping"],
     type: "full-time"
 },
+  
+  {
+    role: "Junior Web Developer",
+    roleAr: "مطوّر ويب مبتدئ",
+    company: "Multiframes S.A.R.L",
+    companyAr: "Multiframes S.A.R.L",
+    period: "March 2023 – August 2023",
+    periodAr: "مارس 2023 – أغسطس 2023",
+    description: "Contributed to the development and maintenance of web applications using C# and ASP.NET for back-end functionality. Implemented front-end updates with HTML and CSS, and managed databases via phpMyAdmin. Handled data entry and content management through a CMS to ensure data accuracy and streamline operations.",
+    descriptionAr: "أسهمت في تطوير وصيانة تطبيقات الويب باستخدام C# و ASP.NET للواجهة الخلفية. نفّذت تحديثات الواجهة الأمامية بـ HTML و CSS، وأدرت قواعد البيانات عبر phpMyAdmin. تولّيت إدخال البيانات وإدارة المحتوى عبر نظام CMS لضمان دقة البيانات وتسهيل العمليات.",
+    tech: ["C#", "ASP.NET", "MySQL", "HTML", "CSS"],
+    type: "full-time"
+  },
   {
     role: "Web Developer & UI/UX Designer",
     roleAr: "مطوّر ومصمم UI/UX",
@@ -110,18 +67,6 @@ export const experiences = [
     tech: ["Next.js", "Figma", "C# ASP.NET", "PostgreSQL", "MySQL", "Laravel"],
     type: "full-time"
   },
-  {
-    role: "Junior Web Developer",
-    roleAr: "مطوّر ويب مبتدئ",
-    company: "Multiframes S.A.R.L",
-    companyAr: "Multiframes S.A.R.L",
-    period: "March 2023 – August 2023",
-    periodAr: "مارس 2023 – أغسطس 2023",
-    description: "Contributed to the development and maintenance of web applications using C# and ASP.NET for back-end functionality. Implemented front-end updates with HTML and CSS, and managed databases via phpMyAdmin. Handled data entry and content management through a CMS to ensure data accuracy and streamline operations.",
-    descriptionAr: "أسهمت في تطوير وصيانة تطبيقات الويب باستخدام C# و ASP.NET للواجهة الخلفية. نفّذت تحديثات الواجهة الأمامية بـ HTML و CSS، وأدرت قواعد البيانات عبر phpMyAdmin. تولّيت إدخال البيانات وإدارة المحتوى عبر نظام CMS لضمان دقة البيانات وتسهيل العمليات.",
-    tech: ["C#", "ASP.NET", "MySQL", "HTML", "CSS"],
-    type: "full-time"
-  }
 ];
 
 export const skillCategories = [
