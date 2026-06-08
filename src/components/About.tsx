@@ -107,13 +107,13 @@ export default function About() {
             ))}
             <div style={{ marginTop: 8, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               {/* View button */}
-              <a href="/Alaa_Fayyad_Resume.pdf" target="_blank" rel="noopener noreferrer"
+              <a href="/Alaa_Fayyad_CV.pdf" target="_blank" rel="noopener noreferrer"
                 className="btn-outline" style={{ ...ar, width: 'fit-content' }}>
                 <Eye size={16} />
                 {isRTL ? 'عرض السيرة الذاتية' : 'View CV'}
               </a>
               {/* Download button */}
-              <a href="/Alaa_Fayyad_Resume.pdf" download className="btn-primary" style={{ ...ar, width: 'fit-content' }}>
+              <a href="/Alaa_Fayyad_CV.pdf" download className="btn-primary" style={{ ...ar, width: 'fit-content' }}>
                 <Download size={16} />
                 {t.about.download_cv}
               </a>

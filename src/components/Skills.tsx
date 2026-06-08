@@ -14,7 +14,7 @@ const techIcons: Record<string, string> = {
 };
 
 const catColors: Record<string, string> = {
-  frontend:'#6366f1', backend:'#10b981', design:'#ec4899', databases:'#f59e0b',
+  frontend:'#6366f1', backend:'#10b981', design:'#ec4899', databases:'#f59e0b', devops:'#06b6d4',
 };
 
 export default function Skills() {
@@ -32,7 +32,7 @@ export default function Skills() {
   const ar: React.CSSProperties = isRTL ? { fontFamily: 'Cairo, sans-serif' } : {};
   const labels: Record<string,string> = {
     frontend: t.skills.frontend, backend: t.skills.backend,
-    design: t.skills.design, databases: t.skills.databases,
+    design: t.skills.design, databases: t.skills.databases, devops: t.skills.devops
   };
 
   return (

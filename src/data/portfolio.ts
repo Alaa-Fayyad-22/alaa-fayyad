@@ -160,9 +160,15 @@ export const skillCategories = [
     skills: [
       { name: "PostgreSQL", level: 85 },
       { name: "MongoDB", level: 82 },
-      { name: "MySQL", level: 75 },
-      { name: "AWS / Vercel", level: 80 },
-      { name: "Docker", level: 72 }
+      { name: "MySQL", level: 75 }
+    ]
+  },
+  {
+    key: "devops",
+    skills: [
+      { name: "CI/CD", level: 75 },
+      { name: "Docker", level: 72 },
+      { name: "AWS / Vercel", level: 80 }
     ]
   }
 ];

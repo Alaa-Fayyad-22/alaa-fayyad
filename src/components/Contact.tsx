@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
-import { Mail, MapPin, Send, CheckCircle, FileText, Clock, DollarSign, Briefcase, AlertCircle } from 'lucide-react';
+import { Mail, MapPin, Send, CheckCircle, FileText, Clock, DollarSign, Briefcase, AlertCircle, Linkedin } from 'lucide-react';
 import { FaGithub, FaInstagram, FaLinkedin, FaWhatsapp } from 'react-icons/fa';
 
 type Tab = 'message' | 'quote';
@@ -186,7 +186,7 @@ export default function Contact() {
               {[
                 { Icon: FaWhatsapp, href: 'https://wa.me/9613748496', label: 'WhatsApp' },
                 // { Icon: FaInstagram, href: 'https://instagram.com', label: 'Instagram' },
-                { Icon: FaLinkedin, href: 'https://www.linkedin.com/in/alaa-fayyad', label: 'LinkedIn' },
+                { Icon: Linkedin, href: 'https://www.linkedin.com/in/alaa-fayyad', label: 'LinkedIn' },
                 { Icon: FaGithub, href: 'http://github.com/Alaa-Fayyad-22', label: 'GitHub' },
               ].map(({ Icon, href, label }) => (
                 <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}

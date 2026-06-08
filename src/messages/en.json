@@ -43,14 +43,15 @@
     "fact4_title": "Full Ownership",
     "fact4_desc": "From design to deployment, I own the entire process end to end."
   },
-  "skills": {
+"skills": {
     "label": "My Skills",
     "title": "What I Work With",
     "subtitle": "A carefully chosen stack for building modern, scalable products",
     "frontend": "Frontend",
     "backend": "Backend",
     "design": "Design & Tools",
-    "databases": "Databases & Cloud"
+    "databases": "Databases",
+    "devops": "DevOps & Cloud"
   },
   "projects": {
     "label": "Projects",
