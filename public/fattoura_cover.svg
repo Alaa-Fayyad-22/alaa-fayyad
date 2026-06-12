@@ -1,0 +1,59 @@
+<svg width="1200" height="760" viewBox="0 0 1200 760" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="34%" cy="36%" r="85%">
+      <stop offset="0%" stop-color="#2b3225"/>
+      <stop offset="100%" stop-color="#191e14"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="760" fill="url(#bg)"/>
+
+  <!-- ===== receipt mark ===== -->
+  <g transform="translate(236 234) rotate(-5)">
+    <!-- shadow -->
+    <path transform="translate(12 16)" d="M0 16 Q0 0 16 0 H224 Q240 0 240 16 V262 l-15 13 -15 -13 -15 13 -15 -13 -15 13 -15 -13 -15 13 -15 -13 -15 13 -15 -13 -15 13 -15 -13 -15 13 -15 -13 -15 13 -15 -13 V16 Z" fill="#000000" opacity="0.30"/>
+    <!-- paper -->
+    <path d="M0 16 Q0 0 16 0 H224 Q240 0 240 16 V262 l-15 13 -15 -13 -15 13 -15 -13 -15 13 -15 -13 -15 13 -15 -13 -15 13 -15 -13 -15 13 -15 -13 -15 13 -15 -13 -15 13 -15 -13 V16 Z" fill="#f7f4ec"/>
+
+    <!-- header title -->
+    <rect x="60" y="26" width="120" height="12" rx="6" fill="#23241f"/>
+    <rect x="86" y="48" width="68" height="7" rx="3.5" fill="#c9c3b4"/>
+
+    <!-- line items: person dot + name bar + price bar -->
+    <circle cx="30" cy="86" r="7" fill="#d8552e"/>
+    <rect x="48" y="81" width="104" height="9" rx="4.5" fill="#d8d2c2"/>
+    <rect x="176" y="81" width="42" height="9" rx="4.5" fill="#a39d8e"/>
+
+    <circle cx="30" cy="118" r="7" fill="#3f7d56"/>
+    <rect x="48" y="113" width="104" height="9" rx="4.5" fill="#d8d2c2"/>
+    <rect x="176" y="113" width="42" height="9" rx="4.5" fill="#a39d8e"/>
+
+    <circle cx="30" cy="150" r="7" fill="#2f6f9f"/>
+    <rect x="48" y="145" width="104" height="9" rx="4.5" fill="#d8d2c2"/>
+    <rect x="176" y="145" width="42" height="9" rx="4.5" fill="#a39d8e"/>
+
+    <circle cx="30" cy="182" r="7" fill="#b8852b"/>
+    <rect x="48" y="177" width="104" height="9" rx="4.5" fill="#d8d2c2"/>
+    <rect x="176" y="177" width="42" height="9" rx="4.5" fill="#a39d8e"/>
+
+    <!-- dashed separator -->
+    <line x1="24" y1="210" x2="216" y2="210" stroke="#c9c3b4" stroke-width="2" stroke-dasharray="3 5"/>
+
+    <!-- total -->
+    <rect x="24" y="226" width="74" height="14" rx="7" fill="#d8552e"/>
+    <rect x="150" y="223" width="66" height="19" rx="9" fill="#d8552e"/>
+  </g>
+
+  <!-- ===== wordmark ===== -->
+  <text x="556" y="350" font-family="Arial, Helvetica, sans-serif" font-size="110" font-weight="800" fill="#f7f4ec" letter-spacing="1">Fattoura</text>
+  <text x="560" y="398" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="400" fill="#9fa392">Splitting, the easy way</text>
+
+  <!-- people dots motif -->
+  <g transform="translate(562 444)">
+    <circle cx="0"   cy="0" r="9" fill="#d8552e"/>
+    <circle cx="30"  cy="0" r="9" fill="#3f7d56"/>
+    <circle cx="60"  cy="0" r="9" fill="#2f6f9f"/>
+    <circle cx="90"  cy="0" r="9" fill="#b8852b"/>
+    <circle cx="120" cy="0" r="9" fill="#8b4a8f"/>
+    <circle cx="150" cy="0" r="9" fill="#c2406a"/>
+  </g>
+</svg>
