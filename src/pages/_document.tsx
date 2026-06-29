@@ -76,6 +76,17 @@ export default function Document() {
             --panel-solid: #100e1a;
             --scanline: rgba(180, 160, 255, 0.05);
             --ok: #34d399;
+            /* Terminal hero (dark window — distinct, lighter than the page) */
+            --term-bg: #14121d;
+            --term-bar: #1c1a28;
+            --term-border: rgba(168, 85, 247, 0.35);
+            --term-bar-border: rgba(255, 255, 255, 0.07);
+            --term-title: #6b6b8a;
+            --term-text: #e6e6f0;
+            --term-out: #c9c9da;
+            --term-green: #4ade80;
+            --term-accent: #c4b5fd;
+            --term-err: #ff7b72;
             color-scheme: dark;
           }
 
@@ -106,6 +117,17 @@ export default function Document() {
             --panel-solid: #ffffff;
             --scanline: rgba(124, 58, 237, 0.07);
             --ok: #0ea371;
+            /* Terminal hero (light surface, dark text — stays readable) */
+            --term-bg: #f6f5fc;
+            --term-bar: #e9e7f5;
+            --term-border: rgba(124, 58, 237, 0.30);
+            --term-bar-border: rgba(20, 18, 42, 0.08);
+            --term-title: #6a6790;
+            --term-text: #2a2740;
+            --term-out: #4a4766;
+            --term-green: #15803d;
+            --term-accent: #6d28d9;
+            --term-err: #c0362c;
             color-scheme: light;
           }
 
@@ -397,25 +419,62 @@ export default function Document() {
           .term-hero { position: relative; min-height: 100vh; display: flex; flex-direction: column;
             align-items: center; justify-content: center; gap: 28px; padding: 90px 20px 40px; }
           .term-win { width: min(720px, 92vw); border-radius: 12px; overflow: hidden;
-            background: #0c0c14; border: 1px solid rgba(168,85,247,0.22);
-            box-shadow: 0 30px 80px rgba(0,0,0,0.45); }
+            background: var(--term-bg); border: 1px solid var(--term-border);
+            box-shadow: 0 24px 70px var(--card-shadow), 0 0 38px var(--glow-soft); }
           .term-bar { display: flex; align-items: center; gap: 8px; padding: 11px 14px;
-            background: #16161f; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; }
+            background: var(--term-bar); border-bottom: 1px solid var(--term-bar-border); position: relative; }
           .term-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
           .term-title { position: absolute; left: 0; right: 0; text-align: center;
-            font-family: 'JetBrains Mono', monospace; font-size: 0.74rem; color: #6b6b8a; pointer-events: none; }
-          .term-body { padding: 22px clamp(16px, 3vw, 28px) 26px; min-height: 230px;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.74rem; color: var(--term-title); pointer-events: none; }
+          /* Constant height: content scrolls INSIDE (auto-scrolls to newest) — the
+             window never grows. Wheel only scrolls here while the terminal is
+             focused (data-lenis-prevent); otherwise Lenis scrolls the page
+             smoothly over it. overscroll-behavior stops scroll-chaining jank. */
+          .term-body { padding: 22px clamp(16px, 3vw, 28px) 26px; cursor: text;
+            height: clamp(300px, 46vh, 440px); overflow-y: auto; overscroll-behavior: contain;
+            scrollbar-width: thin; scrollbar-color: var(--term-border) transparent;
             font-family: 'JetBrains Mono', monospace; font-size: clamp(0.82rem, 2vw, 1rem);
-            line-height: 1.85; color: #e6e6f0; }
-          .term-line { white-space: pre-wrap; word-break: break-word; }
-          .term-prompt { color: #4ade80; }
-          .term-cmd { color: #e6e6f0; }
-          .term-out { color: #c9c9da; }
-          .term-name { color: #c4b5fd; font-size: clamp(1.4rem, 5vw, 2.4rem); font-weight: 800;
+            line-height: 1.85; color: var(--term-text); }
+          .term-body::-webkit-scrollbar { width: 8px; }
+          .term-body::-webkit-scrollbar-track { background: transparent; }
+          .term-body::-webkit-scrollbar-thumb { background: var(--term-border); border-radius: 4px; }
+          .term-body::-webkit-scrollbar-thumb:hover { background: var(--term-accent); }
+          /* Mobile: compact hero + smaller terminal. svh fits the visible screen
+             and stays stable when the keyboard opens (vh/dvh would jump/grow). */
+          @media (max-width: 760px) {
+            .term-hero { min-height: 100svh; padding: 76px 16px 26px; gap: 16px; }
+            .term-body { height: clamp(230px, 42svh, 330px); }
+          }
+          .term-line { white-space: pre-wrap; word-break: break-word;
+            animation: termLineIn 0.14s ease both; }
+          @keyframes termLineIn { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: none; } }
+          @media (prefers-reduced-motion: reduce) { .term-line { animation: none; } }
+          .term-prompt { color: var(--term-green); }
+          .term-cmd { color: var(--term-text); }
+          .term-out { color: var(--term-out); }
+          .term-acc { color: var(--term-accent); }
+          .term-muted { color: var(--term-title); }
+          .term-err { color: var(--term-err); }
+          .term-name { color: var(--term-accent); font-size: clamp(1.4rem, 5vw, 2.4rem); font-weight: 800;
             letter-spacing: -0.02em; margin: 2px 0 6px; line-height: 1.15; }
-          .term-status { color: #4ade80; }
+          .term-status { color: var(--term-green); }
           .term-caret { display: inline-block; width: 9px; height: 1.05em; vertical-align: text-bottom;
-            background: #c4b5fd; margin-left: 2px; animation: blink 1s step-end infinite; }
+            background: var(--term-accent); margin-left: 2px; animation: blink 1s step-end infinite; }
+          .term-hint { color: var(--term-title); opacity: 0.85; }
+          .term-link { color: var(--term-accent); text-decoration: none;
+            border-bottom: 1px solid transparent; transition: border-color 0.18s ease; }
+          .term-link:hover, .term-link:focus-visible { border-bottom-color: var(--term-accent); outline: none; }
+          .term-inputrow { display: flex; align-items: center; gap: 7px; }
+          /* Block-caret input: a transparent real <input> overlays a visible text
+             mirror, so the caret is a blinking block (▌) instead of the thin one. */
+          .term-inputfield { position: relative; flex: 1 1 auto; min-width: 0; margin: 0; cursor: text;
+            display: inline-flex; flex-wrap: wrap; align-items: center; }
+          .term-input-echo { white-space: pre-wrap; word-break: break-word; color: var(--term-text); }
+          .term-input-ph { color: var(--term-title); opacity: 0.75; margin-inline-start: 6px; }
+          .term-input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0;
+            background: transparent; border: none; outline: none;
+            font-family: 'JetBrains Mono', monospace; font-size: inherit; line-height: inherit;
+            color: transparent; caret-color: transparent; }
           .term-cue { background: none; border: none; cursor: pointer; color: var(--text-muted);
             display: flex; align-items: center; justify-content: center; }
           .term-cue:hover { color: var(--primary); }
@@ -427,12 +486,33 @@ export default function Document() {
             backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); }
           .snav__inner { max-width: 1200px; margin: 0 auto; height: 64px; padding: 0 24px;
             display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-          .snav__logo { background: none; border: none; cursor: pointer; padding: 0;
+          .snav__logo { display: inline-flex; align-items: center; background: none; border: none;
+            cursor: pointer; padding: 0; font-family: 'JetBrains Mono', monospace;
             font-weight: 700; font-size: 1.05rem; color: var(--text); letter-spacing: -0.01em; }
+          /* Decorative terminal caret after the name (echoes the "$ whoami" hero) */
+          .snav__caret { display: inline-block; width: 0.55em; height: 1.05em;
+            vertical-align: text-bottom; margin-inline-start: 4px; border-radius: 1px;
+            background: var(--primary); animation: blink 1s step-end infinite; }
+          @media (prefers-reduced-motion: reduce) { .snav__caret { animation: none; } }
           .snav__links { display: flex; align-items: center; gap: 26px; }
-          .snav__link { background: none; border: none; cursor: pointer; padding: 0;
+          /* Terminal-style hover: a violet ">" slides in from the left (no reflow) */
+          .snav__link { position: relative; background: none; border: none; cursor: pointer; padding: 0;
             font-size: 0.9rem; color: var(--text-muted); transition: color 0.2s; }
-          .snav__link:hover { color: var(--primary); }
+          .snav__link::before { content: '>'; position: absolute; inset-inline-start: -11px; top: 0;
+            font-family: 'JetBrains Mono', monospace; color: var(--primary);
+            opacity: 0; transform: translateX(-3px);
+            transition: opacity 0.2s ease, transform 0.2s ease; }
+          .snav__link:hover, .snav__link:focus-visible { color: var(--primary); }
+          .snav__link:hover::before, .snav__link:focus-visible::before { opacity: 1; transform: translateX(0); }
+          /* Scroll-spy active link: violet, persistent ">" prefix + underline (no
+             weight change → no layout shift). */
+          .snav__link.is-active { color: var(--primary);
+            text-decoration: underline; text-decoration-color: var(--primary);
+            text-underline-offset: 5px; text-decoration-thickness: 2px; }
+          .snav__link.is-active::before { opacity: 1; transform: translateX(0); }
+          @media (prefers-reduced-motion: reduce) {
+            .snav__link::before { transition: opacity 0.2s ease; transform: none; }
+          }
           .snav__actions { display: flex; align-items: center; gap: 8px; }
           .snav__icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
             border: 1px solid var(--border); background: var(--surface); color: var(--primary); cursor: pointer;
@@ -441,14 +521,69 @@ export default function Document() {
           .snav__icon--text { width: auto; padding: 0 11px; font-family: 'JetBrains Mono', monospace; }
           .snav__burger { display: none; width: 36px; height: 36px; align-items: center; justify-content: center;
             border: none; background: none; color: var(--text); cursor: pointer; }
-          .snav__drawer { display: flex; flex-direction: column; gap: 2px; padding: 10px 24px 18px;
+          /* Three bars that morph into an X when .is-open (transform/opacity only) */
+          .snav__burger-box { position: relative; width: 22px; height: 16px; }
+          .snav__burger-bar { position: absolute; left: 0; right: 0; height: 2px; border-radius: 2px;
+            background: var(--text);
+            transition: transform 0.28s ease, opacity 0.18s ease, top 0.28s ease; }
+          .snav__burger-bar:nth-child(1) { top: 0; }
+          .snav__burger-bar:nth-child(2) { top: 7px; }
+          .snav__burger-bar:nth-child(3) { top: 14px; }
+          .snav__burger.is-open .snav__burger-bar:nth-child(1) { top: 7px; transform: rotate(45deg); }
+          .snav__burger.is-open .snav__burger-bar:nth-child(2) { opacity: 0; }
+          .snav__burger.is-open .snav__burger-bar:nth-child(3) { top: 7px; transform: rotate(-45deg); }
+          /* Always mounted so it animates BOTH ways; closed state is hidden +
+             slid up. visibility is delayed on close so it fully fades out first.
+             absolute (top:100%) overlay so the closed drawer can't inflate the
+             nav's height — otherwise the scrolled background paints over its
+             reserved space and the bar appears to grow when scrolling. */
+          .snav__drawer { position: absolute; top: 100%; left: 0; right: 0; z-index: 99;
+            display: flex; flex-direction: column; gap: 2px; padding: 10px 24px 18px;
             background: var(--nav-bg-scrolled); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-            border-bottom: 1px solid var(--border); }
-          .snav__drawer-link { background: none; border: none; cursor: pointer; text-align: start;
-            padding: 11px 0; font-size: 1rem; color: var(--text); border-bottom: 1px solid var(--border); }
+            border-bottom: 1px solid var(--border);
+            transform: translateY(-12px); opacity: 0; visibility: hidden; pointer-events: none;
+            transition: opacity 0.27s ease, transform 0.27s ease, visibility 0s linear 0.27s; }
+          .snav__drawer.is-open { transform: translateY(0); opacity: 1; visibility: visible; pointer-events: auto;
+            transition: opacity 0.27s ease, transform 0.27s ease; }
+          .snav__drawer-link { position: relative; background: none; border: none; cursor: pointer; text-align: start;
+            padding: 11px 0; font-size: 1rem; color: var(--text); border-bottom: 1px solid var(--border);
+            opacity: 0; transform: translateY(-6px);
+            transition: color 0.2s, opacity 0.25s ease, transform 0.25s ease; }
+          .snav__drawer-link::before { content: '>'; position: absolute; inset-inline-start: -14px;
+            font-family: 'JetBrains Mono', monospace; color: var(--primary);
+            opacity: 0; transition: opacity 0.2s ease; }
+          .snav__drawer-link:hover, .snav__drawer-link:focus-visible { color: var(--primary); }
+          .snav__drawer-link:hover::before, .snav__drawer-link:focus-visible::before { opacity: 1; }
+          .snav__drawer-link.is-active { color: var(--primary); }
+          .snav__drawer-link.is-active::before { opacity: 1; }
+          /* Open: items reveal with a subtle stagger; close fades them out together */
+          .snav__drawer.is-open .snav__drawer-link,
+          .snav__drawer.is-open .snav__drawer-toggle { opacity: 1; transform: translateY(0); }
+          .snav__drawer.is-open .snav__drawer-link:nth-child(1) { transition-delay: 0.05s; }
+          .snav__drawer.is-open .snav__drawer-link:nth-child(2) { transition-delay: 0.09s; }
+          .snav__drawer.is-open .snav__drawer-link:nth-child(3) { transition-delay: 0.13s; }
+          .snav__drawer.is-open .snav__drawer-link:nth-child(4) { transition-delay: 0.17s; }
+          .snav__drawer.is-open .snav__drawer-link:nth-child(5) { transition-delay: 0.21s; }
+          .snav__drawer.is-open .snav__drawer-toggle { transition-delay: 0.24s; }
+          /* Theme + language toggles inside the mobile drawer */
+          .snav__drawer-toggles { display: flex; flex-direction: column; gap: 2px;
+            margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+          .snav__drawer-toggle { display: flex; align-items: center; gap: 12px; width: 100%;
+            background: none; border: none; cursor: pointer; text-align: start;
+            padding: 13px 0; font-size: 1rem; color: var(--text);
+            opacity: 0; transform: translateY(-6px);
+            transition: color 0.2s, opacity 0.25s ease, transform 0.25s ease; }
+          .snav__drawer-toggle:hover, .snav__drawer-toggle:focus-visible { color: var(--primary); }
+          .snav__drawer-toggle svg { color: var(--primary); flex-shrink: 0; }
+          @media (prefers-reduced-motion: reduce) {
+            .snav__drawer { transition: opacity 0.001s linear, visibility 0s; }
+            .snav__drawer-link, .snav__drawer-toggle, .snav__burger-bar {
+              transition-duration: 0.001s; transition-delay: 0s; }
+          }
           @media (max-width: 760px) {
             .snav__links { display: none; }
             .snav__burger { display: flex; }
+            .snav__bar-only { display: none; }
           }
           @media (min-width: 761px) {
             .snav__drawer { display: none; }
