@@ -17,7 +17,7 @@ const catColors: Record<string, string> = {
   frontend:'#6366f1', backend:'#10b981', design:'#ec4899', databases:'#f59e0b', devops:'#06b6d4',
 };
 
-export default function Skills() {
+export default function Skills({ bare = false }: { bare?: boolean } = {}) {
   const { t, isRTL } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
 
@@ -36,43 +36,42 @@ export default function Skills() {
   };
 
   return (
-    <section id="skills" ref={ref} dir={isRTL ? 'rtl' : 'ltr'}
-      style={{ padding: '96px 0', background: 'var(--bg-secondary)', color: 'var(--text)', position: 'relative' }}>
+    <section id={bare ? undefined : 'skills'} ref={ref} dir={isRTL ? 'rtl' : 'ltr'}
+      style={{ padding: bare ? '8px 0 40px' : '96px 0', background: 'transparent', color: 'var(--text)', position: 'relative', overflow: 'hidden' }}>
 
       <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
         <div style={{ position: 'absolute', width: 500, height: 500, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(168,85,247,0.12), transparent)',
+          background: 'radial-gradient(circle, var(--glow-soft), transparent 70%)',
           filter: 'blur(80px)', top: '10%', right: '-5%' }} />
       </div>
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', position: 'relative' }}>
 
-        <div className="reveal" style={{ textAlign: 'center', marginBottom: 8 }}>
-          <span style={{ fontSize: '1rem', fontWeight:1000, fontFamily: 'bold', letterSpacing: '0.05em',
-            textTransform: 'uppercase', color: 'var(--primary)' }}>
-            {t.skills.label}
-          </span>
-        </div>
 
-        <h2 className="reveal gradient-text" style={{
-          textAlign: 'center', marginBottom: 12,
-          fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif',
-          fontWeight: 800, fontSize: 'clamp(1.8rem,4vw,3rem)',
-        }}>{t.skills.title}</h2>
-        <p className="reveal" style={{ textAlign: 'center',
-          color: 'var(--text-muted)', maxWidth: 520, margin: '0 auto 56px', ...ar }}>{t.skills.subtitle}</p>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px,1fr))', gap: 20 }}>
+        <div className="skills-bento">
           {skillCategories.map((cat, ci) => (
-            <div key={cat.key} className="reveal" style={{
+            <div key={cat.key} className="reveal glass" style={{
               padding: '28px', borderRadius: 20,
-              background: 'var(--surface)', border: '1px solid var(--border)',
               animationDelay: `${ci * 0.1}s`,
-            }}>
+              transition: 'transform 0.2s ease, box-shadow 0.25s ease, border-color 0.2s ease',
+            }}
+              onMouseEnter={e => {
+                const el = e.currentTarget as HTMLDivElement;
+                el.style.transform = 'translateY(-4px)';
+                el.style.boxShadow = '0 14px 40px var(--glow)';
+                el.style.borderColor = 'var(--border-strong)';
+              }}
+              onMouseLeave={e => {
+                const el = e.currentTarget as HTMLDivElement;
+                el.style.transform = 'translateY(0)';
+                el.style.boxShadow = 'none';
+                el.style.borderColor = 'var(--border)';
+              }}
+            >
               {/* Category header */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
                 <div style={{ width: 4, height: 22, borderRadius: 2, background: catColors[cat.key] }} />
-                <h3 style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif',
+                <h3 style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : "'JetBrains Mono', monospace",
                   fontWeight: 700, fontSize: '1rem', color: 'var(--text)' }}>
                   {labels[cat.key]}
                 </h3>

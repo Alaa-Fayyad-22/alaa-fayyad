@@ -5,7 +5,7 @@ import { FaGithub, FaInstagram, FaLinkedin, FaWhatsapp } from 'react-icons/fa';
 
 type Tab = 'message' | 'quote';
 
-export default function Contact() {
+export default function Contact({ bare = false }: { bare?: boolean } = {}) {
   const { t, isRTL } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
   const [tab, setTab] = useState<Tab>('message');
@@ -73,41 +73,24 @@ export default function Contact() {
     : ['Under 3 weeks','1 month','1-3 months','3-6 months','Flexible'];
 
   return (
-    <section id="contact" ref={ref} dir={isRTL ? 'rtl' : 'ltr'}
-      style={{ padding: '96px 0', background: 'var(--bg)', color: 'var(--text)', position: 'relative' }}>
+    <section id={bare ? undefined : 'contact'} ref={ref} dir={isRTL ? 'rtl' : 'ltr'}
+      style={{ padding: bare ? '8px 0 40px' : '96px 0', background: 'transparent', color: 'var(--text)', position: 'relative', overflow: 'hidden' }}>
 
       <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
         <div style={{ position: 'absolute', width: 500, height: 500, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(99,102,241,0.1), transparent)',
+          background: 'radial-gradient(circle, var(--glow-soft), transparent 70%)',
           filter: 'blur(100px)', top: 0, right: '20%' }} />
-      </div>
-
-      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
         <div style={{ position: 'absolute', width: 500, height: 500, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(168,85,247,0.12), transparent)',
+          background: 'radial-gradient(circle, var(--glow-soft), transparent 70%)',
           filter: 'blur(80px)', top: '10%', right: '-5%' }} />
       </div>
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', position: 'relative' }}>
 
-        <div className="reveal" style={{ textAlign: 'center', marginBottom: 8 }}>
-          <span style={{ fontSize: '1rem', fontWeight:1000, fontFamily: 'bold', letterSpacing: '0.05em',
-            textTransform: 'uppercase', color: 'var(--primary)' }}>
-            {t.contact.label}
-          </span>
-        </div>
-        <h2 className="reveal gradient-text" style={{
-          textAlign: 'center', marginBottom: 12,
-          fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif',
-          fontWeight: 800, fontSize: 'clamp(1.8rem,4vw,3rem)',
-        }}>{t.contact.title}</h2>
-        <p className="reveal" style={{ textAlign: 'center', marginBottom: 48,
-          color: 'var(--text-muted)', ...ar }}>{t.contact.subtitle}</p>
 
         {/* Tab switcher */}
         <div className="reveal" style={{ display: 'flex', justifyContent: 'center', marginBottom: 48 }}>
-          <div style={{ display: 'inline-flex', borderRadius: 14,
-            background: 'var(--surface)', border: '1px solid var(--border)', padding: 4, gap: 4 }}>
+          <div className="glass" style={{ display: 'inline-flex', borderRadius: 14, padding: 4, gap: 4 }}>
             {([
               { key: 'message', icon: Mail,     label: isRTL ? 'رسالة' : 'Send Message' },
               { key: 'quote',   icon: FileText,  label: isRTL ? 'طلب عرض سعر' : 'Request a Quote' },
@@ -128,11 +111,11 @@ export default function Contact() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 48 }}>
+        <div className="contact-grid" style={{ display: 'grid', gap: 48 }}>
 
           {/* Info column */}
           <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <h3 style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif',
+            <h3 style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : "'JetBrains Mono', monospace",
               fontWeight: 700, fontSize: '1.3rem', color: 'var(--text)', ...ar }}>
               {t.contact.or_reach}
             </h3>
@@ -143,8 +126,7 @@ export default function Contact() {
             ].map(({ icon: Icon, label, value, href }) => (
               <a key={label} href={href} style={{ display: 'flex', alignItems: 'center',
                 gap: 14, textDecoration: 'none' }}>
-                <div style={{ width: 46, height: 46, borderRadius: 14, flexShrink: 0,
-                  background: 'var(--surface)', border: '1px solid var(--border)',
+                <div className="glass" style={{ width: 46, height: 46, borderRadius: 14, flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Icon size={18} color="var(--primary)" />
                 </div>
@@ -190,17 +172,24 @@ export default function Contact() {
                 { Icon: FaGithub, href: 'http://github.com/Alaa-Fayyad-22', label: 'GitHub' },
               ].map(({ Icon, href, label }) => (
                 <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
+                  className="glass"
                   style={{ width: 42, height: 42, borderRadius: '50%',
-                    background: 'var(--surface)', border: '1px solid var(--border)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    textDecoration: 'none', color: 'var(--text-muted)', transition: 'transform 0.2s, color 0.2s' }}
+                    textDecoration: 'none', color: 'var(--text-muted)',
+                    transition: 'transform 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease' }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1.1)';
-                    (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--primary)';
+                    const el = e.currentTarget as HTMLAnchorElement;
+                    el.style.transform = 'scale(1.1)';
+                    el.style.borderColor = 'var(--primary)';
+                    el.style.color = 'var(--primary)';
+                    el.style.boxShadow = '0 6px 22px var(--glow)';
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLAnchorElement).style.transform = 'scale(1)';
-                    (e.currentTarget as HTMLAnchorElement).style.borderColor = 'var(--border)';
+                    const el = e.currentTarget as HTMLAnchorElement;
+                    el.style.transform = 'scale(1)';
+                    el.style.borderColor = 'var(--border)';
+                    el.style.color = 'var(--text-muted)';
+                    el.style.boxShadow = 'none';
                   }}>
                   <Icon size={16} />
                 </a>
@@ -210,9 +199,8 @@ export default function Contact() {
 
           {/* Form column */}
           <div className="reveal">
-            <form onSubmit={handleSubmit} style={{
-              background: 'var(--surface)', borderRadius: 20,
-              border: '1px solid var(--border)', padding: '32px',
+            <form onSubmit={handleSubmit} className="glass" style={{
+              borderRadius: 20, padding: '32px',
               display: 'flex', flexDirection: 'column', gap: 18,
             }}>
 
@@ -230,7 +218,7 @@ export default function Contact() {
                           value={form[key as keyof typeof form]}
                           onChange={e => setForm({ ...form, [key]: e.target.value })}
                           style={{ ...inputStyle, ...(key==='email' ? { direction:'ltr' } : {}) }}
-                          onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; e.currentTarget.style.boxShadow='0 0 0 3px rgba(99,102,241,0.15)'; }}
+                          onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; e.currentTarget.style.boxShadow='0 0 0 3px var(--glow-soft), 0 0 16px var(--glow)'; }}
                           onBlur={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.boxShadow='none'; }}
                         />
                       </div>
@@ -242,7 +230,7 @@ export default function Contact() {
                     <input type="text" required placeholder={t.contact.subject}
                       value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })}
                       style={inputStyle}
-                      onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; e.currentTarget.style.boxShadow='0 0 0 3px rgba(99,102,241,0.15)'; }}
+                      onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; e.currentTarget.style.boxShadow='0 0 0 3px var(--glow-soft), 0 0 16px var(--glow)'; }}
                       onBlur={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.boxShadow='none'; }}
                     />
                   </div>
@@ -252,7 +240,7 @@ export default function Contact() {
                     <textarea required rows={5} placeholder={t.contact.message}
                       value={form.message} onChange={e => setForm({ ...form, message: e.target.value })}
                       style={{ ...inputStyle, resize:'none' }}
-                      onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; e.currentTarget.style.boxShadow='0 0 0 3px rgba(99,102,241,0.15)'; }}
+                      onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; e.currentTarget.style.boxShadow='0 0 0 3px var(--glow-soft), 0 0 16px var(--glow)'; }}
                       onBlur={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.boxShadow='none'; }}
                     />
                   </div>
@@ -271,7 +259,7 @@ export default function Contact() {
                           value={quote[key as keyof typeof quote]}
                           onChange={e => setQuote({ ...quote, [key]: e.target.value })}
                           style={{ ...inputStyle, ...(key==='email' ? { direction:'ltr' } : {}) }}
-                          onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; e.currentTarget.style.boxShadow='0 0 0 3px rgba(99,102,241,0.15)'; }}
+                          onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; e.currentTarget.style.boxShadow='0 0 0 3px var(--glow-soft), 0 0 16px var(--glow)'; }}
                           onBlur={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.boxShadow='none'; }}
                         />
                       </div>
@@ -340,7 +328,7 @@ export default function Contact() {
                       placeholder={isRTL ? 'اشرح مشروعك بالتفصيل...' : 'Describe your project in detail...'}
                       value={quote.details} onChange={e => setQuote({ ...quote, details: e.target.value })}
                       style={{ ...inputStyle, resize:'none' }}
-                      onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; e.currentTarget.style.boxShadow='0 0 0 3px rgba(99,102,241,0.15)'; }}
+                      onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; e.currentTarget.style.boxShadow='0 0 0 3px var(--glow-soft), 0 0 16px var(--glow)'; }}
                       onBlur={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.boxShadow='none'; }}
                     />
                   </div>

@@ -2,201 +2,124 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 import { experiences } from '../data/portfolio';
 
-const typeColors: Record<string, { bg: string; text: string; label: string; labelAr: string }> = {
-  'full-time': { bg: 'rgba(99,102,241,0.12)', text: '#818cf8', label: 'Full-time', labelAr: 'دوام كامل' },
-  'freelance':  { bg: 'rgba(168,85,247,0.12)', text: '#c084fc', label: 'Freelance',  labelAr: 'عمل حر' },
+const MONO = "'JetBrains Mono', monospace";
+
+const typeMeta: Record<string, { label: string; labelAr: string }> = {
+  'full-time': { label: 'Full-time', labelAr: 'دوام كامل' },
+  'freelance': { label: 'Freelance', labelAr: 'عمل حر' },
 };
 
-export default function Experience() {
-  const { t, isRTL } = useTranslation();
-  const ref = useRef<HTMLDivElement>(null);
+export default function Experience({ bare = false }: { bare?: boolean } = {}) {
+  const { isRTL } = useTranslation();
+  const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
-      .exp-card-left {
-        opacity: 0;
-        transform: translateX(-60px);
-        transition: opacity 0.7s ease, transform 0.7s ease;
-      }
-      .exp-card-right {
-        opacity: 0;
-        transform: translateX(60px);
-        transition: opacity 0.7s ease, transform 0.7s ease;
-      }
-      .exp-card-left.revealed,
-      .exp-card-right.revealed {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    `;
-    document.head.appendChild(style);
-
     const observer = new IntersectionObserver(
       entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('revealed'); }),
-      { threshold: 0.1 }
+      { threshold: 0.08 }
     );
-    ref.current?.querySelectorAll('.exp-card-left, .exp-card-right, .reveal').forEach(el => observer.observe(el));
-    return () => { observer.disconnect(); document.head.removeChild(style); };
+    ref.current?.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    return () => observer.disconnect();
   }, []);
 
+  const ar: React.CSSProperties = isRTL ? { fontFamily: 'Cairo, sans-serif' } : {};
+
   return (
-    <section id="experience" ref={ref} dir={isRTL ? 'rtl' : 'ltr'}
-      style={{ padding: '96px 0', background: 'var(--bg-secondary)' }}>
+    <section id={bare ? undefined : 'experience'} ref={ref} dir={isRTL ? 'rtl' : 'ltr'}
+      style={{ padding: bare ? '8px 0 40px' : '96px 0', background: 'transparent',
+        color: 'var(--text)', position: 'relative', overflow: 'hidden' }}>
+
       <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
         <div style={{ position: 'absolute', width: 500, height: 500, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(168,85,247,0.12), transparent)',
-          filter: 'blur(80px)', top: '10%', right: '-5%' }} />
+          background: 'radial-gradient(circle, var(--glow-soft), transparent 70%)',
+          filter: 'blur(90px)', top: '12%', left: '-6%' }} />
       </div>
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', position: 'relative' }}>
-
-        <div className="reveal" style={{ textAlign: 'center', marginBottom: 8 }}>
-          <span style={{ fontSize: '1rem', fontWeight:1000, fontFamily: 'bold', letterSpacing: '0.05em',
-            textTransform: 'uppercase', color: 'var(--primary)' }}>
-            {t.experience.label}
-          </span>
-        </div>
-        <h2 className="reveal gradient-text" style={{
-          textAlign: 'center',
-          fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif',
-          fontWeight: 800, fontSize: 'clamp(2rem, 5vw, 3rem)',
-          marginBottom: '12px',
-        }}>
-          {t.experience.title}
-        </h2>
-        <p className="reveal" style={{
-          textAlign: 'center', color: 'var(--text-muted)',
-          fontFamily: isRTL ? 'Cairo, sans-serif' : undefined,
-          marginBottom: '64px', fontSize: '1rem',
-        }}>
-          {t.experience.subtitle}
-        </p>
-
-        {/* Timeline */}
         <div style={{ position: 'relative' }}>
+          {/* Timeline rail */}
+          <span aria-hidden="true" style={{ position: 'absolute', insetInlineStart: 5,
+            top: 12, bottom: 12, width: 2, background: 'var(--border)' }} />
 
-          {/* Vertical line */}
-          <div style={{
-            position: 'absolute',
-            [isRTL ? 'right' : 'left']: '20px',
-            top: '8px', bottom: '8px',
-            width: '2px',
-            background: 'linear-gradient(to bottom, var(--primary), var(--accent), transparent)',
-            borderRadius: '2px',
-          }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {experiences.map((exp, i) => {
+              const badge = typeMeta[exp.type] ?? typeMeta['full-time'];
+              return (
+                <article key={i} className="reveal" style={{ position: 'relative',
+                  display: 'flex', gap: 24, animationDelay: `${i * 0.08}s` }}>
 
-          {experiences.map((exp, i) => {
-            const badge = typeColors[exp.type] ?? typeColors['full-time'];
-            // Alternate: even = left, odd = right (flip for RTL)
-            const fromLeft = isRTL ? i % 2 !== 0 : i % 2 === 0;
-            const animClass = fromLeft ? 'exp-card-left' : 'exp-card-right';
+                  {/* Timeline node */}
+                  <span aria-hidden="true" style={{ width: 12, height: 12, borderRadius: '50%',
+                    marginTop: 26, flexShrink: 0, zIndex: 1, background: 'var(--gradient)',
+                    boxShadow: '0 0 0 4px var(--bg)' }} />
 
-            return (
-              <div key={i} className={animClass} style={{
-                position: 'relative',
-                paddingInlineStart: '60px',
-                marginBottom: i < experiences.length - 1 ? '40px' : 0,
-                transitionDelay: `${i * 0.1}s`,
-              }}>
-                {/* Dot */}
-                <div style={{
-                  position: 'absolute',
-                  [isRTL ? 'right' : 'left']: '12px',
-                  top: '22px',
-                  width: '18px', height: '18px',
-                  borderRadius: '50%',
-                  background: 'var(--gradient)',
-                  boxShadow: '0 0 0 4px var(--bg-secondary), 0 0 12px var(--glow)',
-                  zIndex: 1,
-                }} />
-
-                {/* Card */}
-                <div className="glass" style={{
-                  borderRadius: '20px',
-                  padding: '28px 32px',
-                  border: '1px solid var(--border)',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
-                }}
-                  onMouseEnter={e => {
-                    (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-3px)';
-                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 12px 40px rgba(99,102,241,0.15)';
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
-                    (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
-                  }}
-                >
-                  {/* Top row */}
-                  <div style={{
-                    display: 'flex', alignItems: 'flex-start',
-                    justifyContent: 'space-between', gap: '16px',
-                    flexWrap: 'wrap', marginBottom: '6px',
-                  }}>
-                    <h3 style={{
-                      fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif',
-                      fontWeight: 700, fontSize: '1.15rem', color: 'var(--text)',
-                    }}>
-                      {isRTL ? exp.roleAr : exp.role}
-                    </h3>
-                    <span style={{
-                      fontSize: '0.75rem', fontFamily: 'monospace',
-                      padding: '4px 12px', borderRadius: '999px',
-                      background: 'var(--surface-2)', color: 'var(--text-muted)',
-                      whiteSpace: 'nowrap', flexShrink: 0,
-                    }}>
-                      {isRTL ? exp.periodAr : exp.period}
-                    </span>
-                  </div>
-
-                  {/* Company + badge */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', flexWrap: 'wrap' }}>
-                    <span style={{
-                      fontSize: '0.95rem', fontWeight: 600, color: 'var(--primary)',
-                      fontFamily: isRTL ? 'Cairo, sans-serif' : undefined,
-                    }}>
-                      {isRTL ? exp.companyAr : exp.company}
-                    </span>
-                    <span style={{
-                      fontSize: '0.7rem', fontWeight: 600, padding: '3px 10px',
-                      borderRadius: '999px', background: badge.bg, color: badge.text,
-                      fontFamily: 'monospace',
-                    }}>
-                      {isRTL ? badge.labelAr : badge.label}
-                    </span>
-                  </div>
-
-                  {/* Divider */}
-                  <div style={{ height: '1px', background: 'var(--border)', marginBottom: '14px' }} />
-
-                  {/* Description */}
-                  <p style={{
-                    fontSize: '0.9rem', lineHeight: '1.75',
-                    color: 'var(--text-muted)',
-                    fontFamily: isRTL ? 'Cairo, sans-serif' : undefined,
-                    marginBottom: '18px',
-                  }}>
-                    {isRTL ? exp.descriptionAr : exp.description}
-                  </p>
-
-                  {/* Tech chips */}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    {exp.tech.map(tech => (
-                      <span key={tech} style={{
-                        fontSize: '0.72rem', fontFamily: 'monospace',
-                        padding: '4px 12px', borderRadius: '999px',
-                        background: 'rgba(99,102,241,0.1)',
-                        color: 'var(--primary)',
-                        border: '1px solid rgba(99,102,241,0.2)',
-                      }}>
-                        {tech}
+                  <div className="glass" style={{ flex: 1, padding: '24px 26px', borderRadius: 20,
+                    transition: 'transform 0.2s ease, box-shadow 0.25s ease, border-color 0.2s ease' }}
+                    onMouseEnter={e => {
+                      const el = e.currentTarget as HTMLDivElement;
+                      el.style.transform = 'translateY(-4px)';
+                      el.style.boxShadow = '0 14px 40px var(--glow)';
+                      el.style.borderColor = 'var(--border-strong)';
+                    }}
+                    onMouseLeave={e => {
+                      const el = e.currentTarget as HTMLDivElement;
+                      el.style.transform = 'translateY(0)';
+                      el.style.boxShadow = 'none';
+                      el.style.borderColor = 'var(--border)';
+                    }}
+                  >
+                    {/* Role + type */}
+                    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap',
+                      alignItems: 'center', marginBottom: 8 }}>
+                      <h3 style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : MONO, fontWeight: 700,
+                        fontSize: '1.15rem', color: 'var(--text)', letterSpacing: isRTL ? 0 : '-0.01em' }}>
+                        {isRTL ? exp.roleAr : exp.role}
+                      </h3>
+                      <span style={{ fontFamily: MONO, fontSize: '0.66rem', letterSpacing: '0.1em',
+                        textTransform: 'uppercase', padding: '3px 10px', borderRadius: 999,
+                        color: 'var(--primary)', background: 'var(--surface-2)',
+                        border: '1px solid var(--border)' }}>
+                        {isRTL ? badge.labelAr : badge.label}
                       </span>
-                    ))}
+                    </div>
+
+                    {/* Company + period */}
+                    <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap',
+                      alignItems: 'center', marginBottom: 16 }}>
+                      <span style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--primary)',
+                        ...(isRTL ? { fontFamily: 'Cairo, sans-serif' } : {}) }}>
+                        {isRTL ? exp.companyAr : exp.company}
+                      </span>
+                      <span aria-hidden="true" style={{ color: 'var(--text-muted)', opacity: 0.5 }}>•</span>
+                      <span style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : MONO,
+                        fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                        {isRTL ? exp.periodAr : exp.period}
+                      </span>
+                    </div>
+
+                    {/* Description */}
+                    <p style={{ fontSize: '0.92rem', lineHeight: 1.8, color: 'var(--text-muted)',
+                      marginBottom: exp.tech.length ? 18 : 0, ...ar }}>
+                      {isRTL ? exp.descriptionAr : exp.description}
+                    </p>
+
+                    {/* Tech */}
+                    {exp.tech.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        {exp.tech.map(tech => (
+                          <span key={tech} style={{ fontFamily: MONO, fontSize: '0.72rem',
+                            padding: '4px 12px', borderRadius: 999, background: 'var(--surface-2)',
+                            color: 'var(--primary)', border: '1px solid var(--border)' }}>
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                </div>
-              </div>
-            );
-          })}
+                </article>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

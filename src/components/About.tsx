@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 import { Download, Code2, Palette, Zap, Package, View, Eye } from 'lucide-react';
 
-export default function About() {
+export default function About({ bare = false }: { bare?: boolean } = {}) {
   const { t, isRTL } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
 
@@ -25,29 +25,18 @@ export default function About() {
   ];
 
   return (
-    <section id="about" ref={ref} dir={isRTL ? 'rtl' : 'ltr'}
-      style={{ padding: '96px 0', background: 'var(--bg)', color: 'var(--text)' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+    <section id={bare ? undefined : 'about'} ref={ref} dir={isRTL ? 'rtl' : 'ltr'}
+      style={{ padding: bare ? '8px 0 40px' : '96px 0', background: 'transparent', color: 'var(--text)',
+        position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
+        <div style={{ position: 'absolute', width: 480, height: 480, borderRadius: '50%',
+          background: 'radial-gradient(circle, var(--glow-soft), transparent 70%)',
+          filter: 'blur(90px)', top: '6%', left: '-6%' }} />
+      </div>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', position: 'relative' }}>
 
-        {/* Label */}
-        <div className="reveal" style={{ textAlign: 'center', marginBottom: 8 }}>
-          <span style={{ fontSize: '1rem', fontWeight:1000, fontFamily: 'bold', letterSpacing: '0.05em',
-            textTransform: 'uppercase', color: 'var(--primary)' }}>
-            {t.about.label}
-          </span>
-        </div>
-
-        {/* Title */}
-        <h2 className="reveal gradient-text" style={{
-          textAlign: 'center', marginBottom: 64,
-          fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif',
-          fontWeight: 800, fontSize: 'clamp(1.8rem,4vw,3rem)',
-        }}>
-          {t.about.title}
-        </h2>
-
-        {/* Bio + Avatar row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px,1fr))',
+        {/* Bio + Avatar row (asymmetric) */}
+        <div className="about-grid" style={{ display: 'grid',
           gap: 64, alignItems: 'center', marginBottom: 64 }}>
 
           {/* Avatar */}
@@ -67,7 +56,7 @@ export default function About() {
               <div style={{ position: 'absolute', bottom: -8, right: -8, padding: '8px 14px',
                 borderRadius: 14, background: 'var(--surface)', border: '1px solid var(--border)',
                 textAlign: 'center' }}>
-                <div className="gradient-text" style={{ fontFamily: 'Syne, sans-serif',
+                <div className="gradient-text" style={{ fontFamily: "'JetBrains Mono', monospace",
                   fontWeight: 800, fontSize: '1.4rem' }}>3+</div>
                 <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', ...ar }}>
                   {isRTL ? 'سنوات' : 'Years'}
@@ -77,7 +66,7 @@ export default function About() {
               {/* <div style={{ position: 'absolute', top: -8, left: -8, padding: '8px 14px',
                 borderRadius: 14, background: 'var(--surface)', border: '1px solid var(--border)',
                 textAlign: 'center' }}>
-                <div className="gradient-text" style={{ fontFamily: 'Syne, sans-serif',
+                <div className="gradient-text" style={{ fontFamily: "'JetBrains Mono', monospace",
                   fontWeight: 800, fontSize: '1.4rem' }}>25+</div>
                 <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', ...ar }}>
                   {isRTL ? 'مشروع' : 'Projects'}
@@ -88,7 +77,7 @@ export default function About() {
               <div style={{ position: 'absolute', top: -8, left: -8, padding: '8px 14px',
                 borderRadius: 14, background: 'var(--surface)', border: '1px solid var(--border)',
                 textAlign: 'center' }}>
-                <div className="gradient-text" style={{ fontFamily: 'Syne, sans-serif',
+                <div className="gradient-text" style={{ fontFamily: "'JetBrains Mono', monospace",
                   fontWeight: 800, fontSize: '1.4rem' }}>10+</div>
                 <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', ...ar }}>
                   {isRTL ? 'تقنية' : 'Technologies'}
@@ -124,20 +113,29 @@ export default function About() {
         {/* Fact cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px,1fr))', gap: 16 }}>
           {facts.map(({ icon: Icon, title, desc, color }, i) => (
-            <div key={i} className="reveal" style={{
+            <div key={i} className="reveal glass" style={{
               padding: '24px', borderRadius: 20,
-              background: 'var(--surface)', border: '1px solid var(--border)',
-              transition: 'transform 0.2s',
+              transition: 'transform 0.2s ease, box-shadow 0.25s ease, border-color 0.2s ease',
               animationDelay: `${i * 0.08}s`,
             }}
-              onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px)'}
-              onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)'}
+              onMouseEnter={e => {
+                const el = e.currentTarget as HTMLDivElement;
+                el.style.transform = 'translateY(-4px)';
+                el.style.boxShadow = '0 14px 40px var(--glow)';
+                el.style.borderColor = 'var(--border-strong)';
+              }}
+              onMouseLeave={e => {
+                const el = e.currentTarget as HTMLDivElement;
+                el.style.transform = 'translateY(0)';
+                el.style.boxShadow = 'none';
+                el.style.borderColor = 'var(--border)';
+              }}
             >
               <div style={{ width: 44, height: 44, borderRadius: 12, marginBottom: 14,
                 background: color + '22', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Icon size={20} color={color} />
               </div>
-              <h3 style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif',
+              <h3 style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : "'JetBrains Mono', monospace",
                 fontWeight: 700, fontSize: '1rem', marginBottom: 6, color: 'var(--text)' }}>
                 {title}
               </h3>

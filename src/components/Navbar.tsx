@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
-import { Menu, X } from 'lucide-react';
+import { useTheme } from '../hooks/useTheme';
+import { Menu, X, Sun, Moon } from 'lucide-react';
 
 function smoothScroll(id: string) {
   const getScroll = () =>
@@ -36,6 +37,7 @@ function smoothScroll(id: string) {
 
 export default function Navbar() {
   const { t, locale, isRTL, toggleLocale } = useTranslation();
+  const { theme, toggleTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -55,7 +57,19 @@ export default function Navbar() {
   ];
 
   const ar: React.CSSProperties = isRTL ? { fontFamily: 'Cairo, sans-serif' } : {};
-  const navBg = scrolled ? 'rgba(244,243,255,0.92)' : 'rgba(244,243,255,0.55)';
+  const navBg = scrolled ? 'var(--nav-bg-scrolled)' : 'var(--nav-bg)';
+
+  const themeToggleStyle: React.CSSProperties = {
+    width: 38, height: 38, borderRadius: 999, flexShrink: 0,
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    border: '1px solid var(--border)', background: 'var(--surface)',
+    color: 'var(--primary)', cursor: 'pointer',
+    transition: 'border-color 0.2s, box-shadow 0.25s, transform 0.2s',
+  };
+  const ThemeIcon = theme === 'dark' ? Sun : Moon;
+  const themeLabel = theme === 'dark'
+    ? (isRTL ? 'الوضع الفاتح' : 'Switch to light mode')
+    : (isRTL ? 'الوضع الداكن' : 'Switch to dark mode');
 
   const linkBtnStyle: React.CSSProperties = {
     background: 'none', border: 'none', cursor: 'pointer',
@@ -65,12 +79,12 @@ export default function Navbar() {
   };
 
   return (
-    <nav style={{
+    <nav className="top-nav" style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
       background: navBg,
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
-      borderBottom: scrolled ? '1px solid rgba(99,102,241,0.15)' : '1px solid transparent',
+      borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
       transition: 'background 0.3s ease, border-color 0.3s ease',
     }}>
       <div style={{
@@ -83,8 +97,8 @@ export default function Navbar() {
         {/* Logo */}
         <button onClick={() => smoothScroll('top')} style={{
           background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-          fontFamily: isRTL ? 'Cairo, sans-serif' : 'Syne, sans-serif',
-          fontWeight: 800, fontSize: '1.15rem',
+          fontFamily: isRTL ? 'Cairo, sans-serif' : "'JetBrains Mono', monospace",
+          fontWeight: 800, fontSize: '1.1rem', letterSpacing: '-0.02em',
           backgroundImage: 'var(--gradient)',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
           flexShrink: 0,
@@ -110,6 +124,20 @@ export default function Navbar() {
           alignItems: 'center', gap: 10,
           flexDirection: isRTL ? 'row-reverse' : 'row',
         }}>
+          <button onClick={toggleTheme} aria-label={themeLabel} title={themeLabel}
+            style={themeToggleStyle}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = 'var(--primary)';
+              e.currentTarget.style.boxShadow = '0 0 18px var(--glow)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = 'var(--border)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            <ThemeIcon size={17} />
+          </button>
+
           <button onClick={toggleLocale} style={{
             padding: '5px 14px', borderRadius: 999,
             border: '1px solid var(--border)', background: 'transparent',
@@ -131,7 +159,7 @@ export default function Navbar() {
           }}
             onMouseEnter={e => {
               e.currentTarget.style.transform = 'scale(1.05)';
-              e.currentTarget.style.boxShadow = '0 4px 20px rgba(79,70,229,0.35)';
+              e.currentTarget.style.boxShadow = '0 4px 22px var(--glow)';
             }}
             onMouseLeave={e => {
               e.currentTarget.style.transform = 'scale(1)';
@@ -155,7 +183,9 @@ export default function Navbar() {
       {/* Mobile dropdown */}
       {menuOpen && (
         <div style={{
-          background: '#fff', borderTop: '1px solid var(--border)',
+          background: 'var(--nav-bg-scrolled)',
+          backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          borderTop: '1px solid var(--border)',
           padding: '20px 24px 24px', display: 'flex', flexDirection: 'column', gap: 4,
           direction: isRTL ? 'rtl' : 'ltr',
         }}>
@@ -176,6 +206,9 @@ export default function Navbar() {
             </button>
           ))}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingTop: 16 }}>
+            <button onClick={toggleTheme} aria-label={themeLabel} style={themeToggleStyle}>
+              <ThemeIcon size={16} />
+            </button>
             <button onClick={toggleLocale} style={{
               padding: '6px 16px', borderRadius: 999,
               border: '1px solid var(--border)', background: 'none',

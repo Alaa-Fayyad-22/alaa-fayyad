@@ -5,7 +5,7 @@ export const projects = [
   titleAr: "هابيدو",
   description: "Full-stack site where customers browse and book inflatable rentals — a catalog and photo gallery, a quote-based booking flow with tiered package discounts, and one-tap WhatsApp leads. Owners manage their own inventory through a Supabase-backed admin.",
   descriptionAr: "موقع متكامل يتيح للعملاء تصفّح وحجز الألعاب النطّاطة — كتالوج ومعرض صور، ونظام حجز عبر طلب عرض سعر مع خصومات حسب الباقة، وتواصل فوري عبر واتساب. يدير المالكون مخزونهم بأنفسهم عبر لوحة تحكم مبنية على Supabase.",
-  image: "/happidoo_screen.png",
+  image: "/happidoo.png",
   tags: ["Next.js", "Tailwind CSS", "Supabase"],
   category: "web",
   live: "https://www.happidoo.org",

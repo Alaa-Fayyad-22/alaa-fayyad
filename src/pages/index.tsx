@@ -1,25 +1,28 @@
 import Head from 'next/head';
-import { useEffect } from 'react';
-import Navbar from '../components/Navbar';
-import Hero from '../components/Hero';
+import { useEffect, useState } from 'react';
+import SiteNav from '../components/site/SiteNav';
+import BootOverlay from '../components/site/BootOverlay';
+import TerminalHero from '../components/site/TerminalHero';
+import SmoothScroll from '../components/SmoothScroll';
+import ScreenFrame from '../components/deck/ScreenFrame';
 import About from '../components/About';
 import Skills from '../components/Skills';
 import Projects from '../components/Projects';
 import Experience from '../components/Experience';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
-import CustomCursor from '../components/CustomCursor';
 import { useTranslation } from '../hooks/useTranslation';
 import { Analytics } from "@vercel/analytics/next"
 
 export default function Home() {
-  const { isRTL, locale } = useTranslation();
+  const { t, isRTL, locale } = useTranslation();
+  const [booted, setBooted] = useState(false);
 
   // Apply RTL direction and font to <html> and <body> reactively
   useEffect(() => {
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
     document.documentElement.lang = locale;
-    document.body.style.fontFamily = isRTL ? 'Cairo, sans-serif' : 'Outfit, sans-serif';
+    document.body.style.fontFamily = isRTL ? 'Cairo, sans-serif' : 'Inter, sans-serif';
   }, [isRTL, locale]);
 
   return (
@@ -28,25 +31,46 @@ export default function Home() {
         <title>Alaa Fayyad | Full Stack Developer & UI/UX Designer</title>
         <meta name="description" content="Portfolio of Alaa Fayyad — Full Stack Developer and UI/UX Designer" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {/* <link rel="icon" href="/favicon.ico" /> */}
         <link rel="icon" href="/favicon.png" style={{ borderRadius: '100%' }} />
       </Head>
 
-      <div>
-        <CustomCursor />
-        <Navbar />
-        <main>
-          <Hero />
-          <About />
-          <Skills />
-          <Projects />
-          <Experience />
-          <Contact />
-        </main>
-        <Footer />
-      </div>
-      
-    <Analytics/>
+      {!booted && <BootOverlay onDone={() => setBooted(true)} />}
+
+      <SmoothScroll />
+      <SiteNav />
+
+      <main>
+        <TerminalHero start={booted} />
+
+        <ScreenFrame id="about" num={1}
+          title={t.about.title} isRTL={isRTL}>
+          <About bare />
+        </ScreenFrame>
+
+        <ScreenFrame id="skills" num={2}
+          title={t.skills.title} subtitle={t.skills.subtitle} isRTL={isRTL}>
+          <Skills bare />
+        </ScreenFrame>
+
+        <ScreenFrame id="projects" num={3}
+          title={t.projects.title} subtitle={t.projects.subtitle} isRTL={isRTL}>
+          <Projects bare />
+        </ScreenFrame>
+
+        <ScreenFrame id="experience" num={4}
+          title={t.experience.title} subtitle={t.experience.subtitle} isRTL={isRTL}>
+          <Experience bare />
+        </ScreenFrame>
+
+        <ScreenFrame id="contact" num={5}
+          title={t.contact.title} subtitle={t.contact.subtitle} isRTL={isRTL}>
+          <Contact bare />
+        </ScreenFrame>
+      </main>
+
+      <Footer />
+
+      <Analytics/>
     </>
   );
 }

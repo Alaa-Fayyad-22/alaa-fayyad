@@ -8,7 +8,8 @@ export default function Footer() {
     <footer style={{
   padding: '32px 0',
   borderTop: '1px solid var(--border)',
-  background: 'var(--bg)',
+  background: 'transparent',
+  position: 'relative',
 }} dir={isRTL ? 'rtl' : 'ltr'}>
   <div style={{
     maxWidth: 1280, margin: '0 auto', padding: '0 24px',
@@ -40,19 +41,23 @@ export default function Footer() {
   requestAnimationFrame(step);
 }}
 
+      className="glass"
       style={{
         width: 40, height: 40, borderRadius: '50%',
-        background: 'var(--surface)', border: '1px solid var(--border)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'pointer', transition: 'transform 0.2s, border-color 0.2s',
+        cursor: 'pointer', transition: 'transform 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease',
       }}
       onMouseEnter={e => {
-        (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.1)';
-        (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--primary)';
+        const el = e.currentTarget as HTMLButtonElement;
+        el.style.transform = 'scale(1.1)';
+        el.style.borderColor = 'var(--primary)';
+        el.style.boxShadow = '0 6px 22px var(--glow)';
       }}
       onMouseLeave={e => {
-        (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
-        (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
+        const el = e.currentTarget as HTMLButtonElement;
+        el.style.transform = 'scale(1)';
+        el.style.borderColor = 'var(--border)';
+        el.style.boxShadow = 'none';
       }}>
       <ArrowUp size={16} color="var(--primary)" />
     </button>
