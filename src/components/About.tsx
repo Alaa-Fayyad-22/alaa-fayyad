@@ -1,6 +1,41 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 import { Download, Code2, Palette, Zap, Package, View, Eye } from 'lucide-react';
+
+/** Subtle count-up that runs once when scrolled into view (respects reduced motion). */
+function CountUp({ end, duration = 1100 }: { end: number; duration?: number }) {
+  const [val, setVal] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const started = useRef(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+    const reduce = typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) { setVal(end); return; }
+
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !started.current) {
+          started.current = true;
+          const start = performance.now();
+          const tick = (now: number) => {
+            const p = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - p, 3);
+            setVal(Math.round(eased * end));
+            if (p < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }
+      });
+    }, { threshold: 0.4 });
+    io.observe(node);
+    return () => io.disconnect();
+  }, [end, duration]);
+
+  return <span ref={ref}>{val}</span>;
+}
 
 export default function About({ bare = false }: { bare?: boolean } = {}) {
   const { t, isRTL } = useTranslation();
@@ -39,50 +74,39 @@ export default function About({ bare = false }: { bare?: boolean } = {}) {
         <div className="about-grid" style={{ display: 'grid',
           gap: 64, alignItems: 'center', marginBottom: 64 }}>
 
-          {/* Avatar */}
-          <div className="reveal" style={{ display: 'flex', justifyContent: 'center' }}>
-            <div style={{ position: 'relative' }}>
-              <div className="animate-float" style={{
-                width: 260, height: 260, borderRadius: '50%', padding: 3,
-                background: 'var(--gradient)',
-              }}>
-                <div style={{ width: '100%', height: '100%', borderRadius: '50%',
-                  background: 'var(--surface-2)', display: 'flex',
-                  alignItems: 'center', justifyContent: 'center', fontSize: 80 }}>
-                  👨‍💻
+          {/* Stats panel (replaces the avatar circle) */}
+          <div className="reveal" style={{ display: 'flex' }}>
+            <div className="glass" style={{
+              width: '100%', borderRadius: 24, padding: '40px 24px',
+              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
+              alignItems: 'center', gap: 4 }}>
+              {[
+                { value: 3,  plus: true,  label: isRTL ? 'سنوات خبرة' : 'years experience' },
+                { value: 10, plus: true,  label: isRTL ? 'تقنية' : 'technologies' },
+                { value: 2,  plus: false, label: isRTL ? 'تخصّصان' : 'disciplines',
+                  sub: isRTL ? 'تطوير + تصميم' : 'dev + design' },
+              ].map((s, i) => (
+                <div key={i} style={{ textAlign: 'center', padding: '4px 8px',
+                  borderInlineStart: i > 0 ? '1px solid var(--border)' : 'none' }}>
+                  <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800,
+                    fontSize: 'clamp(1.9rem, 5vw, 2.9rem)', lineHeight: 1,
+                    letterSpacing: '-0.03em', color: 'var(--text)',
+                    display: 'inline-flex', alignItems: 'baseline' }}>
+                    <CountUp end={s.value} />
+                    {s.plus && <span style={{ color: 'var(--primary)' }}>+</span>}
+                  </div>
+                  <div style={{ marginTop: 12, fontSize: '0.8rem', fontWeight: 600,
+                    color: 'var(--text-muted)', ...ar }}>
+                    {s.label}
+                  </div>
+                  {s.sub && (
+                    <div style={{ marginTop: 4, fontSize: '0.68rem',
+                      color: 'var(--text-muted)', opacity: 0.72, ...ar }}>
+                      {s.sub}
+                    </div>
+                  )}
                 </div>
-              </div>
-              {/* Badge: years */}
-              <div style={{ position: 'absolute', bottom: -8, right: -8, padding: '8px 14px',
-                borderRadius: 14, background: 'var(--surface)', border: '1px solid var(--border)',
-                textAlign: 'center' }}>
-                <div className="gradient-text" style={{ fontFamily: "'JetBrains Mono', monospace",
-                  fontWeight: 800, fontSize: '1.4rem' }}>3+</div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', ...ar }}>
-                  {isRTL ? 'سنوات' : 'Years'}
-                </div>
-              </div>
-              {/* Badge: projects */}
-              {/* <div style={{ position: 'absolute', top: -8, left: -8, padding: '8px 14px',
-                borderRadius: 14, background: 'var(--surface)', border: '1px solid var(--border)',
-                textAlign: 'center' }}>
-                <div className="gradient-text" style={{ fontFamily: "'JetBrains Mono', monospace",
-                  fontWeight: 800, fontSize: '1.4rem' }}>25+</div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', ...ar }}>
-                  {isRTL ? 'مشروع' : 'Projects'}
-                </div>
-              </div> */}
-
-              {/* Badge: technologies */}
-              <div style={{ position: 'absolute', top: -8, left: -8, padding: '8px 14px',
-                borderRadius: 14, background: 'var(--surface)', border: '1px solid var(--border)',
-                textAlign: 'center' }}>
-                <div className="gradient-text" style={{ fontFamily: "'JetBrains Mono', monospace",
-                  fontWeight: 800, fontSize: '1.4rem' }}>10+</div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', ...ar }}>
-                  {isRTL ? 'تقنية' : 'Technologies'}
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 

@@ -136,7 +136,7 @@ export default function Projects({ bare = false }: { bare?: boolean } = {}) {
         </div>
 
         <div className="reveal" style={{ marginTop:48, textAlign:'center' }}>
-          <a href="https://github.com" target="_blank" rel="noopener noreferrer"
+          <a href="https://github.com/Alaa-Fayyad-22" target="_blank" rel="noopener noreferrer"
             className="glass"
             style={{ display:'inline-flex', alignItems:'center', gap:8,
               padding:'12px 28px', borderRadius:999, fontWeight:600,

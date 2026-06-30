@@ -1,5 +1,3 @@
-import { projects, experiences, skillCategories } from '../data/portfolio';
-
 /**
  * Pure command engine for the interactive hero terminal. Framework-free so the
  * component stays lean: given a typed line + a small localized context, it
@@ -30,20 +28,24 @@ const CONTACT = {
 };
 const RESUME = '/Alaa_Fayyad_CV.pdf';
 
-/** name -> short description, shown by `help`. */
-const COMMANDS: [string, string][] = [
-  ['help', 'show this list of commands'],
-  ['whoami', 'who is Alaa'],
-  ['about', 'a short bio'],
+/** Commands shown by `help`, grouped by their two consistent behaviours. */
+// TYPE A — navigate: print a confirmation line, then smooth-scroll to the section.
+const NAV_COMMANDS: [string, string][] = [
+  ['about', 'who I am'],
   ['skills', 'tech stack & tools'],
-  ['projects', 'list projects + jump to them'],
-  ['experience', 'work history'],
-  ['contact', 'contact info + jump to it'],
-  ['email', 'open a new email to me'],
+  ['projects', 'selected work'],
+  ['experience', 'career history'],
+  ['contact', 'inquiries '],
+];
+// TYPE B — info / action: print (or open a link) in place, no page scroll.
+const INFO_COMMANDS: [string, string][] = [
+  ['help', 'show this list of commands'],
+  ['whoami', 'name & role'],
+  ['email', 'open a new email to me ↗'],
   ['github', 'open my GitHub ↗'],
   ['linkedin', 'open my LinkedIn ↗'],
-  ['resume', 'open my résumé / cv ↗'],
-  ['clear', 'clear the terminal'],
+  ['resume', 'open my résumé / CV ↗'],
+  ['cls', 'clear the terminal'],
 ];
 
 const pad = (s: string, n: number) => (s.length >= n ? s + ' ' : s + ' '.repeat(n - s.length));
@@ -51,7 +53,6 @@ const pad = (s: string, n: number) => (s.length >= n ? s + ' ' : s + ' '.repeat(
 export function runCommand(raw: string, ctx: TermContext): CommandResult {
   const input = raw.trim().replace(/\s+/g, ' ');
   const cmd = input.toLowerCase();
-  const L = ctx.locale === 'ar';
 
   // Empty line: just a fresh prompt, no output.
   if (cmd === '') return { lines: [] };
@@ -61,8 +62,11 @@ export function runCommand(raw: string, ctx: TermContext): CommandResult {
       return {
         lines: [
           { text: 'available commands:', tone: 'accent' },
-          ...COMMANDS.map(([n, d]) => ({ text: `  ${pad(n, 11)}${d}`, tone: 'out' as Tone })),
-          { text: "tip: try 'projects', 'email', or 'resume' — or just scroll down.", tone: 'muted' },
+          { text: 'NAVIGATION:', tone: 'muted' },
+          ...NAV_COMMANDS.map(([n, d]) => ({ text: `  ${pad(n, 11)}${d}`, tone: 'out' as Tone })),
+          { text: 'PERSONAL INFO:', tone: 'muted' },
+          ...INFO_COMMANDS.map(([n, d]) => ({ text: `  ${pad(n, 11)}${d}`, tone: 'out' as Tone })),
+          { text: 'tip: section commands scroll the page; the rest print right here.', tone: 'muted' },
         ],
       };
 
@@ -71,56 +75,25 @@ export function runCommand(raw: string, ctx: TermContext): CommandResult {
         lines: [
           { text: ctx.name, tone: 'name' },
           { text: ctx.role, tone: 'out' },
-          { text: ctx.status, tone: 'ok' },
+          // { text: ctx.status, tone: 'ok' },
         ],
       };
 
+    // ── TYPE A: navigate — print a confirmation line, then smooth-scroll ─────
     case cmd === 'about':
-      return { lines: ctx.bio.map(b => ({ text: b, tone: 'out' as Tone })) };
+      return { lines: [{ text: '→ opening about…', tone: 'ok' }], action: { type: 'scroll', id: 'about' } };
 
     case cmd === 'skills' || cmd === 'ls skills':
-      return {
-        lines: [
-          { text: 'tech stack:', tone: 'accent' },
-          ...skillCategories.map(c => ({
-            text: `  ${pad(c.key, 11)}${c.skills.map(s => s.name).join(', ')}`,
-            tone: 'out' as Tone,
-          })),
-        ],
-      };
+      return { lines: [{ text: '→ opening skills…', tone: 'ok' }], action: { type: 'scroll', id: 'skills' } };
 
-    case cmd === 'projects' || cmd === 'ls projects': {
-      const lines: OutputLine[] = [{ text: 'featured projects:', tone: 'accent' }];
-      for (const p of projects) {
-        lines.push({ text: `  • ${L ? p.titleAr : p.title}  [${p.tags.join(', ')}]`, tone: 'out' });
-        lines.push({ text: `    ${p.live}`, tone: 'muted', href: p.live });
-      }
-      lines.push({ text: '↓ opening projects section…', tone: 'ok' });
-      return { lines, action: { type: 'scroll', id: 'projects' } };
-    }
+    case cmd === 'projects' || cmd === 'ls projects':
+      return { lines: [{ text: '→ opening projects…', tone: 'ok' }], action: { type: 'scroll', id: 'projects' } };
 
-    case cmd === 'experience': {
-      const lines: OutputLine[] = [{ text: 'work experience:', tone: 'accent' }];
-      for (const e of experiences) {
-        lines.push({ text: `  • ${L ? e.roleAr : e.role} @ ${L ? e.companyAr : e.company}`, tone: 'out' });
-        lines.push({ text: `    ${L ? e.periodAr : e.period}`, tone: 'muted' });
-      }
-      return { lines };
-    }
+    case cmd === 'experience':
+      return { lines: [{ text: '→ opening experience…', tone: 'ok' }], action: { type: 'scroll', id: 'experience' } };
 
     case cmd === 'contact':
-      return {
-        lines: [
-          { text: "let's talk:", tone: 'accent' },
-          { text: `  ${pad('email', 11)}${CONTACT.email}`, tone: 'out', href: `mailto:${CONTACT.email}` },
-          { text: `  ${pad('whatsapp', 11)}${CONTACT.whatsapp}`, tone: 'out', href: CONTACT.whatsapp },
-          { text: `  ${pad('linkedin', 11)}${CONTACT.linkedin}`, tone: 'out', href: CONTACT.linkedin },
-          { text: `  ${pad('github', 11)}${CONTACT.github}`, tone: 'out', href: CONTACT.github },
-          { text: `  ${pad('location', 11)}${ctx.location}`, tone: 'muted' },
-          { text: '↓ scrolling to contact…', tone: 'ok' },
-        ],
-        action: { type: 'scroll', id: 'contact' },
-      };
+      return { lines: [{ text: '→ opening contact…', tone: 'ok' }], action: { type: 'scroll', id: 'contact' } };
 
     // ── action commands (print a confirmation, then do the thing) ───────────
     case cmd === 'email':
@@ -167,22 +140,81 @@ export function runCommand(raw: string, ctx: TermContext): CommandResult {
       return { lines: [{ text: 'about  skills  projects  experience  contact', tone: 'out' }] };
 
     case cmd === 'sudo' || cmd.startsWith('sudo '):
-      return { lines: [{ text: 'permission denied: nice try 🙂 (you already own this page — just scroll)', tone: 'err' }] };
+      return { lines: [{ text: 'permission denied: you can\'t sudo your way through this one — try scrolling.', tone: 'err' }] };
 
     case cmd.startsWith('echo '):
       return { lines: [{ text: input.slice(5), tone: 'out' }] };
 
-    case cmd === 'pwd':
-      return { lines: [{ text: '/home/alaa/portfolio', tone: 'out' }] };
+    // case cmd === 'pwd':
+    //   return { lines: [{ text: '/home/alaa/portfolio', tone: 'out' }] };
 
     case cmd === 'date':
       return { lines: [{ text: new Date().toString(), tone: 'out' }] };
 
     case cmd === 'hi' || cmd === 'hello' || cmd === 'hey':
-      return { lines: [{ text: `hey! 👋 type 'help' to see what you can do.`, tone: 'out' }] };
+      return { lines: [{ text: `hi. this terminal listens. type 'help' for commands.`, tone: 'out' }] };
 
     case cmd === 'joke':
-      return { lines: [{ text: 'there are 10 kinds of people: those who read binary, and those who don’t.', tone: 'out' }] };
+      const jokes = [
+  'You know what screams "I\'m insecure"? http://',
+  'Why do web developers wear glasses? To improve their site.',
+  'I got really angry and smashed my keyboard. I completely lost CTRL.',
+  'There are only 10 kinds of people in the world: those who understand binary and those who don’t.',
+  'My code has commitment issues. It refuses to commit.',
+  'There’s no place like 127.0.0.1.',
+  // 'My code and I have something in common. We both break under pressure.',
+  // 'My website has trust issues. It refuses insecure connections.',
+  // 'I named my dog "Cache". Now he only comes back when he feels like it.',
+  'I asked CSS to center something. It laughed.',
+  'JavaScript developers don’t make mistakes. They make unexpected features.',
+  '404. Joke not found.',
+  // 'I told my code to behave. It threw an exception.',
+  // 'My password is "incorrect". Now whenever I forget it, the computer reminds me.',
+  // 'I’m emotionally attached to my bugs. I raised them myself.',
+  'My code works perfectly. Until someone else runs it.',
+  'I started using tabs. Now everyone needs therapy.',
+  // 'There’s no cloud. It’s just someone else’s computer.',
+  // 'I would tell you a UDP joke... but you might not get it.',
+  'To understand recursion, you must first understand recursion.',
+  // 'I only trust atoms and immutable objects.',
+  'I refactored my code. The bugs appreciated the new layout.',
+  'My code is like a horror movie. Don’t look behind the comments.',
+  // 'I don’t always test my code. My users do.',
+  // 'Home is where the Wi-Fi connects automatically.',
+  'I tried to fix one bug. Now it’s a feature.',
+  'My favorite exercise is running npm install.',
+  // 'The bug wasn’t in my code. It was in production’s opinion.',
+  // 'I love deadlines. They make my CPU spike.',
+  'My code is clean. The stack trace is just decorative.',
+  // 'I use AI to write code. It uses me to find bugs.',
+  // 'The only thing recursive about me is my imposter syndrome.',
+  'I told my computer I needed a break. It froze.',
+  // 'I finally found the bug. It was between the keyboard and the chair.',
+  // 'Programmers never die. They just lose their memory.',
+  'My code has excellent security. Even I can’t get in.',
+  'If it works, don’t touch it. If you touched it, good luck.',
+  // 'I opened Stack Overflow for one answer. Three hours later I knew medieval history.',
+  'The best debugger is still console.log.',
+  // 'I removed a semicolon. The entire application entered the quantum realm.',
+  // 'Every time I optimize my code, I discover a new bottleneck.',
+  'There’s nothing more permanent than a temporary fix.',
+  'My favorite design pattern is Copy & Paste.',
+  'I wanted to write elegant code. Then the deadline happened.',
+  'The code compiled. Nobody knows why.',
+  'I use dark mode. It hides the bugs.',
+  'My API has one endpoint: disappointment.',
+  'The backend is fine. The frontend disagrees.',
+  // 'I wrote self-documenting code. Unfortunately, it only speaks to me.',
+  // 'Everything is wireless until you need to debug it.'
+];
+      return {
+    lines: [
+      {
+        text: jokes[Math.floor(Math.random() * jokes.length)],
+        tone: 'out'
+      }
+    ]
+  };
 
     default:
       return {

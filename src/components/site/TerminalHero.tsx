@@ -118,15 +118,21 @@ export default function TerminalHero({ start }: { start: boolean }) {
       return next;
     });
 
-    // Run the side-effect after the confirmation line has painted.
+    // Fire the side-effect once the confirmation line has painted.
     if (!('clear' in result) && result.action) {
       const act = result.action;
-      const tid = setTimeout(() => {
-        if (act.type === 'scroll') smoothScrollTo(act.id);
-        else if (act.href.startsWith('mailto:')) window.location.href = act.href;
-        else window.open(act.href, '_blank', 'noopener,noreferrer');
-      }, 180);
-      actionTimers.current.push(tid);
+      if (act.type === 'scroll') {
+        // Identical path to the nav links: smoothScrollTo() → Lenis. Kicked off
+        // on the next animation frame (after the confirmation line paints) with
+        // no artificial delay, so it glides exactly like a nav-link click.
+        requestAnimationFrame(() => requestAnimationFrame(() => smoothScrollTo(act.id)));
+      } else {
+        const tid = setTimeout(() => {
+          if (act.href.startsWith('mailto:')) window.location.href = act.href;
+          else window.open(act.href, '_blank', 'noopener,noreferrer');
+        }, 120);
+        actionTimers.current.push(tid);
+      }
     }
   };
 

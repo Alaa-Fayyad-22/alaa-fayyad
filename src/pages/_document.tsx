@@ -43,7 +43,10 @@ export default function Document() {
           }
 
           html {
-            scroll-behavior: smooth !important;
+            /* No native scroll-behavior here on purpose: Lenis is the single
+               smooth-scroll owner. A native smooth scroll-behavior stacks a
+               second easing curve on top of Lenis per-frame scrolling, which
+               causes laggy/janky momentum on long jumps. */
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
           }

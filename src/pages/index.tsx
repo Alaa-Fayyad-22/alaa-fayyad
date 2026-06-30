@@ -29,9 +29,29 @@ export default function Home() {
     <>
       <Head>
         <title>Alaa Fayyad | Full Stack Developer & UI/UX Designer</title>
-        <meta name="description" content="Portfolio of Alaa Fayyad — Full Stack Developer and UI/UX Designer" />
+        <meta name="description" content="Portfolio of Alaa Fayyad — Full Stack Developer and UI/UX Designer building modern, bilingual web apps with React, Next.js, and TypeScript." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="author" content="Alaa Fayyad" />
+        <link rel="canonical" href="https://alaafayyad.vercel.app" />
         <link rel="icon" href="/favicon.png" style={{ borderRadius: '100%' }} />
+
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Alaa Fayyad" />
+        <meta property="og:url" content="https://alaafayyad.vercel.app" />
+        <meta property="og:title" content="Alaa Fayyad | Full Stack Developer & UI/UX Designer" />
+        <meta property="og:description" content="Full Stack Developer and UI/UX Designer building modern, bilingual web apps with React, Next.js, and TypeScript." />
+        <meta property="og:image" content="https://alaafayyad.vercel.app/portfolio_screen.png" />
+        <meta property="og:image:width" content="1360" />
+        <meta property="og:image:height" content="642" />
+        <meta property="og:image:alt" content="Alaa Fayyad — Full Stack Developer & UI/UX Designer portfolio" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Alaa Fayyad | Full Stack Developer & UI/UX Designer" />
+        <meta name="twitter:description" content="Full Stack Developer and UI/UX Designer building modern, bilingual web apps with React, Next.js, and TypeScript." />
+        <meta name="twitter:image" content="https://alaafayyad.vercel.app/portfolio_screen.png" />
+        <meta name="twitter:image:alt" content="Alaa Fayyad — Full Stack Developer & UI/UX Designer portfolio" />
       </Head>
 
       {!booted && <BootOverlay onDone={() => setBooted(true)} />}

@@ -1,5 +1,19 @@
 export const projects = [
   {
+  id: 3,
+  title: "Fattoura",
+  titleAr: "فاتورة",
+  description: "AI-powered web app that turns a photo of a restaurant receipt into a fully settled bill. Snap the receipt and a vision model (Google Gemini) reads every item, quantity, and price via OCR; assign each line to whoever shared it — including multi-quantity orders and uneven splits — and the app calculates who owes whom across multiple payers, in both lira and dollars. It removes the slow, error-prone manual math of splitting a group bill.",
+  descriptionAr: "تطبيق ويب مدعوم بالذكاء الاصطناعي يحوّل صورة فاتورة المطعم إلى حساب مقسَّم ومسوَّى بالكامل. التقط صورة للفاتورة فيقرأ نموذج رؤية (Google Gemini) كل صنف وكمية وسعر عبر تقنية OCR؛ ثم أسنِد كل بند إلى من شاركه — بما في ذلك الطلبات متعددة الكميات والحصص غير المتساوية — ويحتسب التطبيق من يدفع لمن بين عدّة دافعين، بالليرة والدولار معاً. يلغي الحساب اليدوي البطيء والمعرّض للأخطاء عند تقسيم فاتورة جماعية.",
+  image: "/fattoura_cover.svg",
+  tags: ["Next.js", "React", "Gemini OCR"],
+  category: "web",
+  live: "https://fattoura.vercel.app/",
+  github: "https://github.com/Alaa-Fayyad-22/split-the-bill",
+  featured: true,
+  color: "from-amber-500 to-orange-600"
+},
+{
   id: 1,
   title: "Happidoo",
   titleAr: "هابيدو",
@@ -26,20 +40,6 @@ export const projects = [
   github: "https://github.com/Alaa-Fayyad-22/alaa-fayyad",
   featured: true,
   color: "from-blue-500 to-cyan-500"
-},
-{
-  id: 3,
-  title: "Fattoura",
-  titleAr: "فاتورة",
-  description: "Web app that splits a restaurant bill from a photo. Snap the receipt and a vision model (Google Gemini) reads the items, quantities, and prices; assign each one to whoever shared it — including multi-quantity and uneven splits — and it settles who pays whom across multiple payers, in both lira and dollars.",
-  descriptionAr: "تطبيق ويب لتقسيم فاتورة المطعم انطلاقاً من صورة. التقط صورة للفاتورة فيقرأ نموذج رؤية (Google Gemini) الأصناف والكميات والأسعار؛ ثم أسنِد كل صنف إلى من شاركه — بما في ذلك الكميات المتعددة والحصص غير المتساوية — ويحتسب التطبيق من يدفع لمن بين عدّة دافعين، بالليرة والدولار معاً.",
-  image: "/fattoura_cover.svg",
-  tags: ["Next.js", "React", "Gemini OCR"],
-  category: "web",
-  live: "https://fattoura.vercel.app/",
-  github: "https://github.com/Alaa-Fayyad-22/split-the-bill",
-  featured: true,
-  color: "from-amber-500 to-orange-600"
 }
 ];
 
