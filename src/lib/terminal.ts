@@ -42,6 +42,7 @@ const INFO_COMMANDS: [string, string][] = [
   ['help', 'show this list of commands'],
   ['whoami', 'name & role'],
   ['email', 'open a new email to me ↗'],
+  ['whatsapp', 'open WhatsApp ↗'],
   ['github', 'open my GitHub ↗'],
   ['linkedin', 'open my LinkedIn ↗'],
   ['resume', 'open my résumé / CV ↗'],
@@ -123,6 +124,16 @@ export function runCommand(raw: string, ctx: TermContext): CommandResult {
         action: { type: 'open', href: CONTACT.linkedin },
       };
 
+    case cmd === 'whatsapp':
+      return {
+        lines: [
+          { text: 'opening WhatsApp ↗', tone: 'ok' },
+          { text: `  ${CONTACT.whatsapp}`, tone: 'muted', href: CONTACT.whatsapp },
+        ],
+        action: { type: 'open', href: CONTACT.whatsapp },
+      };
+
+
     case cmd === 'resume' || cmd === 'cv':
       return {
         lines: [
@@ -155,6 +166,7 @@ export function runCommand(raw: string, ctx: TermContext): CommandResult {
       return { lines: [{ text: `hi. this terminal listens. type 'help' for commands.`, tone: 'out' }] };
 
     case cmd === 'joke':
+      {
       const jokes = [
   'You know what screams "I\'m insecure"? http://',
   'Why do web developers wear glasses? To improve their site.',
@@ -215,6 +227,7 @@ export function runCommand(raw: string, ctx: TermContext): CommandResult {
       }
     ]
   };
+}
 
     default:
       return {
