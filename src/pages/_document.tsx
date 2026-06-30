@@ -69,7 +69,7 @@ export default function Document() {
             --gradient: linear-gradient(135deg, #818cf8, #a855f7, #c084fc);
             --grid-line: rgba(168, 85, 247, 0.11);
             --nav-bg: rgba(10, 10, 15, 0.55);
-            --nav-bg-scrolled: rgba(10, 10, 15, 0.85);
+            --nav-bg-scrolled: rgba(10, 10, 15, 0.95);
             --card-shadow: rgba(0, 0, 0, 0.55);
             --overlay: rgba(5, 4, 12, 0.72);
             /* OS / HUD */
@@ -110,7 +110,7 @@ export default function Document() {
             --gradient: linear-gradient(135deg, #6366f1, #7c3aed, #a855f7);
             --grid-line: rgba(124, 58, 237, 0.16);
             --nav-bg: rgba(255, 255, 255, 0.62);
-            --nav-bg-scrolled: rgba(255, 255, 255, 0.88);
+            --nav-bg-scrolled: rgba(255, 255, 255, 0.95);
             --card-shadow: rgba(80, 60, 140, 0.20);
             --overlay: rgba(20, 18, 42, 0.55);
             /* OS / HUD — daylight console: prominent violet chrome */
