@@ -497,24 +497,42 @@ export default function Document() {
             vertical-align: text-bottom; margin-inline-start: 4px; border-radius: 1px;
             background: var(--primary); animation: blink 1s step-end infinite; }
           @media (prefers-reduced-motion: reduce) { .snav__caret { animation: none; } }
-          .snav__links { display: flex; align-items: center; gap: 26px; }
+          .snav__links { position: relative; display: flex; align-items: center; gap: 26px;
+            --arrow-gap: 8px; }
           /* Terminal-style hover: a violet ">" slides in from the left (no reflow) */
           .snav__link { position: relative; background: none; border: none; cursor: pointer; padding: 0;
-            font-size: 0.9rem; color: var(--text-muted); transition: color 0.2s; }
+            font-size: 0.9rem; color: var(--text-muted); transition: color 0.35s ease; }
           .snav__link::before { content: '>'; position: absolute; inset-inline-start: -11px; top: 0;
             font-family: 'JetBrains Mono', monospace; color: var(--primary);
             opacity: 0; transform: translateX(-3px);
             transition: opacity 0.2s ease, transform 0.2s ease; }
           .snav__link:hover, .snav__link:focus-visible { color: var(--primary); }
           .snav__link:hover::before, .snav__link:focus-visible::before { opacity: 1; transform: translateX(0); }
-          /* Scroll-spy active link: violet, persistent ">" prefix + underline (no
-             weight change → no layout shift). */
-          .snav__link.is-active { color: var(--primary);
-            text-decoration: underline; text-decoration-color: var(--primary);
-            text-underline-offset: 5px; text-decoration-thickness: 2px; }
-          .snav__link.is-active::before { opacity: 1; transform: translateX(0); }
+          /* Scroll-spy active link: violet text only — the traveling shared
+             arrow + underline (below) mark it, so no per-link markers here. */
+          .snav__link.is-active { color: var(--primary); }
+          /* Active link's own hover ">" is suppressed; the shared arrow owns it. */
+          .snav__link.is-active::before,
+          .snav__link.is-active:hover::before { opacity: 0; }
+          /* Shared traveling indicator (desktop). left/width are set inline from
+             the measured active link; the CSS transition makes them glide. The
+             constant transform sets the snug gap (LTR) / mirror (RTL). */
+          /* The position transition lives on the base element UNCONDITIONALLY,
+             so every left/width change glides. First-frame placement is made
+             instant via an inline transition:none from JS (see SiteNav), which
+             is removed one frame later — that avoids the slide-in-from-0 without
+             ever leaving left/width un-transitioned on real moves. */
+          .snav__arrow, .snav__underline { position: absolute; opacity: 0; pointer-events: none;
+            transition: left 0.45s cubic-bezier(.6,.1,.2,1), width 0.45s cubic-bezier(.6,.1,.2,1), opacity 0.25s ease; }
+          .snav__arrow.is-on, .snav__underline.is-on { opacity: 1; }
+          .snav__arrow { top: 50%; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;
+            line-height: 1; color: var(--primary);
+            transform: translate(calc(-100% - var(--arrow-gap)), -50%); }
+          [dir="rtl"] .snav__arrow { transform: translate(var(--arrow-gap), -50%) scaleX(-1); }
+          .snav__underline { bottom: -7px; height: 2px; border-radius: 2px; background: var(--primary); }
           @media (prefers-reduced-motion: reduce) {
             .snav__link::before { transition: opacity 0.2s ease; transform: none; }
+            .snav__arrow, .snav__underline { transition: opacity 0.25s ease; }
           }
           .snav__actions { display: flex; align-items: center; gap: 8px; }
           .snav__icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center;

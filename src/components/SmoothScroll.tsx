@@ -20,6 +20,10 @@ export default function SmoothScroll() {
       gsap.registerPlugin(ScrollTrigger);
 
       const lenis = new Lenis({
+        // Manual wheel/trackpad feel — intentionally left as-is. Programmatic
+        // scroll-to (nav clicks + terminal section commands) overrides duration
+        // and easing per call in smoothScrollTo(); this global config only
+        // governs the user's own scrolling.
         duration: 1.1,
         easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true,

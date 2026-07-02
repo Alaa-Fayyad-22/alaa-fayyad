@@ -5,7 +5,15 @@
  * - Under prefers-reduced-motion, jumps instantly (no animation).
  * - Otherwise falls back to an eased rAF scroll.
  */
-type LenisLike = { scrollTo: (target: number | HTMLElement, opts?: { offset?: number }) => void };
+type ScrollToOpts = { offset?: number; duration?: number; easing?: (t: number) => number };
+type LenisLike = { scrollTo: (target: number | HTMLElement, opts?: ScrollToOpts) => void };
+
+// easeInOutCubic — programmatic scroll starts slow, accelerates through the
+// middle, and settles gently at the target. Applied ONLY to nav-click / terminal
+// scroll-to below; the user's manual wheel scrolling keeps the global Lenis feel.
+const easeInOutCubic = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const PROGRAMMATIC_DURATION = 1.2;
 
 export function smoothScrollTo(id: string, offset = 80) {
   if (typeof window === 'undefined') return;
@@ -14,8 +22,9 @@ export function smoothScrollTo(id: string, offset = 80) {
   const lenis = (window as unknown as { __lenis?: LenisLike }).__lenis;
 
   if (lenis) {
-    if (id === 'top') lenis.scrollTo(0, { offset: 0 });
-    else if (targetEl) lenis.scrollTo(targetEl, { offset: -offset });
+    const opts = { duration: PROGRAMMATIC_DURATION, easing: easeInOutCubic };
+    if (id === 'top') lenis.scrollTo(0, { offset: 0, ...opts });
+    else if (targetEl) lenis.scrollTo(targetEl, { offset: -offset, ...opts });
     return;
   }
 
@@ -39,9 +48,13 @@ export function smoothScrollTo(id: string, offset = 80) {
 
   const start = currentScroll;
   const distance = target - start;
-  const duration = 1000;
+  const duration = 1200;
   const startTime = performance.now();
-  const ease = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
+  // easeInOutCubic — matches the Lenis easing: slow start, faster middle,
+  // gentle settle. (Fallback path: reduced-motion is handled above; this runs
+  // only when Lenis isn't active yet.)
+  const ease = (t: number) =>
+    t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
   function step(now: number) {
     const progress = Math.min((now - startTime) / duration, 1);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useTheme } from '../../hooks/useTheme';
 import { smoothScrollTo } from '../../lib/scroll';
@@ -14,6 +14,13 @@ export default function SiteNav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState('');
+
+  // Shared traveling indicator (desktop horizontal nav only). Positions are
+  // measured from the active link and applied to one arrow + one underline
+  // element, which glide via a CSS transition on left/width.
+  const linksRef = useRef<HTMLDivElement>(null);
+  const [ind, setInd] = useState({ left: 0, width: 0, arrowAnchor: 0, ready: false });
+  const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -48,6 +55,68 @@ export default function SiteNav() {
     return () => observer.disconnect();
   }, []);
 
+  // Measure the active link and reposition the shared arrow + underline. Bails
+  // when the horizontal nav is hidden (mobile: .snav__links is display:none, so
+  // offsetParent is null) — the drawer keeps its own static markers.
+  const updateIndicator = useCallback(() => {
+    const container = linksRef.current;
+    if (!container || container.offsetParent === null) {
+      setInd(s => (s.ready ? { ...s, ready: false } : s));
+      return;
+    }
+    const el = container.querySelector<HTMLElement>('.snav__link.is-active');
+    if (!el) {
+      setInd(s => (s.ready ? { ...s, ready: false } : s));
+      return;
+    }
+    const left = el.offsetLeft;
+    const width = el.offsetWidth;
+    // Anchor the arrow at the link edge nearest its reading-order start: the
+    // left edge in LTR, the right edge in RTL. CSS applies the snug gap/mirror.
+    const arrowAnchor = isRTL ? left + width : left;
+    setInd({ left, width, arrowAnchor, ready: true });
+  }, [isRTL]);
+
+  // Reposition whenever the active link or language/direction changes.
+  useEffect(() => { updateIndicator(); }, [active, locale, updateIndicator]);
+
+  // One frame after the first measured placement, drop the inline transition:none
+  // so subsequent left/width changes glide. This lands the first appearance in
+  // place (no slide-in-from-0) without ever leaving a real move un-transitioned.
+  useEffect(() => {
+    if (!ind.ready || animate) return;
+    const id = requestAnimationFrame(() => setAnimate(true));
+    return () => cancelAnimationFrame(id);
+  }, [ind.ready, animate]);
+
+  // Measure after layout, once web fonts have loaded (JetBrains Mono changes the
+  // link widths), on full load, and on resize — so the offsets are never stale.
+  // A ResizeObserver on the links row is the catch-all: it fires on ANY layout
+  // change of the row (late font swap, locale label change, sub-pixel reflow)
+  // even when no resize event fires. No feedback loop — the arrow/underline are
+  // absolutely positioned overlays and don't affect the row's size.
+  useEffect(() => {
+    updateIndicator();
+    const raf = requestAnimationFrame(updateIndicator);
+    const onResize = () => updateIndicator();
+    window.addEventListener('resize', onResize);
+    window.addEventListener('load', onResize);
+    if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => updateIndicator()).catch(() => {});
+    }
+    let ro: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== 'undefined' && linksRef.current) {
+      ro = new ResizeObserver(() => updateIndicator());
+      ro.observe(linksRef.current);
+    }
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('load', onResize);
+      ro?.disconnect();
+    };
+  }, [updateIndicator]);
+
   const go = (id: string) => { setOpen(false); smoothScrollTo(id); };
   const ThemeIcon = theme === 'dark' ? Sun : Moon;
   const themeLabel = theme === 'dark'
@@ -62,7 +131,15 @@ export default function SiteNav() {
           <span className="snav__caret" aria-hidden="true" />
         </button>
 
-        <div className="snav__links">
+        <div className="snav__links" ref={linksRef}>
+          {/* Shared traveling indicator: one arrow + one underline that glide
+              (CSS transition on left/width) to the active link. */}
+          <span aria-hidden="true"
+            className={`snav__arrow ${ind.ready ? 'is-on' : ''}`}
+            style={{ left: ind.arrowAnchor, transition: animate ? undefined : 'none' }}>&gt;</span>
+          <span aria-hidden="true"
+            className={`snav__underline ${ind.ready ? 'is-on' : ''}`}
+            style={{ left: ind.left, width: ind.width, transition: animate ? undefined : 'none' }} />
           {links.map(l => (
             <button key={l.id} className={`snav__link ${active === l.id ? 'is-active' : ''}`}
               aria-current={active === l.id ? 'true' : undefined} onClick={() => go(l.id)}>{l.label}</button>

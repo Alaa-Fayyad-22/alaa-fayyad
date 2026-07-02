@@ -169,7 +169,7 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
                 { Icon: FaWhatsapp, href: 'https://wa.me/9613748496', label: 'WhatsApp' },
                 // { Icon: FaInstagram, href: 'https://instagram.com', label: 'Instagram' },
                 { Icon: Linkedin, href: 'https://www.linkedin.com/in/alaa-fayyad', label: 'LinkedIn' },
-                { Icon: FaGithub, href: 'http://github.com/Alaa-Fayyad-22', label: 'GitHub' },
+                { Icon: FaGithub, href: 'https://github.com/Alaa-Fayyad-22', label: 'GitHub' },
               ].map(({ Icon, href, label }) => (
                 <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
                   className="glass"
