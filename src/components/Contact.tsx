@@ -50,7 +50,7 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
     }
   };
 
-  const ar: React.CSSProperties = isRTL ? { fontFamily: 'Cairo, sans-serif' } : {};
+  const ar: React.CSSProperties = isRTL ? { fontFamily: 'var(--font-arabic), sans-serif' } : {};
 
   const inputStyle: React.CSSProperties = {
     width: '100%', padding: '12px 16px', borderRadius: 12,
@@ -115,7 +115,7 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
 
           {/* Info column */}
           <div className="reveal" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <h3 style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : "'JetBrains Mono', monospace",
+            <h3 style={{ fontFamily: isRTL ? 'var(--font-arabic), sans-serif' : "var(--font-mono), monospace",
               fontWeight: 700, fontSize: '1.3rem', color: 'var(--text)', ...ar }}>
               {t.contact.or_reach}
             </h3>

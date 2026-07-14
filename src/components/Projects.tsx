@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { useTranslation } from '../hooks/useTranslation';
 import { projects } from '../data/portfolio';
 import { ExternalLink, Github, ArrowRight } from 'lucide-react';
@@ -28,7 +29,7 @@ export default function Projects({ bare = false }: { bare?: boolean } = {}) {
     return () => observer.disconnect();
   }, []);
 
-  const ar: React.CSSProperties = isRTL ? { fontFamily: 'Cairo, sans-serif' } : {};
+  const ar: React.CSSProperties = isRTL ? { fontFamily: 'var(--font-arabic), sans-serif' } : {};
 
   return (
     <section id={bare ? undefined : 'projects'} ref={ref} dir={isRTL ? 'rtl' : 'ltr'}
@@ -65,8 +66,20 @@ export default function Projects({ bare = false }: { bare?: boolean } = {}) {
                 <div className="proj-media"
                   style={{ background: projectColors[p.color] || 'linear-gradient(135deg,#818cf8,#a855f7)' }}>
                   {p.image ? (
-                    <img src={p.image} alt={isRTL ? p.titleAr : p.title}
-                      style={{ width:'100%', height:'100%', objectFit:'fill' }} />
+                    <Image
+                      src={p.image}
+                      alt={isRTL ? p.imageAltAr : p.imageAlt}
+                      fill
+                      // Large tile spans the full grid width on desktop; the rest
+                      // are half-width. Below 900px every card is full-width.
+                      sizes={isLarge
+                        ? '(max-width: 900px) 100vw, 1200px'
+                        : '(max-width: 900px) 100vw, 600px'}
+                      // Next's optimizer refuses SVG by default (dangerouslyAllowSVG),
+                      // so the SVG cover is served as-is instead of 404ing.
+                      unoptimized={p.image.endsWith('.svg')}
+                      style={{ objectFit:'fill' }}
+                    />
                   ) : (
                     <span style={{ fontSize:48 }}>
                       {p.category==='web'?'🌐':p.category==='mobile'?'📱':'🎨'}
@@ -100,7 +113,7 @@ export default function Projects({ bare = false }: { bare?: boolean } = {}) {
 
                 {/* Body */}
                 <div className="proj-body">
-                  <h3 style={{ fontFamily: isRTL?'Cairo, sans-serif':"'JetBrains Mono', monospace",
+                  <h3 style={{ fontFamily: isRTL?'var(--font-arabic), sans-serif':"var(--font-mono), monospace",
                     fontWeight:700, fontSize: isLarge ? '1.3rem' : '1.05rem',
                     marginBottom:8, color:'var(--text)', letterSpacing:'-0.01em' }}>
                     {isRTL ? p.titleAr : p.title}

@@ -25,7 +25,7 @@ type Props = {
  */
 export default function ScreenFrame({ id, num, title, subtitle, isRTL, cinematic = false, children }: Props) {
   const ref = useRef<HTMLElement>(null);
-  const ar: React.CSSProperties = isRTL ? { fontFamily: 'Cairo, sans-serif' } : {};
+  const ar: React.CSSProperties = isRTL ? { fontFamily: 'var(--font-arabic), sans-serif' } : {};
 
   useEffect(() => {
     const el = ref.current;
@@ -93,7 +93,7 @@ export default function ScreenFrame({ id, num, title, subtitle, isRTL, cinematic
         <header className="screen-head reveal">
           <div className="screen-heading-row">
             <SectionEyebrow num={num} />
-            <h2 className="screen-title" style={isRTL ? { fontFamily: 'Cairo, sans-serif' } : undefined}>{title}</h2>
+            <h2 className="screen-title" style={isRTL ? { fontFamily: 'var(--font-arabic), sans-serif' } : undefined}>{title}</h2>
           </div>
           {subtitle && <p className="screen-sub" style={ar}>{subtitle}</p>}
         </header>

@@ -56,7 +56,7 @@ export default function Navbar() {
     { id: 'contact',    label: t.nav.contact     },
   ];
 
-  const ar: React.CSSProperties = isRTL ? { fontFamily: 'Cairo, sans-serif' } : {};
+  const ar: React.CSSProperties = isRTL ? { fontFamily: 'var(--font-arabic), sans-serif' } : {};
   const navBg = scrolled ? 'var(--nav-bg-scrolled)' : 'var(--nav-bg)';
 
   const themeToggleStyle: React.CSSProperties = {
@@ -97,7 +97,7 @@ export default function Navbar() {
         {/* Logo */}
         <button onClick={() => smoothScroll('top')} style={{
           background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-          fontFamily: isRTL ? 'Cairo, sans-serif' : "'JetBrains Mono', monospace",
+          fontFamily: isRTL ? 'var(--font-arabic), sans-serif' : "var(--font-mono), monospace",
           fontWeight: 800, fontSize: '1.1rem', letterSpacing: '-0.02em',
           backgroundImage: 'var(--gradient)',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',

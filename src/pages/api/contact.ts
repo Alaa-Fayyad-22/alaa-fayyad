@@ -1,7 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { checkBotId } from 'botid/server';
+import { botIdOptions } from '../../lib/botid';
 import { Resend } from 'resend';
 import { promises as dns } from 'dns';
-import { escapeHtml, field, sanitizeDisplayName, safeIp, rateLimit } from '../../lib/security';
+import { field, escapeHtml, sanitizeDisplayName, safeIp, rateLimit } from '../../lib/security';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -32,20 +34,13 @@ async function validateEmail(email: string): Promise<string | null> {
   return null;
 }
 
-async function getGeoData(ip: string) {
-  // ip is pre-validated by safeIp(); encode defensively before use in the URL.
-  try {
-    const res = await fetch(
-      `http://ip-api.com/json/${encodeURIComponent(ip)}?fields=status,country,regionName,city,lat,lon,isp`
-    );
-    const data = await res.json();
-    if (data.status === 'success') return data;
-  } catch {}
-  return null;
-}
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  // Bot check runs first — before parsing, validating, or spending a Resend send
+  // on a request we're going to throw away anyway.
+  const verification = await checkBotId(botIdOptions);
+  if (verification.isBot) return res.status(403).json({ error: 'Access denied' });
 
   const rawIp =
     req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
@@ -54,7 +49,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     '';
   const validIp = safeIp(rawIp);
 
-  // Rate limit (best-effort, per instance) keyed by client IP.
+  // Rate limit (best-effort, per instance) keyed by client IP. The IP is used
+  // only as an in-memory bucket key for the window below — it is never logged,
+  // geolocated, emailed, or persisted anywhere.
   if (!rateLimit(`contact:${validIp || rawIp || 'unknown'}`, 5, 60_000))
     return res.status(429).json({ error: 'Too many requests. Please try again shortly.' });
 
@@ -70,21 +67,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Validate email
   const emailError = await validateEmail(email);
   if (emailError) return res.status(400).json({ error: emailError });
-
-  const geo = validIp ? await getGeoData(validIp) : null;
-  const ipDisplay = validIp || 'Unknown';
-
-  const locationBlock = geo
-    ? `
-      <p style="margin: 0 0 8px;"><strong style="color: #6366f1;">📍 Location:</strong> ${escapeHtml(geo.city)}, ${escapeHtml(geo.regionName)}, ${escapeHtml(geo.country)}</p>
-      <p style="margin: 0 0 8px;"><strong style="color: #6366f1;">🌐 ISP:</strong> ${escapeHtml(geo.isp)}</p>
-      <p style="margin: 0 0 8px;"><strong style="color: #6366f1;">🗺️ Coordinates:</strong>
-        <a href="https://www.google.com/maps?q=${encodeURIComponent(geo.lat)},${encodeURIComponent(geo.lon)}" target="_blank" rel="noopener noreferrer">
-          ${escapeHtml(geo.lat)}, ${escapeHtml(geo.lon)} (View on Map)
-        </a>
-      </p>
-    `
-    : '';
 
   try {
     await resend.emails.send({
@@ -105,12 +87,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             <p style="margin: 0 0 16px; line-height: 1.7; color: #374151;">
               <strong style="color: #6366f1;">Message:</strong><br/>${escapeHtml(message).replace(/\n/g, '<br/>')}
             </p>
-            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 16px 0;" />
-            <div style="background: #f8f8fc; padding: 16px; border-radius: 8px; font-size: 0.8rem; color: #6b7280;">
-              <p style="margin: 0 0 8px; font-weight: 700; color: #374151;">🔍 Sender Info</p>
-              <p style="margin: 0 0 8px;"><strong style="color: #6366f1;">🖥️ IP Address:</strong> ${escapeHtml(ipDisplay)}</p>
-              ${locationBlock}
-            </div>
           </div>
           <p style="text-align: center; color: #9ca3af; font-size: 0.75rem; margin-top: 20px;">Sent from your portfolio</p>
         </div>

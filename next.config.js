@@ -1,15 +1,25 @@
+/* eslint-disable @typescript-eslint/no-require-imports -- next.config.js is CommonJS */
 /** @type {import('next').NextConfig} */
+const { withBotId } = require('botid/next/config');
+
+// BotID serves its challenge script and proxies its verification traffic from
+// this fixed path prefix (see botid/next/config). withBotId installs its own
+// headers there — our site-wide CSP must not also land on it, or the challenge
+// can't run and bot protection silently degrades. Every other path gets the
+// full header set below.
+const BOTID_PATH_PREFIX = '149e9513-01fa-4fb0-aad4-566afd725d1b';
 
 // Content-Security-Policy. 'unsafe-inline' is required for scripts (the theme
 // no-flash script + Next's inline bootstrap) and styles (styled-jsx, inline
-// style attributes, Google Fonts). Everything else is locked to same-origin
-// plus the few external origins the site actually uses.
+// style attributes). Fonts are self-hosted via next/font, so no Google origins
+// appear here any more. Vercel Analytics' script and beacon origins are allowed
+// explicitly so analytics keeps working under the policy.
 const csp = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com",
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src 'self' https://fonts.gstatic.com",
-  "img-src 'self' data: https:",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self'",
+  "img-src 'self' data:",
   "connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
@@ -31,14 +41,18 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  images: {
+    formats: ['image/avif', 'image/webp'],
+  },
   async headers() {
     return [
       {
-        source: '/:path*',
+        // Everything except BotID's challenge/proxy prefix.
+        source: `/((?!${BOTID_PATH_PREFIX}/).*)`,
         headers: securityHeaders,
       },
     ];
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = withBotId(nextConfig);

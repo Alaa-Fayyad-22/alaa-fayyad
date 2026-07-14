@@ -87,5 +87,133 @@
   "footer": {
     "built": "Alaa Fayyad",
     "rights": "All rights reserved."
+  },
+  "legal": {
+    "navLabel": "Legal",
+    "close": "Close",
+    "updated": "Last updated",
+    "privacy": {
+      "title": "Privacy Policy",
+      "intro": "This is my personal portfolio. There are no accounts, no logins, and no advertising. It does not track you across other websites and it sets no cookies of any kind. Below is exactly what the site does with data — nothing more.",
+      "sections": [
+        {
+          "h": "Analytics",
+          "p": [
+            "The site uses Vercel Analytics to count page views. It is cookieless: it sets no cookies, builds no profile of you, and does not follow you to other sites. What I see is aggregate traffic — which pages were viewed and how often — never individual visitors."
+          ],
+          "list": []
+        },
+        {
+          "h": "The two forms",
+          "p": [
+            "The contact section has two forms and you choose which to use. I use what you send only to read your message and reply to you. Nothing is published, sold, or shared for advertising, and the site keeps no database of its own — there is nowhere for a submission to be stored."
+          ],
+          "list": [
+            "Send a message — collects your name, email address, subject, and message.",
+            "Request a quote — collects your name, email address, and project details, plus the project type, budget range, and timeline if you choose to pick them."
+          ]
+        },
+        {
+          "h": "How a submission is checked",
+          "p": [
+            "Before a submission is accepted, the site checks that the email address is well-formed, rejects known disposable-inbox domains, and performs a DNS lookup on the domain you typed to confirm it can actually receive mail. It also limits how many submissions can arrive from one sender in a short window, so the form cannot be flooded."
+          ],
+          "list": []
+        },
+        {
+          "h": "Bot check (BotID)",
+          "p": [
+            "Submissions are protected by Vercel BotID, an invisible bot check that runs when you press submit. There is no CAPTCHA and nothing for you to solve. It exists only to tell an automated script apart from a person so the form is not abused."
+          ],
+          "list": []
+        },
+        {
+          "h": "Email delivery (Resend)",
+          "p": [
+            "Form submissions reach me as email through Resend, an email delivery provider. Your submission passes through Resend on its way to my personal inbox, which means Resend processes it in transit. It goes to that inbox and nowhere else."
+          ],
+          "list": []
+        },
+        {
+          "h": "Your IP address",
+          "p": [
+            "This site does not log, store, geolocate, or email your IP address. While a form submission is being handled it is held briefly in memory purely as the key for the rate limit described above, and then it is gone. No location data is collected."
+          ],
+          "list": []
+        },
+        {
+          "h": "Fonts",
+          "p": [
+            "Fonts are self-hosted and served from this site's own origin. Rendering this page does not make your browser send a request to Google Fonts or any other third-party font host."
+          ],
+          "list": []
+        },
+        {
+          "h": "What is stored in your browser",
+          "p": [
+            "No cookies are set. The site saves two values in your browser's local storage, on your device only. They are never transmitted to me or to anyone else, and you can clear them at any time through your browser settings."
+          ],
+          "list": [
+            "lang — remembers whether you chose English or Arabic.",
+            "theme — remembers whether you chose the dark or light appearance."
+          ]
+        },
+        {
+          "h": "Your rights",
+          "p": [
+            "I extend the following to every visitor, wherever you are and whichever laws happen to apply to you. To exercise any of them, simply email me and I will act on it."
+          ],
+          "list": [
+            "Ask what information I hold about you.",
+            "Ask me to correct it.",
+            "Ask me to delete it.",
+            "Ask me for a copy of it.",
+            "Ask me any question at all about how this site handles data."
+          ]
+        },
+        {
+          "h": "Contact",
+          "p": [
+            "Questions about anything on this page: alaafayyadp1@gmail.com"
+          ],
+          "list": []
+        },
+        {
+          "h": "Changes to this policy",
+          "p": [
+            "The date at the top changes only when the wording here materially changes — not when the site is simply redeployed."
+          ],
+          "list": []
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms of Use",
+      "intro": "Short and plain: enjoy the site, and please respect what is mine and what belongs to the projects' own repositories.",
+      "sections": [
+        {
+          "h": "The content of this site",
+          "p": [
+            "The design, text, images, and layout of this site are mine. Please do not reproduce, republish, or reuse them without my permission. Linking to the site is always welcome, and quoting a short passage with attribution is fine."
+          ],
+          "list": []
+        },
+        {
+          "h": "Project code",
+          "p": [
+            "The projects shown here are separate from this site. Each project's code is governed solely by the license stated in that project's own repository — whatever that license says is what governs. I grant no additional rights here, and nothing on this page overrides, extends, or replaces a repository's license.",
+            "If a repository states no license, then no reuse rights are granted for it. The absence of a license is not permission — it means all rights are reserved by default. If you would like to use code from an unlicensed repository, ask me first."
+          ],
+          "list": []
+        },
+        {
+          "h": "Contact",
+          "p": [
+            "Questions about permission or licensing: alaafayyadp1@gmail.com"
+          ],
+          "list": []
+        }
+      ]
+    }
   }
 }

@@ -1,8 +1,10 @@
 import { useTranslation } from '../hooks/useTranslation';
-import { Heart, ArrowUp } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
+import Legal from './site/Legal';
 
 export default function Footer() {
   const { t, isRTL } = useTranslation();
+  const year = new Date().getFullYear();
 
   return (
     <footer style={{
@@ -16,15 +18,19 @@ export default function Footer() {
     display: 'flex', flexWrap: 'wrap',
     alignItems: 'center', justifyContent: 'center', gap: 16,
   }}>
-    <p style={{
-      fontSize: '0.875rem', color: 'var(--text-muted)',
-      display: 'flex', alignItems: 'center', gap: 6,
-      fontFamily: isRTL ? 'Cairo, sans-serif' : undefined,
-      textAlign: 'center',
+    <div style={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+      fontFamily: isRTL ? 'var(--font-arabic), sans-serif' : undefined,
     }}>
-      {t.footer.built}
-      · © {isRTL? new Date().getFullYear().toLocaleString('ar-EG') : new Date().getFullYear()} · {t.footer.rights}
-    </p>
+      <p style={{
+        fontSize: '0.875rem', color: 'var(--text-muted)',
+        textAlign: 'center', margin: 0,
+      }}>
+        {/* useGrouping:false — otherwise ar-EG renders 2026 as ٢٬٠٢٦ (a "2,026" thousands separator). */}
+        © {isRTL ? year.toLocaleString('ar-EG', { useGrouping: false }) : year} {t.footer.built}. {t.footer.rights}
+      </p>
+      <Legal />
+    </div>
     <button aria-label="arrowUp" onClick={() => {
   const getScroll = () => window.pageYOffset !== undefined
     ? window.pageYOffset

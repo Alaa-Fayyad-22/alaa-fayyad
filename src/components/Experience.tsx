@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 import { experiences } from '../data/portfolio';
 
-const MONO = "'JetBrains Mono', monospace";
+const MONO = "var(--font-mono), monospace";
 
 const typeMeta: Record<string, { label: string; labelAr: string }> = {
   'full-time': { label: 'Full-time', labelAr: 'دوام كامل' },
@@ -22,7 +22,7 @@ export default function Experience({ bare = false }: { bare?: boolean } = {}) {
     return () => observer.disconnect();
   }, []);
 
-  const ar: React.CSSProperties = isRTL ? { fontFamily: 'Cairo, sans-serif' } : {};
+  const ar: React.CSSProperties = isRTL ? { fontFamily: 'var(--font-arabic), sans-serif' } : {};
 
   return (
     <section id={bare ? undefined : 'experience'} ref={ref} dir={isRTL ? 'rtl' : 'ltr'}
@@ -71,7 +71,7 @@ export default function Experience({ bare = false }: { bare?: boolean } = {}) {
                     {/* Role + type */}
                     <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap',
                       alignItems: 'center', marginBottom: 8 }}>
-                      <h3 style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : MONO, fontWeight: 700,
+                      <h3 style={{ fontFamily: isRTL ? 'var(--font-arabic), sans-serif' : MONO, fontWeight: 700,
                         fontSize: '1.15rem', color: 'var(--text)', letterSpacing: isRTL ? 0 : '-0.01em' }}>
                         {isRTL ? exp.roleAr : exp.role}
                       </h3>
@@ -87,11 +87,11 @@ export default function Experience({ bare = false }: { bare?: boolean } = {}) {
                     <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap',
                       alignItems: 'center', marginBottom: 16 }}>
                       <span style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--primary)',
-                        ...(isRTL ? { fontFamily: 'Cairo, sans-serif' } : {}) }}>
+                        ...(isRTL ? { fontFamily: 'var(--font-arabic), sans-serif' } : {}) }}>
                         {isRTL ? exp.companyAr : exp.company}
                       </span>
                       <span aria-hidden="true" style={{ color: 'var(--text-muted)', opacity: 0.5 }}>•</span>
-                      <span style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : MONO,
+                      <span style={{ fontFamily: isRTL ? 'var(--font-arabic), sans-serif' : MONO,
                         fontSize: '0.8rem', color: 'var(--text-muted)' }}>
                         {isRTL ? exp.periodAr : exp.period}
                       </span>

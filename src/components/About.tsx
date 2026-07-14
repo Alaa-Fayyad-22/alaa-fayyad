@@ -50,7 +50,7 @@ export default function About({ bare = false }: { bare?: boolean } = {}) {
     return () => observer.disconnect();
   }, []);
 
-  const ar: React.CSSProperties = isRTL ? { fontFamily: 'Cairo, sans-serif' } : {};
+  const ar: React.CSSProperties = isRTL ? { fontFamily: 'var(--font-arabic), sans-serif' } : {};
 
   const facts = [
     { icon: Code2,    title: t.about.fact1_title, desc: t.about.fact1_desc, color: '#3b82f6' },
@@ -88,7 +88,7 @@ export default function About({ bare = false }: { bare?: boolean } = {}) {
               ].map((s, i) => (
                 <div key={i} style={{ textAlign: 'center', padding: '4px 8px',
                   borderInlineStart: i > 0 ? '1px solid var(--border)' : 'none' }}>
-                  <div style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800,
+                  <div style={{ fontFamily: "var(--font-body), sans-serif", fontWeight: 800,
                     fontSize: 'clamp(1.9rem, 5vw, 2.9rem)', lineHeight: 1,
                     letterSpacing: '-0.03em', color: 'var(--text)',
                     display: 'inline-flex', alignItems: 'baseline' }}>
@@ -159,7 +159,7 @@ export default function About({ bare = false }: { bare?: boolean } = {}) {
                 background: color + '22', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Icon size={20} color={color} />
               </div>
-              <h3 style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : "'JetBrains Mono', monospace",
+              <h3 style={{ fontFamily: isRTL ? 'var(--font-arabic), sans-serif' : "var(--font-mono), monospace",
                 fontWeight: 700, fontSize: '1rem', marginBottom: 6, color: 'var(--text)' }}>
                 {title}
               </h3>

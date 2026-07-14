@@ -12,6 +12,8 @@ import Experience from '../components/Experience';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
 import { useTranslation } from '../hooks/useTranslation';
+import { SITE_URL, SITE_NAME, SITE_TITLE, SITE_DESCRIPTION, OG_IMAGE } from '../lib/site';
+import { buildJsonLd } from '../lib/jsonLd';
 import { Analytics } from "@vercel/analytics/next"
 
 export default function Home() {
@@ -22,36 +24,47 @@ export default function Home() {
   useEffect(() => {
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
     document.documentElement.lang = locale;
-    document.body.style.fontFamily = isRTL ? 'Cairo, sans-serif' : 'Inter, sans-serif';
+    document.body.style.fontFamily = isRTL ? 'var(--font-arabic), sans-serif' : 'var(--font-body), sans-serif';
   }, [isRTL, locale]);
 
   return (
     <>
       <Head>
-        <title>Alaa Fayyad | Full Stack Developer & UI/UX Designer</title>
-        <meta name="description" content="Portfolio of Alaa Fayyad — Full Stack Developer and UI/UX Designer building modern, bilingual web apps with React, Next.js, and TypeScript." />
+        <title>{SITE_TITLE}</title>
+        <meta name="description" content={SITE_DESCRIPTION} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="author" content="Alaa Fayyad" />
-        <link rel="canonical" href="https://alaafayyad.vercel.app" />
+        <meta name="author" content={SITE_NAME} />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href={SITE_URL} />
         <link rel="icon" href="/favicon.png" style={{ borderRadius: '100%' }} />
 
         {/* Open Graph */}
         <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Alaa Fayyad" />
-        <meta property="og:url" content="https://alaafayyad.vercel.app" />
-        <meta property="og:title" content="Alaa Fayyad | Full Stack Developer & UI/UX Designer" />
-        <meta property="og:description" content="Full Stack Developer and UI/UX Designer building modern, bilingual web apps with React, Next.js, and TypeScript." />
-        <meta property="og:image" content="https://alaafayyad.vercel.app/portfolio_screen.png" />
-        <meta property="og:image:width" content="1360" />
-        <meta property="og:image:height" content="642" />
-        <meta property="og:image:alt" content="Alaa Fayyad — Full Stack Developer & UI/UX Designer portfolio" />
+        <meta property="og:site_name" content={SITE_NAME} />
+        <meta property="og:url" content={SITE_URL} />
+        <meta property="og:title" content={SITE_TITLE} />
+        <meta property="og:description" content={SITE_DESCRIPTION} />
+        {/* The locale is toggled client-side on one URL, so the active locale is
+            reported and the other is offered as an alternate on that same URL. */}
+        <meta property="og:locale" content={isRTL ? 'ar_AR' : 'en_US'} />
+        <meta property="og:locale:alternate" content={isRTL ? 'en_US' : 'ar_AR'} />
+        <meta property="og:image" content={OG_IMAGE.url} />
+        <meta property="og:image:width" content={String(OG_IMAGE.width)} />
+        <meta property="og:image:height" content={String(OG_IMAGE.height)} />
+        <meta property="og:image:alt" content={OG_IMAGE.alt} />
 
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Alaa Fayyad | Full Stack Developer & UI/UX Designer" />
-        <meta name="twitter:description" content="Full Stack Developer and UI/UX Designer building modern, bilingual web apps with React, Next.js, and TypeScript." />
-        <meta name="twitter:image" content="https://alaafayyad.vercel.app/portfolio_screen.png" />
-        <meta name="twitter:image:alt" content="Alaa Fayyad — Full Stack Developer & UI/UX Designer portfolio" />
+        <meta name="twitter:title" content={SITE_TITLE} />
+        <meta name="twitter:description" content={SITE_DESCRIPTION} />
+        <meta name="twitter:image" content={OG_IMAGE.url} />
+        <meta name="twitter:image:alt" content={OG_IMAGE.alt} />
+
+        {/* Structured data — built from the real project/skill data. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd()) }}
+        />
       </Head>
 
       {!booted && <BootOverlay onDone={() => setBooted(true)} />}

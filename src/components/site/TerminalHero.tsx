@@ -160,7 +160,7 @@ export default function TerminalHero({ start }: { start: boolean }) {
     }
   };
 
-  const ar: React.CSSProperties = isRTL ? { fontFamily: 'Cairo, sans-serif' } : {};
+  const ar: React.CSSProperties = isRTL ? { fontFamily: 'var(--font-arabic), sans-serif' } : {};
 
   return (
     <section id="overview" className="term-hero">

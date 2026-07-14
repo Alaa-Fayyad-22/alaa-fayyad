@@ -29,7 +29,7 @@ export default function Skills({ bare = false }: { bare?: boolean } = {}) {
     return () => observer.disconnect();
   }, []);
 
-  const ar: React.CSSProperties = isRTL ? { fontFamily: 'Cairo, sans-serif' } : {};
+  const ar: React.CSSProperties = isRTL ? { fontFamily: 'var(--font-arabic), sans-serif' } : {};
   const labels: Record<string,string> = {
     frontend: t.skills.frontend, backend: t.skills.backend,
     design: t.skills.design, databases: t.skills.databases, devops: t.skills.devops
@@ -71,7 +71,7 @@ export default function Skills({ bare = false }: { bare?: boolean } = {}) {
               {/* Category header */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
                 <div style={{ width: 4, height: 22, borderRadius: 2, background: catColors[cat.key] }} />
-                <h3 style={{ fontFamily: isRTL ? 'Cairo, sans-serif' : "'JetBrains Mono', monospace",
+                <h3 style={{ fontFamily: isRTL ? 'var(--font-arabic), sans-serif' : "var(--font-mono), monospace",
                   fontWeight: 700, fontSize: '1rem', color: 'var(--text)' }}>
                   {labels[cat.key]}
                 </h3>
