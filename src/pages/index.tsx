@@ -15,6 +15,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import { SITE_URL, SITE_NAME, SITE_TITLE, SITE_DESCRIPTION, OG_IMAGE } from '../lib/site';
 import { buildJsonLd } from '../lib/jsonLd';
 import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export default function Home() {
   const { t, isRTL, locale } = useTranslation();
@@ -35,8 +36,11 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="author" content={SITE_NAME} />
         <meta name="robots" content="index, follow" />
+        <meta name="theme-color" content="#0a0a0f" />
         <link rel="canonical" href={SITE_URL} />
         <link rel="icon" href="/favicon.png" style={{ borderRadius: '100%' }} />
+        <link rel="apple-touch-icon" href="/favicon.png" />
+        <link rel="manifest" href="/manifest.json" />
 
         {/* Open Graph */}
         <meta property="og:type" content="website" />
@@ -104,6 +108,7 @@ export default function Home() {
       <Footer />
 
       <Analytics/>
+      <SpeedInsights/>
     </>
   );
 }
