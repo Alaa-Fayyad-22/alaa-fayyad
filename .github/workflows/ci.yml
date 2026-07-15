@@ -46,9 +46,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Docker build
-        run: docker build -t my-portfolio .
-
       - name: Deploy to Vercel
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: npx vercel --token=${{ secrets.VERCEL_TOKEN }} --prod --yes
