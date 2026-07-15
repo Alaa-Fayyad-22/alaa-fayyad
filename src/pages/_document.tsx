@@ -80,7 +80,7 @@ export default function Document() {
             --term-bar: #1c1a28;
             --term-border: rgba(168, 85, 247, 0.35);
             --term-bar-border: rgba(255, 255, 255, 0.07);
-            --term-title: #6b6b8a;
+            --term-title: #8080a6; /* WCAG AA: 4.53:1 on --term-bar (was #6b6b8a, 3.34:1) */
             --term-text: #e6e6f0;
             --term-out: #c9c9da;
             --term-green: #4ade80;
@@ -121,7 +121,7 @@ export default function Document() {
             --term-bar: #e9e7f5;
             --term-border: rgba(124, 58, 237, 0.30);
             --term-bar-border: rgba(20, 18, 42, 0.08);
-            --term-title: #6a6790;
+            --term-title: #67648c; /* WCAG AA: 4.56:1 on --term-bar (was #6a6790, 4.35:1) */
             --term-text: #2a2740;
             --term-out: #4a4766;
             --term-green: #15803d;
