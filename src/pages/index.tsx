@@ -64,10 +64,12 @@ export default function Home() {
         <meta name="twitter:image" content={OG_IMAGE.url} />
         <meta name="twitter:image:alt" content={OG_IMAGE.alt} />
 
-        {/* Structured data — built from the real project/skill data. */}
+        {/* Structured data — built from the real project/skill data. `<` is
+            escaped so a `</script>` substring in any field (e.g. a future
+            project description) can't break out of the script tag. */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd()) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd()).replace(/</g, '\\u003c') }}
         />
       </Head>
 

@@ -3,7 +3,7 @@ import { checkBotId } from 'botid/server';
 import { botIdOptions } from '../../lib/botid';
 import { Resend } from 'resend';
 import { promises as dns } from 'dns';
-import { field, escapeHtml, sanitizeDisplayName, safeIp, rateLimit } from '../../lib/security';
+import { field, headerField, escapeHtml, sanitizeDisplayName, safeIp, rateLimit, isSameOrigin } from '../../lib/security';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -36,6 +36,7 @@ async function validateEmail(email: string): Promise<string | null> {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (!isSameOrigin(req)) return res.status(403).json({ error: 'Cross-site request rejected' });
 
   // Bot check runs first — before parsing, validating, or spending a Resend send
   // on a request we're going to throw away anyway.
@@ -58,7 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Coerce + length-cap all inputs before doing anything with them.
   const name = field(req.body?.name, 100);
   const email = field(req.body?.email, 254);
-  const subject = field(req.body?.subject, 150);
+  const subject = headerField(req.body?.subject, 150);
   const message = field(req.body?.message, 5000);
 
   if (!name || !email || !subject || !message)

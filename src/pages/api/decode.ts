@@ -5,7 +5,7 @@
 // client never throws on a failed write, so an unchecked call silently no-ops.
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getSupabase } from '../../lib/supabase';
-import { field, safeIp, rateLimit } from '../../lib/security';
+import { field, safeIp, rateLimit, isSameOrigin } from '../../lib/security';
 
 const STAGE_COUNT = 4;
 
@@ -50,7 +50,20 @@ async function getState(supabase: ReturnType<typeof getSupabase>): Promise<Puzzl
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const supabase = getSupabase();
 
+  const rawIp =
+    req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
+    req.headers['x-real-ip']?.toString() ||
+    req.socket.remoteAddress ||
+    '';
+  const validIp = safeIp(rawIp);
+  const ipKey = validIp || rawIp || 'unknown';
+
   if (req.method === 'GET') {
+    // Read-only and public, but still throttled — otherwise this endpoint has
+    // no request cost at all and can be hammered freely.
+    if (!rateLimit(`decode:get:${ipKey}`, 20, 10_000))
+      return res.status(429).json({ error: 'Too many requests. Try again in a bit.' });
+
     let state: PuzzleState;
     try {
       state = await getState(supabase);
@@ -96,6 +109,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (req.method === 'POST') {
+    if (!isSameOrigin(req)) return res.status(403).json({ error: 'Cross-site request rejected' });
+
     let state: PuzzleState;
     try {
       state = await getState(supabase);
@@ -108,14 +123,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const stage = state.current_stage;
 
-    const rawIp =
-      req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
-      req.headers['x-real-ip']?.toString() ||
-      req.socket.remoteAddress ||
-      '';
-    const validIp = safeIp(rawIp);
-
-    if (!rateLimit(`decode:${validIp || rawIp || 'unknown'}:stage${stage}`, 1, 25_000))
+    if (!rateLimit(`decode:${ipKey}:stage${stage}`, 1, 25_000))
       return res.status(429).json({ error: 'Too many guesses. Try again in a bit.' });
 
     const guess = field(req.body?.guess, 500);

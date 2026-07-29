@@ -3,7 +3,7 @@ import { checkBotId } from 'botid/server';
 import { botIdOptions } from '../../lib/botid';
 import { Resend } from 'resend';
 import { promises as dns } from 'dns';
-import { escapeHtml, field, sanitizeDisplayName, safeIp, rateLimit } from '../../lib/security';
+import { escapeHtml, field, headerField, sanitizeDisplayName, safeIp, rateLimit, isSameOrigin } from '../../lib/security';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -34,6 +34,7 @@ async function validateEmail(email: string): Promise<string | null> {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (!isSameOrigin(req)) return res.status(403).json({ error: 'Cross-site request rejected' });
 
   // Bot check runs first — before parsing, validating, or spending a Resend send
   // on a request we're going to throw away anyway.
@@ -56,7 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Coerce + length-cap all inputs before doing anything with them.
   const name = field(req.body?.name, 100);
   const email = field(req.body?.email, 254);
-  const projectType = field(req.body?.projectType, 100);
+  const projectType = headerField(req.body?.projectType, 100);
   const budget = field(req.body?.budget, 100);
   const timeline = field(req.body?.timeline, 100);
   const details = field(req.body?.details, 5000);
@@ -72,7 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       from: `${sanitizeDisplayName(name)} <onboarding@resend.dev>`,
       to: 'alaafayyadp1@gmail.com',
       replyTo: email,
-      subject: `[Quote Request] ${projectType || 'New Project'} — ${name}`,
+      subject: `[Quote Request] ${projectType || 'New Project'} — ${sanitizeDisplayName(name)}`,
        html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #f8f8fc; border-radius: 12px;">
           <div style="background: linear-gradient(135deg, #6366f1, #a855f7); padding: 24px; border-radius: 10px; margin-bottom: 24px;">
