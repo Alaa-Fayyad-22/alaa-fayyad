@@ -597,6 +597,106 @@ export default function Document() {
             display: flex; align-items: center; justify-content: center; }
           .term-cue:hover { color: var(--primary); }
 
+          /* ════════════════ TERMINAL EASTER EGGS (/decode, /fix) ════════════════
+             Rendered inside the shared <Modal>, so focus-trap / esc / scroll-lock
+             / focus-restore all come from there. These classes only skin the
+             content — same tokens, font, and timings as the terminal above. */
+          .decode-panel, .fix-panel {
+            font-family: var(--font-mono), monospace; color: var(--term-text);
+            font-size: 0.92rem; line-height: 1.7; display: flex; flex-direction: column; gap: 14px;
+          }
+          .decode-hint, .fix-hint-line { color: var(--term-title); opacity: 0.85; font-size: 0.78rem; margin: 0; }
+          .decode-progress {
+            color: var(--term-title); opacity: 0.7; font-size: 0.76rem; margin: 0;
+            letter-spacing: 0.04em; text-transform: uppercase;
+          }
+
+          .decode-solved, .fix-success {
+            font-family: var(--font-mono), monospace; color: var(--term-green);
+            background: rgba(74, 222, 128, 0.12); border: 1px solid rgba(74, 222, 128, 0.35);
+            border-radius: 8px; padding: 10px 14px; font-size: 0.86rem;
+          }
+          .decode-solved-date { color: var(--term-title); }
+
+          .decode-complete { display: flex; flex-direction: column; gap: 16px; padding: 6px 2px 2px; }
+          .decode-complete-text {
+            font-family: var(--font-mono), monospace; color: var(--term-text);
+            white-space: pre-wrap; word-break: break-word; margin: 0; line-height: 2;
+          }
+          .decode-complete-stat { color: var(--term-title); opacity: 0.8; font-size: 0.82rem; margin: 0; }
+
+          .decode-riddle {
+            font-family: var(--font-mono), monospace; color: var(--term-accent);
+            white-space: pre-wrap; word-break: break-word; margin: 0;
+            border-inline-start: 2px solid var(--term-border); padding-inline-start: 12px;
+          }
+
+          .decode-feed {
+            border: 1px solid var(--term-border); border-radius: 8px; padding: 10px 12px;
+            max-height: 220px; overflow-y: auto; overscroll-behavior: contain;
+            scrollbar-width: thin; scrollbar-color: var(--term-border) transparent;
+            display: flex; flex-direction: column; gap: 8px; background: var(--term-bg);
+          }
+          .decode-feed::-webkit-scrollbar { width: 8px; }
+          .decode-feed::-webkit-scrollbar-track { background: transparent; }
+          .decode-feed::-webkit-scrollbar-thumb { background: var(--term-border); border-radius: 4px; }
+          .decode-muted { color: var(--term-title); opacity: 0.85; margin: 0; font-size: 0.86rem; }
+          .decode-theory { display: flex; gap: 8px; font-size: 0.86rem; white-space: pre-wrap; word-break: break-word; }
+          .decode-theory-label { color: var(--term-accent); flex-shrink: 0; }
+          .decode-theory-content { color: var(--term-out); }
+
+          .decode-form { display: flex; gap: 8px; }
+          .decode-input {
+            flex: 1 1 auto; min-width: 0; background: var(--term-bg); color: var(--term-text);
+            border: 1px solid var(--term-border); border-radius: 6px; padding: 8px 10px;
+            font-family: var(--font-mono), monospace; font-size: 0.88rem; outline: none;
+          }
+          .decode-input:focus-visible { outline: 2px solid var(--term-accent); outline-offset: 1px; }
+          .decode-submit {
+            font-family: var(--font-mono), monospace; font-size: 0.86rem; color: var(--term-accent);
+            background: transparent; border: 1px solid var(--term-border); border-radius: 6px;
+            padding: 8px 14px; cursor: pointer; transition: border-color 0.18s ease, background 0.18s ease;
+          }
+          .decode-submit:hover:not(:disabled), .decode-submit:focus-visible { border-color: var(--term-accent); background: var(--surface-2); outline: none; }
+          .decode-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+          .decode-note { color: var(--term-title); font-size: 0.82rem; margin: 0; }
+          .decode-close { color: var(--term-accent); opacity: 0.85; font-size: 0.82rem; margin: 0; }
+          .decode-error { color: var(--term-err); font-size: 0.82rem; margin: 0; }
+          .decode-continue { align-self: flex-start; margin-top: 4px; }
+
+          .fix-meta { display: flex; align-items: center; gap: 10px; }
+          .fix-tag {
+            font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em;
+            color: var(--term-accent); border: 1px solid var(--term-border); border-radius: 999px;
+            padding: 2px 10px;
+          }
+          .fix-title { font-weight: 700; color: var(--term-text); }
+          .fix-status { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 0.86rem; color: var(--term-out); }
+          .fix-hint-btn {
+            font-family: var(--font-mono), monospace; font-size: 0.8rem; color: var(--term-accent);
+            background: transparent; border: 1px solid var(--term-border); border-radius: 6px;
+            padding: 5px 12px; cursor: pointer; transition: border-color 0.18s ease, background 0.18s ease;
+          }
+          .fix-hint-btn:hover, .fix-hint-btn:focus-visible { border-color: var(--term-accent); background: var(--surface-2); outline: none; }
+          .fix-hint-text { color: var(--term-title); font-size: 0.84rem; margin: 0; font-style: italic; }
+
+          .fix-split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-height: 280px; }
+          .fix-code {
+            width: 100%; height: 100%; min-height: 280px; resize: vertical;
+            background: var(--term-bg); color: var(--term-text); border: 1px solid var(--term-border);
+            border-radius: 8px; padding: 12px; font-family: var(--font-mono), monospace;
+            font-size: 0.8rem; line-height: 1.6; outline: none;
+          }
+          .fix-code:focus-visible { outline: 2px solid var(--term-accent); outline-offset: 1px; }
+          .fix-preview {
+            width: 100%; height: 100%; min-height: 280px; border: 1px solid var(--term-border);
+            border-radius: 8px; background: #fff;
+          }
+          @media (max-width: 700px) {
+            .fix-split { grid-template-columns: 1fr; }
+            .fix-code, .fix-preview { min-height: 220px; }
+          }
+
           /* ════════════════ CLEAN NAV ════════════════ */
           .snav { position: fixed; top: 0; left: 0; right: 0; z-index: 100;
             transition: background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease; border-bottom: 1px solid transparent; }

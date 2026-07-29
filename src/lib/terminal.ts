@@ -8,7 +8,10 @@
 
 export type Tone = 'cmd' | 'out' | 'accent' | 'muted' | 'name' | 'ok' | 'err';
 export type OutputLine = { text: string; tone?: Tone; href?: string };
-export type Action = { type: 'open'; href: string } | { type: 'scroll'; id: string };
+export type Action =
+  | { type: 'open'; href: string }
+  | { type: 'scroll'; id: string }
+  | { type: 'overlay'; id: 'decode' | 'fix' };
 export type CommandResult = { lines: OutputLine[]; action?: Action } | { clear: true };
 
 export type TermContext = {
@@ -164,6 +167,12 @@ export function runCommand(raw: string, ctx: TermContext): CommandResult {
 
     case cmd === 'hi' || cmd === 'hello' || cmd === 'hey':
       return { lines: [{ text: `hi. this terminal listens. type 'help' for commands.`, tone: 'out' }] };
+
+    case cmd === ':wq':
+      return { lines: [{ text: '→ decoding…', tone: 'ok' }], action: { type: 'overlay', id: 'decode' } };
+
+    // case cmd === '/fix':
+    //   return { lines: [{ text: '→ loading a broken component…', tone: 'ok' }], action: { type: 'overlay', id: 'fix' } };
 
     case cmd === 'joke':
       {

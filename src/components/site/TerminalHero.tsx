@@ -3,6 +3,8 @@ import { useTranslation } from '../../hooks/useTranslation';
 import { smoothScrollTo } from '../../lib/scroll';
 import { runCommand, type OutputLine, type TermContext } from '../../lib/terminal';
 import { ArrowDown } from 'lucide-react';
+import DecodePuzzle from './DecodePuzzle';
+import FixChallenge from './FixChallenge';
 
 type Line = { kind: 'cmd' | 'out'; text: string; cls?: string };
 type LogItem = { kind: 'in'; text: string } | { kind: 'out'; line: OutputLine };
@@ -29,6 +31,7 @@ export default function TerminalHero({ start }: { start: boolean }) {
   const [log, setLog] = useState<LogItem[]>([]);
   const [value, setValue] = useState('');
   const [focused, setFocused] = useState(false);
+  const [overlay, setOverlay] = useState<'decode' | 'fix' | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
 
@@ -126,6 +129,10 @@ export default function TerminalHero({ start }: { start: boolean }) {
         // on the next animation frame (after the confirmation line paints) with
         // no artificial delay, so it glides exactly like a nav-link click.
         requestAnimationFrame(() => requestAnimationFrame(() => smoothScrollTo(act.id)));
+      } else if (act.type === 'overlay') {
+        // Same 120ms beat as opening a link — let the confirmation line paint first.
+        const tid = setTimeout(() => setOverlay(act.id), 120);
+        actionTimers.current.push(tid);
       } else {
         const tid = setTimeout(() => {
           if (act.href.startsWith('mailto:')) window.location.href = act.href;
@@ -257,6 +264,9 @@ export default function TerminalHero({ start }: { start: boolean }) {
       <button className="term-cue" onClick={() => smoothScrollTo('about')} aria-label="Scroll to content">
         <ArrowDown size={20} className="animate-float" />
       </button>
+
+      <DecodePuzzle open={overlay === 'decode'} onClose={() => setOverlay(null)} />
+      <FixChallenge open={overlay === 'fix'} onClose={() => setOverlay(null)} />
     </section>
   );
 }
