@@ -48,86 +48,108 @@ export default function Document() {
           }
 
           /* ════════════════ DESIGN TOKENS ════════════════ */
+          /* SINGLE-ACCENT SYSTEM — one teal accent, one identity, both themes.
+             Five source colours per theme (bg / text / muted / border / accent);
+             every elevation / hover / disabled / focus state is a lightness step
+             or an alpha of those five, and intermediate solid shades are derived
+             with color-mix() in oklab, never a new hex. There is exactly ONE
+             accent hue anywhere on the site — no second colour for success,
+             error, prompts, or nav. Error states read as emphasised neutral text
+             on a faint neutral panel. The terminal window dots are monochrome in
+             both themes (see the override block near the end of this stylesheet).
+
+             DARK — bg #101418 · text #E4E7EA (14.4:1) · muted #9AA3AA (7.2:1)
+             · border #2C333A (1.45:1, dividers only) · accent #4FA8A0 (6.6:1).
+             Accent fill takes a near-black label (#0B0E10 on #4FA8A0 = 6.9:1). */
           :root, [data-theme="dark"] {
-            --bg: #0a0a0f;
-            --bg-secondary: #0d0c16;
-            --surface: rgba(168, 85, 247, 0.06);
-            --surface-2: rgba(168, 85, 247, 0.11);
-            --surface-solid: #12101c;
-            --border: rgba(168, 85, 247, 0.20);
-            --border-strong: rgba(168, 85, 247, 0.45);
-            --text: #ECECF4;
-            --text-muted: #9a98b8;
-            --primary: #a855f7;
-            --accent: #818cf8;
-            --glow: rgba(168, 85, 247, 0.45);
-            --glow-soft: rgba(168, 85, 247, 0.18);
-            --gradient: linear-gradient(135deg, #818cf8, #a855f7, #c084fc);
-            --grid-line: rgba(168, 85, 247, 0.11);
-            --nav-bg: rgba(10, 10, 15, 0.55);
-            --nav-bg-scrolled: rgba(10, 10, 15, 0.95);
+            --bg: #101418;
+            --surface: rgba(228, 231, 234, 0.05);
+            --surface-2: rgba(228, 231, 234, 0.09);
+            --surface-solid: color-mix(in oklab, #101418 88%, #2C333A);
+            --border: #2C333A;
+            --border-strong: color-mix(in oklab, #2C333A 55%, #9AA3AA); /* ~1.45:1 divider → ~3.3:1 for interactive edges */
+            --text: #E4E7EA;
+            --text-muted: #9AA3AA;
+            --primary: #4FA8A0;
+            --accent: #4FA8A0;
+            --glow: rgba(79, 168, 160, 0.35);
+            --gradient: var(--accent);
+            --nav-bg: rgba(16, 20, 24, 0.55);
+            --nav-bg-scrolled: rgba(16, 20, 24, 0.95);
             --card-shadow: rgba(0, 0, 0, 0.55);
-            --overlay: rgba(5, 4, 12, 0.72);
-            /* OS / HUD */
-            --hud: rgba(168, 85, 247, 0.85);
-            --hud-dim: rgba(168, 85, 247, 0.28);
-            --panel-bg: rgba(16, 14, 26, 0.62);
-            --panel-solid: #100e1a;
-            --scanline: rgba(180, 160, 255, 0.05);
-            --ok: #34d399;
-            /* Terminal hero (dark window — distinct, lighter than the page) */
-            --term-bg: #14121d;
-            --term-bar: #1c1a28;
-            --term-border: rgba(168, 85, 247, 0.35);
-            --term-bar-border: rgba(255, 255, 255, 0.07);
-            --term-title: #8080a6; /* WCAG AA: 4.53:1 on --term-bar (was #6b6b8a, 3.34:1) */
-            --term-text: #e6e6f0;
-            --term-out: #c9c9da;
-            --term-green: #4ade80;
-            --term-accent: #c4b5fd;
-            --term-err: #ff7b72;
+            --overlay: rgba(0, 0, 0, 0.72);
+            /* Label colour on an accent fill (buttons, active pills): near-black
+               in dark (#0B0E10 on #4FA8A0 = 6.9:1; white on #4FA8A0 fails). */
+            --on-gradient: #0B0E10;
+            /* Error styling — neutral, no hue. Emphasised text + faint text tint. */
+            --danger: #E4E7EA;
+            --danger-bg: rgba(228, 231, 234, 0.10);
+            --danger-border: rgba(228, 231, 234, 0.28);
+            --panel-solid: color-mix(in oklab, #101418 88%, #2C333A);
+            --ok: #4FA8A0;
+            /* Terminal hero (dark window — a couple of lightness steps above the page) */
+            --term-bg: color-mix(in oklab, #101418 82%, #2C333A);
+            --term-bar: color-mix(in oklab, #101418 70%, #2C333A);
+            --term-border: #2C333A;
+            --term-bar-border: rgba(255, 255, 255, 0.06);
+            --term-title: #9AA3AA;
+            --term-text: #E4E7EA;
+            --term-out: #9AA3AA;
+            --term-green: #4FA8A0; /* the "$" prompt — the accent, not green */
+            --term-accent: #4FA8A0;
+            --term-err: #E4E7EA;   /* error line — neutral bright text, no red */
             color-scheme: dark;
           }
 
+          /* LIGHT — bg #F7F9FA · text #14181C (16.9:1) · muted #5C6670 (5.5:1)
+             · border #DCE1E4 (1.2:1, dividers only) · accent #2E7D76 (4.6:1).
+             Accent fill takes a WHITE label (#fff on #2E7D76 = 4.9:1; near-black
+             on #2E7D76 fails). */
           [data-theme="light"] {
-            --bg: #eceef7;
-            --bg-secondary: #e1e3f1;
-            --surface: rgba(255, 255, 255, 0.74);
-            --surface-2: rgba(124, 58, 237, 0.09);
+            --bg: #F7F9FA;
+            --surface: rgba(255, 255, 255, 0.72);
+            --surface-2: rgba(20, 24, 28, 0.05);
             --surface-solid: #ffffff;
-            --border: rgba(124, 58, 237, 0.30);
-            --border-strong: rgba(124, 58, 237, 0.55);
-            --text: #141229;
-            --text-muted: #4f4d6e;
-            --primary: #7c3aed;
-            --accent: #6d28d9;
-            --glow: rgba(124, 58, 237, 0.30);
-            --glow-soft: rgba(124, 58, 237, 0.14);
-            --gradient: linear-gradient(135deg, #6366f1, #7c3aed, #a855f7);
-            --grid-line: rgba(124, 58, 237, 0.16);
-            --nav-bg: rgba(255, 255, 255, 0.62);
-            --nav-bg-scrolled: rgba(255, 255, 255, 0.95);
-            --card-shadow: rgba(80, 60, 140, 0.20);
-            --overlay: rgba(20, 18, 42, 0.55);
-            /* OS / HUD — daylight console: prominent violet chrome */
-            --hud: rgba(124, 58, 237, 0.88);
-            --hud-dim: rgba(124, 58, 237, 0.40);
-            --panel-bg: rgba(255, 255, 255, 0.80);
+            --border: #DCE1E4;
+            --border-strong: color-mix(in oklab, #5C6670 65%, #DCE1E4); /* ~1.2:1 divider → ~3.7:1 for interactive edges */
+            --text: #14181C;
+            --text-muted: #5C6670;
+            --primary: #2E7D76;
+            --accent: #2E7D76;
+            --glow: rgba(46, 125, 118, 0.28);
+            --gradient: var(--accent);
+            --nav-bg: rgba(247, 249, 250, 0.62);
+            --nav-bg-scrolled: rgba(247, 249, 250, 0.95);
+            --card-shadow: rgba(20, 24, 28, 0.12);
+            --overlay: rgba(20, 24, 28, 0.45);
+            --on-gradient: #ffffff; /* white label on the accent fill in light */
+            --danger: #14181C;
+            --danger-bg: rgba(20, 24, 28, 0.05);
+            --danger-border: rgba(20, 24, 28, 0.18);
             --panel-solid: #ffffff;
-            --scanline: rgba(124, 58, 237, 0.07);
-            --ok: #0ea371;
-            /* Terminal hero (light surface, dark text — stays readable) */
-            --term-bg: #f6f5fc;
-            --term-bar: #e9e7f5;
-            --term-border: rgba(124, 58, 237, 0.30);
-            --term-bar-border: rgba(20, 18, 42, 0.08);
-            --term-title: #67648c; /* WCAG AA: 4.56:1 on --term-bar (was #6a6790, 4.35:1) */
-            --term-text: #2a2740;
-            --term-out: #4a4766;
-            --term-green: #15803d;
-            --term-accent: #6d28d9;
-            --term-err: #c0362c;
+            --ok: #2E7D76;
+            /* Terminal hero (white card on the near-white page, border-defined —
+               kept at #fff so the accent "$" clears 4.5:1 on it). */
+            --term-bg: #ffffff;
+            --term-bar: color-mix(in oklab, #ffffff 90%, #14181C);
+            --term-border: #DCE1E4;
+            --term-bar-border: rgba(20, 24, 28, 0.08);
+            --term-title: #5C6670;
+            --term-text: #14181C;
+            --term-out: #5C6670;
+            --term-green: #2E7D76; /* the "$" prompt — the accent, not green */
+            --term-accent: #2E7D76;
+            --term-err: #14181C;   /* error line — neutral text, no red */
             color-scheme: light;
+          }
+
+          /* Radius scale — deliberate, not uniform:
+             control = near-square (inputs, small icon buttons)
+             panel   = cards, panels, modals, buttons, the terminal window
+             full pill (999px) is reserved for tags/chips only; 50% for dots. */
+          :root {
+            --radius-control: 3px;
+            --radius-panel: 8px;
           }
 
           html { background-color: var(--bg); }
@@ -157,145 +179,56 @@ export default function Document() {
 
           ::-webkit-scrollbar { width: 7px; }
           ::-webkit-scrollbar-track { background: var(--bg); }
-          ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+          ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: var(--radius-control); }
 
-          /* ════════════════ FONTS ════════════════ */
-          .font-display { font-family: var(--font-mono), monospace; }
-          .font-mono    { font-family: var(--font-mono), monospace; }
-          .font-arabic  { font-family: var(--font-arabic), sans-serif; }
-
-          /* ════════════════ BACKGROUND GRID ════════════════ */
-          .grid-bg {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            pointer-events: none;
-            background-image: radial-gradient(circle, var(--grid-line) 1px, transparent 1px);
-            background-size: 38px 38px;
-            -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 0%, transparent 72%);
-            mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 0%, transparent 72%);
-            animation: gridDrift 40s linear infinite;
-          }
-          @keyframes gridDrift {
-            from { background-position: 0 0; }
-            to   { background-position: 38px 38px; }
-          }
-
-          /* ════════════════ GRADIENT / GLOW ════════════════ */
-          .gradient-text {
-            background: var(--gradient);
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: gradient 6s ease infinite;
-          }
-          .glow      { box-shadow: 0 0 30px var(--glow), 0 0 60px var(--glow-soft); }
-          .glow-text { text-shadow: 0 0 22px var(--glow); }
-
+          /* Plain bordered surface. Was ".glass" (backdrop-blur + translucent) —
+             the blur did nothing behind a static card, so it is now just an
+             opaque panel with a border. The one intentional backdrop-blur left
+             on the site is the scrolled nav bar (content moves under it). */
           .glass {
-            background: var(--surface);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: var(--surface-solid);
             border: 1px solid var(--border);
-          }
-
-          /* Gradient-outlined surface (mask trick) */
-          .gradient-border {
-            position: relative;
-            border: 1px solid transparent;
-            background:
-              linear-gradient(var(--surface-solid), var(--surface-solid)) padding-box,
-              var(--gradient) border-box;
           }
 
           /* ════════════════ BUTTONS ════════════════ */
           .btn-primary {
             display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 28px; border-radius: 999px;
-            background: var(--gradient); color: #fff;
+            padding: 12px 28px; border-radius: var(--radius-panel);
+            background: var(--accent); color: var(--on-gradient);
             font-weight: 600; font-size: 0.95rem;
             border: none; cursor: pointer; text-decoration: none;
-            box-shadow: 0 0 0 transparent;
-            transition: transform 0.2s ease, box-shadow 0.25s ease;
+            transition: transform 0.15s ease, filter 0.15s ease;
           }
-          .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px var(--glow);
-          }
+          .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.06); }
           .btn-primary:focus-visible {
             outline: 2px solid var(--primary); outline-offset: 3px;
           }
 
           .btn-outline {
             display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 28px; border-radius: 999px;
-            background: var(--surface); color: var(--primary);
+            padding: 12px 28px; border-radius: var(--radius-panel);
+            background: transparent; color: var(--primary);
             font-weight: 600; font-size: 0.95rem;
             border: 1px solid var(--border-strong);
             cursor: pointer; text-decoration: none;
-            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            transition: transform 0.2s ease, box-shadow 0.25s ease, background 0.2s ease;
+            transition: background 0.15s ease, border-color 0.15s ease;
           }
           .btn-outline:hover {
-            transform: translateY(-2px);
             background: var(--surface-2);
-            box-shadow: 0 8px 30px var(--glow);
+            border-color: var(--primary);
           }
           .btn-outline:focus-visible {
             outline: 2px solid var(--primary); outline-offset: 3px;
           }
 
           /* ════════════════ SCROLL REVEAL ════════════════ */
-          .reveal {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.7s ease, transform 0.7s ease;
-            will-change: opacity, transform;
-          }
-          .reveal.revealed { opacity: 1; transform: translateY(0); }
+          /* Opacity only — no slide. A quick fade in as sections enter view. */
+          .reveal { opacity: 0; transition: opacity 0.3s ease; }
+          .reveal.revealed { opacity: 1; }
 
-          /* Hero staggered entrance */
-          .hero-item {
-            opacity: 0;
-            transform: translateY(32px);
-            animation: heroSlideUp 0.7s ease forwards;
-          }
-          .hero-item:nth-child(1) { animation-delay: 0s; }
-          .hero-item:nth-child(2) { animation-delay: 0.12s; }
-          .hero-item:nth-child(3) { animation-delay: 0.22s; }
-          .hero-item:nth-child(4) { animation-delay: 0.34s; }
-          .hero-item:nth-child(5) { animation-delay: 0.44s; }
-          .hero-item:nth-child(6) { animation-delay: 0.54s; }
-          .hero-item:nth-child(7) { animation-delay: 0.66s; }
-          @keyframes heroSlideUp { to { opacity: 1; transform: translateY(0); } }
-
-          /* ════════════════ NAV / MISC HELPERS ════════════════ */
-          .skill-bar { height: 6px; border-radius: 3px; background: var(--border); overflow: clip; }
-          .skill-bar-fill {
-            height: 100%; border-radius: 3px; background: var(--gradient);
-            transform-origin: left; transform: scaleX(0);
-            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
-          }
-          [dir="rtl"] .skill-bar-fill { transform-origin: right; }
-          .skill-bar-fill.animated { transform: scaleX(1); }
-
-          @keyframes gradient {
-            0%, 100% { background-position: 0% 50%; }
-            50%      { background-position: 100% 50%; }
-          }
-          @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50%      { transform: translateY(-18px); }
-          }
           @keyframes blink {
             0%, 100% { opacity: 1; }
             50%      { opacity: 0; }
-          }
-          .animate-float { animation: float 6s ease-in-out infinite; }
-          .animate-blink { animation: blink 1s step-end infinite; }
-          @media (prefers-reduced-motion: reduce) {
-            .animate-float { animation: none; }
           }
 
           section[id] { scroll-margin-top: 72px; }
@@ -309,7 +242,6 @@ export default function Document() {
             display: flex; align-items: center; justify-content: center;
             padding: 24px;
             background: var(--overlay);
-            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
             animation: fadeIn 0.18s ease both;
           }
           @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -321,18 +253,13 @@ export default function Document() {
             display: flex; flex-direction: column;
             width: min(720px, 100%); max-height: min(85vh, 760px);
             overflow: hidden;
-            border-radius: 16px;
+            border-radius: var(--radius-panel);
             border: 1px solid var(--border);
             background: var(--panel-solid);
-            box-shadow: 0 24px 70px var(--card-shadow), 0 0 0 1px var(--glow-soft);
-            animation: modalIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
-          }
-          @keyframes modalIn {
-            from { opacity: 0; transform: translateY(12px) scale(0.98); }
-            to   { opacity: 1; transform: none; }
+            box-shadow: 0 24px 70px var(--card-shadow);
           }
           @media (prefers-reduced-motion: reduce) {
-            .modal-overlay, .modal-panel { animation: none; }
+            .modal-overlay { animation: none; }
           }
 
           /* Fixed header — stays put while the body scrolls under it. */
@@ -351,7 +278,7 @@ export default function Document() {
           .modal-x {
             flex: 0 0 auto;
             display: inline-flex; align-items: center; justify-content: center;
-            width: 34px; height: 34px; border-radius: 9px;
+            width: 34px; height: 34px; border-radius: var(--radius-control);
             background: var(--bg); color: var(--text-muted);
             border: 1px solid var(--border); cursor: pointer;
             transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
@@ -406,7 +333,7 @@ export default function Document() {
           .legal-link {
             background: none; border: none; padding: 2px 4px; cursor: pointer;
             font-size: 0.8rem; color: var(--text-muted);
-            border-radius: 4px; transition: color 0.18s ease;
+            border-radius: var(--radius-control); transition: color 0.18s ease;
             font-family: inherit;
           }
           .legal-link:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
@@ -414,15 +341,12 @@ export default function Document() {
 
           @media (max-width: 560px) {
             .modal-overlay { padding: 12px; }
-            .modal-panel { max-height: 88vh; border-radius: 14px; }
+            .modal-panel { max-height: 88vh; border-radius: var(--radius-panel); }
             .modal-head { padding: 16px 18px; }
             .modal-scroll { padding: 18px; }
           }
 
-          /* ════════════════ CONTENT SHELL OFFSET ════════════════ */
-          .page-shell { padding-top: 34px; padding-bottom: 32px; }
           @media (min-width: 1100px) {
-            .page-shell { padding-inline-start: 256px; }
             section[id] { scroll-margin-top: 40px; }
           }
 
@@ -439,7 +363,7 @@ export default function Document() {
             display: flex;
             flex-direction: column;
             height: 100%;
-            border-radius: 22px;
+            border-radius: var(--radius-panel);
             overflow: hidden;
           }
           .proj-media {
@@ -498,14 +422,13 @@ export default function Document() {
             gap: clamp(12px, 2vw, 18px); direction: ltr; align-self: stretch; }
           .screen-eyebrow__num { font-family: var(--font-mono), monospace; font-weight: 800;
             font-size: clamp(1.9rem, 5vw, 3.2rem); line-height: 1; color: var(--primary);
-            letter-spacing: -0.02em; text-shadow: 0 0 24px var(--glow-soft); }
+            letter-spacing: -0.02em; }
           .screen-eyebrow__rule { width: 2px; align-self: stretch; min-height: 1em;
-            background: var(--primary); border-radius: 1px; opacity: 0.85; }
+            background: var(--primary); opacity: 0.85; }
           .screen-title { font-weight: 800; color: var(--text);
             font-size: clamp(1.9rem, 5vw, 3.2rem); line-height: 1.1; letter-spacing: -0.02em;
             min-width: 0; }
           .screen-sub { color: var(--text-muted); font-size: 1.02rem; line-height: 1.7; max-width: 620px; }
-          .screen-body { margin-top: 14px; }
 
           /* Visually-hidden (screen-reader only) */
           .hd-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -525,9 +448,9 @@ export default function Document() {
           .boot2__ok { color: var(--ok); }
           .boot2__caret { color: var(--primary); }
           .boot2__barwrap { margin-top: 20px; width: min(360px, 70vw); height: 6px;
-            background: var(--surface); border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
-          .boot2__bar { height: 100%; width: 0; background: var(--gradient);
-            box-shadow: 0 0 12px var(--glow); animation: bootBar 1.7s ease forwards; }
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-control); overflow: hidden; }
+          .boot2__bar { height: 100%; width: 0; background: var(--accent);
+            animation: bootBar 1.7s ease forwards; }
           .hd-blink { animation: blink 1s step-end infinite; }
           @keyframes bootBar { from { width: 0; } to { width: 100%; } }
           @keyframes bootFadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -536,9 +459,9 @@ export default function Document() {
           /* ════════════════ TERMINAL HERO ════════════════ */
           .term-hero { position: relative; min-height: 100vh; display: flex; flex-direction: column;
             align-items: center; justify-content: center; gap: 28px; padding: 90px 20px 40px; }
-          .term-win { width: min(720px, 92vw); border-radius: 12px; overflow: hidden;
+          .term-win { width: min(720px, 92vw); border-radius: var(--radius-panel); overflow: hidden;
             background: var(--term-bg); border: 1px solid var(--term-border);
-            box-shadow: 0 24px 70px var(--card-shadow), 0 0 38px var(--glow-soft); }
+            box-shadow: 0 24px 70px var(--card-shadow); }
           .term-bar { display: flex; align-items: center; gap: 8px; padding: 11px 14px;
             background: var(--term-bar); border-bottom: 1px solid var(--term-bar-border); position: relative; }
           .term-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
@@ -591,8 +514,17 @@ export default function Document() {
           .term-input-ph { color: var(--term-title); opacity: 0.75; margin-inline-start: 6px; }
           .term-input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0;
             background: transparent; border: none; outline: none;
-            font-family: var(--font-mono), monospace; font-size: inherit; line-height: inherit;
-            color: transparent; caret-color: transparent; }
+            font-family: var(--font-mono), monospace; line-height: inherit;
+            color: transparent; caret-color: transparent;
+            /* Fixed at 16px (not "inherit", which tracks .term-body's
+               clamp(0.82rem, 2vw, 1rem) and dips as low as ~13px on phones) —
+               iOS Safari auto-zooms the whole page on focus for any input
+               under 16px. .term-body's own clamp already tops out at exactly
+               16px, so this is a no-op on desktop and only raises the floor
+               on narrow viewports. The input is fully transparent (a
+               keystroke-capture overlay for the visible .term-input-echo
+               beside it), so this can't cause any visible size mismatch. */
+            font-size: 16px; }
           .term-cue { background: none; border: none; cursor: pointer; color: var(--text-muted);
             display: flex; align-items: center; justify-content: center; }
           .term-cue:hover { color: var(--primary); }
@@ -613,8 +545,9 @@ export default function Document() {
 
           .decode-solved, .fix-success {
             font-family: var(--font-mono), monospace; color: var(--term-green);
-            background: rgba(74, 222, 128, 0.12); border: 1px solid rgba(74, 222, 128, 0.35);
-            border-radius: 8px; padding: 10px 14px; font-size: 0.86rem;
+            background: color-mix(in oklab, var(--accent) 12%, transparent);
+            border: 1px solid color-mix(in oklab, var(--accent) 35%, transparent);
+            border-radius: var(--radius-panel); padding: 10px 14px; font-size: 0.86rem;
           }
           .decode-solved-date { color: var(--term-title); }
 
@@ -632,7 +565,7 @@ export default function Document() {
           }
 
           .decode-feed {
-            border: 1px solid var(--term-border); border-radius: 8px; padding: 10px 12px;
+            border: 1px solid var(--term-border); border-radius: var(--radius-panel); padding: 10px 12px;
             max-height: 220px; overflow-y: auto; overscroll-behavior: contain;
             scrollbar-width: thin; scrollbar-color: var(--term-border) transparent;
             display: flex; flex-direction: column; gap: 8px; background: var(--term-bg);
@@ -648,13 +581,19 @@ export default function Document() {
           .decode-form { display: flex; gap: 8px; }
           .decode-input {
             flex: 1 1 auto; min-width: 0; background: var(--term-bg); color: var(--term-text);
-            border: 1px solid var(--term-border); border-radius: 6px; padding: 8px 10px;
+            border: 1px solid var(--term-border); border-radius: var(--radius-control); padding: 8px 10px;
             font-family: var(--font-mono), monospace; font-size: 0.88rem; outline: none;
           }
           .decode-input:focus-visible { outline: 2px solid var(--term-accent); outline-offset: 1px; }
+          /* 0.88rem (~14px) is under iOS Safari's 16px auto-zoom-on-focus
+             threshold — bump to 16px on touch-width viewports only, keeping
+             the smaller terminal-density look on desktop. */
+          @media (max-width: 820px) {
+            .decode-input { font-size: 16px; }
+          }
           .decode-submit {
             font-family: var(--font-mono), monospace; font-size: 0.86rem; color: var(--term-accent);
-            background: transparent; border: 1px solid var(--term-border); border-radius: 6px;
+            background: transparent; border: 1px solid var(--term-border); border-radius: var(--radius-control);
             padding: 8px 14px; cursor: pointer; transition: border-color 0.18s ease, background 0.18s ease;
           }
           .decode-submit:hover:not(:disabled), .decode-submit:focus-visible { border-color: var(--term-accent); background: var(--surface-2); outline: none; }
@@ -674,7 +613,7 @@ export default function Document() {
           .fix-status { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 0.86rem; color: var(--term-out); }
           .fix-hint-btn {
             font-family: var(--font-mono), monospace; font-size: 0.8rem; color: var(--term-accent);
-            background: transparent; border: 1px solid var(--term-border); border-radius: 6px;
+            background: transparent; border: 1px solid var(--term-border); border-radius: var(--radius-control);
             padding: 5px 12px; cursor: pointer; transition: border-color 0.18s ease, background 0.18s ease;
           }
           .fix-hint-btn:hover, .fix-hint-btn:focus-visible { border-color: var(--term-accent); background: var(--surface-2); outline: none; }
@@ -684,17 +623,23 @@ export default function Document() {
           .fix-code {
             width: 100%; height: 100%; min-height: 280px; resize: vertical;
             background: var(--term-bg); color: var(--term-text); border: 1px solid var(--term-border);
-            border-radius: 8px; padding: 12px; font-family: var(--font-mono), monospace;
+            border-radius: var(--radius-panel); padding: 12px; font-family: var(--font-mono), monospace;
             font-size: 0.8rem; line-height: 1.6; outline: none;
           }
           .fix-code:focus-visible { outline: 2px solid var(--term-accent); outline-offset: 1px; }
           .fix-preview {
             width: 100%; height: 100%; min-height: 280px; border: 1px solid var(--term-border);
-            border-radius: 8px; background: #fff;
+            border-radius: var(--radius-panel); background: #fff;
           }
           @media (max-width: 700px) {
             .fix-split { grid-template-columns: 1fr; }
             .fix-code, .fix-preview { min-height: 220px; }
+          }
+          /* 0.8rem (~13px) is under iOS Safari's 16px auto-zoom-on-focus
+             threshold — bump to 16px on touch-width viewports only, keeping
+             the smaller editor-density look on desktop. */
+          @media (max-width: 820px) {
+            .fix-code { font-size: 16px; }
           }
 
           /* ════════════════ CLEAN NAV ════════════════ */
@@ -707,55 +652,33 @@ export default function Document() {
           .snav__logo { display: inline-flex; align-items: center; background: none; border: none;
             cursor: pointer; padding: 0; font-family: var(--font-mono), monospace;
             font-weight: 700; font-size: 1.05rem; color: var(--text); letter-spacing: -0.01em; }
-          /* Decorative terminal caret after the name (echoes the "$ whoami" hero) */
-          .snav__caret { display: inline-block; width: 0.55em; height: 1.05em;
-            vertical-align: text-bottom; margin-inline-start: 4px; border-radius: 1px;
-            background: var(--primary); animation: blink 1s step-end infinite; }
-          @media (prefers-reduced-motion: reduce) { .snav__caret { animation: none; } }
-          .snav__links { position: relative; display: flex; align-items: center; gap: 26px;
-            --arrow-gap: 8px; }
-          /* Terminal-style hover: a violet ">" slides in from the left (no reflow) */
+          .snav__links { position: relative; display: flex; align-items: center; gap: 26px; --arrow-gap: 8px; }
           .snav__link { position: relative; background: none; border: none; cursor: pointer; padding: 0;
-            font-size: 0.9rem; color: var(--text-muted); transition: color 0.35s ease; }
-          .snav__link::before { content: '>'; position: absolute; inset-inline-start: -11px; top: 0;
-            font-family: var(--font-mono), monospace; color: var(--primary);
-            opacity: 0; transform: translateX(-3px);
-            transition: opacity 0.2s ease, transform 0.2s ease; }
+            font-size: 0.9rem; color: var(--text-muted); transition: color 0.2s ease; }
           .snav__link:hover, .snav__link:focus-visible { color: var(--primary); }
-          .snav__link:hover::before, .snav__link:focus-visible::before { opacity: 1; transform: translateX(0); }
-          /* Scroll-spy active link: violet text only — the traveling shared
-             arrow + underline (below) mark it, so no per-link markers here. */
           .snav__link.is-active { color: var(--primary); }
-          /* Active link's own hover ">" is suppressed; the shared arrow owns it. */
-          .snav__link.is-active::before,
-          .snav__link.is-active:hover::before { opacity: 0; }
-          /* Shared traveling indicator (desktop). left/width are set inline from
-             the measured active link; the CSS transition makes them glide. The
-             constant transform sets the snug gap (LTR) / mirror (RTL). */
-          /* The position transition lives on the base element UNCONDITIONALLY,
-             so every left/width change glides. First-frame placement is made
-             instant via an inline transition:none from JS (see SiteNav), which
-             is removed one frame later — that avoids the slide-in-from-0 without
-             ever leaving left/width un-transitioned on real moves. */
+          /* Scroll-spy indicator: a terminal-style ">" plus an underline, both
+             gliding (CSS transition on left/width) to the active link. */
           .snav__arrow, .snav__underline { position: absolute; opacity: 0; pointer-events: none;
-            transition: left 0.45s cubic-bezier(.6,.1,.2,1), width 0.45s cubic-bezier(.6,.1,.2,1), opacity 0.25s ease; }
+            transition: left 0.35s ease, width 0.35s ease, opacity 0.2s ease; }
           .snav__arrow.is-on, .snav__underline.is-on { opacity: 1; }
           .snav__arrow { top: 50%; font-family: var(--font-mono), monospace; font-size: 0.9rem;
             line-height: 1; color: var(--primary);
             transform: translate(calc(-100% - var(--arrow-gap)), -50%); }
           [dir="rtl"] .snav__arrow { transform: translate(var(--arrow-gap), -50%) scaleX(-1); }
-          .snav__underline { bottom: -7px; height: 2px; border-radius: 2px; background: var(--primary); }
+          .snav__underline { bottom: -7px; height: 2px; background: var(--primary); }
           @media (prefers-reduced-motion: reduce) {
-            .snav__link::before { transition: opacity 0.2s ease; transform: none; }
-            .snav__arrow, .snav__underline { transition: opacity 0.25s ease; }
+            .snav__arrow, .snav__underline { transition: opacity 0.2s ease; }
           }
           .snav__actions { display: flex; align-items: center; gap: 8px; }
-          .snav__icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
+          /* 44px min — WCAG/iOS touch-target floor. Visual icon size (size={17}
+             in SiteNav) is unchanged; this only grows the surrounding hit area. */
+          .snav__icon { width: 44px; height: 44px; border-radius: var(--radius-control); display: flex; align-items: center; justify-content: center;
             border: 1px solid var(--border); background: var(--surface); color: var(--primary); cursor: pointer;
-            font-size: 0.72rem; font-weight: 700; transition: border-color 0.2s, box-shadow 0.2s; }
+            font-size: 0.72rem; font-weight: 700; transition: border-color 0.2s; }
           .snav__icon:hover { border-color: var(--primary); }
-          .snav__icon--text { width: auto; padding: 0 11px; font-family: var(--font-mono), monospace; }
-          .snav__burger { display: none; width: 36px; height: 36px; align-items: center; justify-content: center;
+          .snav__icon--text { width: auto; padding: 0 14px; font-family: var(--font-mono), monospace; }
+          .snav__burger { display: none; width: 44px; height: 44px; align-items: center; justify-content: center;
             border: none; background: none; color: var(--text); cursor: pointer; }
           /* Three bars that morph into an X when .is-open (transform/opacity only) */
           .snav__burger-box { position: relative; width: 22px; height: 16px; }
@@ -824,6 +747,18 @@ export default function Document() {
           @media (min-width: 761px) {
             .snav__drawer { display: none; }
           }
+
+          /* Terminal window dots: monochrome in both themes. They are inert chrome
+             (they don't close/minimise anything), so the row-of-three shape
+             carries the "terminal window" cue without three extra hues competing
+             with the single accent. One muted-grey value for all three. */
+          .term-dot--r,
+          .term-dot--y,
+          .term-dot--g { background: var(--text-muted); }
+
+          /* Fallback surface behind a project image (never seen once the image
+             loads); no per-project colour in a one-accent system. */
+          .proj-media { background: var(--surface-2); }
         `}}
         />
       </Head>

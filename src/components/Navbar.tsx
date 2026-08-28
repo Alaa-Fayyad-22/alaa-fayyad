@@ -152,7 +152,7 @@ export default function Navbar() {
 
           <button onClick={() => smoothScroll('contact')} style={{
             padding: '8px 20px', borderRadius: 999,
-            background: 'var(--gradient)', color: '#fff',
+            background: 'var(--gradient)', color: 'var(--on-gradient)',
             fontSize: '0.875rem', fontWeight: 600, border: 'none',
             whiteSpace: 'nowrap', cursor: 'pointer',
             transition: 'transform 0.2s, box-shadow 0.2s', ...ar,
@@ -219,7 +219,7 @@ export default function Navbar() {
             </button>
             <button onClick={() => { smoothScroll('contact'); setMenuOpen(false); }} style={{
               padding: '8px 20px', borderRadius: 999,
-              background: 'var(--gradient)', color: '#fff', border: 'none',
+              background: 'var(--gradient)', color: 'var(--on-gradient)', border: 'none',
               fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer', ...ar,
             }}>
               {t.nav.hire}

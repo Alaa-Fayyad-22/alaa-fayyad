@@ -148,7 +148,7 @@ export default function TerminalHero({ start }: { start: boolean }) {
     name,
     role,
     status,
-    bio: [t.about.bio1, t.about.bio2, t.about.bio3],
+    bio: [t.about.bio1, t.about.bio2],
     location: t.contact.location,
   });
 
@@ -179,9 +179,9 @@ export default function TerminalHero({ start }: { start: boolean }) {
 
       <div className="term-win" dir="ltr">
         <div className="term-bar" aria-hidden="true">
-          <span className="term-dot" style={{ background: '#ff5f56' }} />
-          <span className="term-dot" style={{ background: '#ffbd2e' }} />
-          <span className="term-dot" style={{ background: '#27c93f' }} />
+          <span className="term-dot term-dot--r" />
+          <span className="term-dot term-dot--y" />
+          <span className="term-dot term-dot--g" />
           <span className="term-title">alaa@portfolio: ~</span>
         </div>
 
@@ -262,7 +262,7 @@ export default function TerminalHero({ start }: { start: boolean }) {
       </div>
 
       <button className="term-cue" onClick={() => smoothScrollTo('about')} aria-label="Scroll to content">
-        <ArrowDown size={20} className="animate-float" />
+        <ArrowDown size={20} />
       </button>
 
       <DecodePuzzle open={overlay === 'decode'} onClose={() => setOverlay(null)} />

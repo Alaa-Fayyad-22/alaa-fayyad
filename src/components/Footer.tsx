@@ -51,20 +51,10 @@ export default function Footer() {
       style={{
         width: 40, height: 40, borderRadius: '50%',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        cursor: 'pointer', transition: 'transform 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease',
+        cursor: 'pointer', transition: 'border-color 0.15s ease',
       }}
-      onMouseEnter={e => {
-        const el = e.currentTarget as HTMLButtonElement;
-        el.style.transform = 'scale(1.1)';
-        el.style.borderColor = 'var(--primary)';
-        el.style.boxShadow = '0 6px 22px var(--glow)';
-      }}
-      onMouseLeave={e => {
-        const el = e.currentTarget as HTMLButtonElement;
-        el.style.transform = 'scale(1)';
-        el.style.borderColor = 'var(--border)';
-        el.style.boxShadow = 'none';
-      }}>
+      onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--primary)'; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; }}>
       <ArrowUp size={16} color="var(--primary)" />
     </button>
   </div>

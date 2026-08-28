@@ -15,9 +15,9 @@ export default function SiteNav() {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState('');
 
-  // Shared traveling indicator (desktop horizontal nav only). Positions are
-  // measured from the active link and applied to one arrow + one underline
-  // element, which glide via a CSS transition on left/width.
+  // Scroll-spy indicator (desktop horizontal nav only). Position/width are
+  // measured from the active link and applied to a traveling ">" + underline,
+  // which glide via a CSS transition on left/width.
   const linksRef = useRef<HTMLDivElement>(null);
   const [ind, setInd] = useState({ left: 0, width: 0, arrowAnchor: 0, ready: false });
   const [animate, setAnimate] = useState(false);
@@ -55,9 +55,9 @@ export default function SiteNav() {
     return () => observer.disconnect();
   }, []);
 
-  // Measure the active link and reposition the shared arrow + underline. Bails
-  // when the horizontal nav is hidden (mobile: .snav__links is display:none, so
-  // offsetParent is null) — the drawer keeps its own static markers.
+  // Measure the active link and reposition the ">" + underline. Bails when the
+  // horizontal nav is hidden (mobile: .snav__links is display:none, so
+  // offsetParent is null) — the drawer marks its own active link.
   const updateIndicator = useCallback(() => {
     const container = linksRef.current;
     if (!container || container.offsetParent === null) {
@@ -71,8 +71,8 @@ export default function SiteNav() {
     }
     const left = el.offsetLeft;
     const width = el.offsetWidth;
-    // Anchor the arrow at the link edge nearest its reading-order start: the
-    // left edge in LTR, the right edge in RTL. CSS applies the snug gap/mirror.
+    // Anchor the ">" at the link edge nearest its reading-order start: the left
+    // edge in LTR, the right edge in RTL. CSS applies the snug gap / mirror.
     const arrowAnchor = isRTL ? left + width : left;
     setInd({ left, width, arrowAnchor, ready: true });
   }, [isRTL]);
@@ -128,12 +128,11 @@ export default function SiteNav() {
       <div className="snav__inner">
         <button className="snav__logo" onClick={() => smoothScrollTo('top')}>
           {locale === 'ar' ? 'علاء فياض' : 'Alaa Fayyad'}
-          <span className="snav__caret" aria-hidden="true" />
         </button>
 
         <div className="snav__links" ref={linksRef}>
-          {/* Shared traveling indicator: one arrow + one underline that glide
-              (CSS transition on left/width) to the active link. */}
+          {/* Scroll-spy indicator: a ">" + underline that glide (CSS transition
+              on left/width) to the active link. */}
           <span aria-hidden="true"
             className={`snav__arrow ${ind.ready ? 'is-on' : ''}`}
             style={{ left: ind.arrowAnchor, transition: animate ? undefined : 'none' }}>&gt;</span>

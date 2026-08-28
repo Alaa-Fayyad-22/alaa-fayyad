@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
-import { Mail, MapPin, Send, CheckCircle, FileText, Clock, DollarSign, Briefcase, AlertCircle, Linkedin } from 'lucide-react';
-import { FaGithub, FaInstagram, FaLinkedin, FaWhatsapp } from 'react-icons/fa';
+import { Mail, MapPin, Send, CheckCircle, FileText, AlertCircle, Linkedin } from 'lucide-react';
+import { FaGithub, FaWhatsapp } from 'react-icons/fa';
 
 type Tab = 'message' | 'quote';
 
@@ -53,10 +53,14 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
   const ar: React.CSSProperties = isRTL ? { fontFamily: 'var(--font-arabic), sans-serif' } : {};
 
   const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '12px 16px', borderRadius: 12,
+    width: '100%', padding: '12px 16px', borderRadius: 'var(--radius-control)',
     border: '1px solid var(--border)', outline: 'none',
     background: 'var(--bg)', color: 'var(--text)',
-    fontSize: '0.9rem', transition: 'border-color 0.2s, box-shadow 0.2s',
+    // 16px flat (not the smaller 0.9rem this used to be): below 16px, iOS
+    // Safari auto-zooms the whole page on focus. This is an inline style, so
+    // there's no separate "smaller on desktop" tier here — 16px reads fine
+    // at any width for a real body-text form field.
+    fontSize: '1rem', transition: 'border-color 0.15s ease',
     boxSizing: 'border-box', ...ar,
   };
 
@@ -76,21 +80,11 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
     <section id={bare ? undefined : 'contact'} ref={ref} dir={isRTL ? 'rtl' : 'ltr'}
       style={{ padding: bare ? '8px 0 40px' : '96px 0', background: 'transparent', color: 'var(--text)', position: 'relative', overflow: 'hidden' }}>
 
-      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-        <div style={{ position: 'absolute', width: 500, height: 500, borderRadius: '50%',
-          background: 'radial-gradient(circle, var(--glow-soft), transparent 70%)',
-          filter: 'blur(100px)', top: 0, right: '20%' }} />
-        <div style={{ position: 'absolute', width: 500, height: 500, borderRadius: '50%',
-          background: 'radial-gradient(circle, var(--glow-soft), transparent 70%)',
-          filter: 'blur(80px)', top: '10%', right: '-5%' }} />
-      </div>
-
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', position: 'relative' }}>
-
 
         {/* Tab switcher */}
         <div className="reveal" style={{ display: 'flex', justifyContent: 'center', marginBottom: 48 }}>
-          <div className="glass" style={{ display: 'inline-flex', borderRadius: 14, padding: 4, gap: 4 }}>
+          <div className="glass" style={{ display: 'inline-flex', borderRadius: 'var(--radius-panel)', padding: 4, gap: 4 }}>
             {([
               { key: 'message', icon: Mail,     label: isRTL ? 'رسالة' : 'Send Message' },
               { key: 'quote',   icon: FileText,  label: isRTL ? 'طلب عرض سعر' : 'Request a Quote' },
@@ -98,11 +92,11 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
               <button key={key} onClick={() => { setTab(key); setStatus('idle'); }}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 8,
-                  padding: '10px 22px', borderRadius: 10, border: 'none',
+                  padding: '10px 22px', borderRadius: 'var(--radius-control)', border: 'none',
                   cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600,
-                  transition: 'all 0.2s', ...ar,
-                  background: tab === key ? 'var(--gradient)' : 'transparent',
-                  color: tab === key ? '#fff' : 'var(--text-muted)',
+                  transition: 'background 0.15s ease, color 0.15s ease', ...ar,
+                  background: tab === key ? 'var(--accent)' : 'transparent',
+                  color: tab === key ? 'var(--on-gradient)' : 'var(--text-muted)',
                 }}>
                 <Icon size={15} />
                 {label}
@@ -126,7 +120,7 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
             ].map(({ icon: Icon, label, value, href }) => (
               <a key={label} href={href} style={{ display: 'flex', alignItems: 'center',
                 gap: 14, textDecoration: 'none' }}>
-                <div className="glass" style={{ width: 46, height: 46, borderRadius: 14, flexShrink: 0,
+                <div className="glass" style={{ width: 46, height: 46, borderRadius: 'var(--radius-panel)', flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Icon size={18} color="var(--primary)" />
                 </div>
@@ -138,27 +132,14 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
             ))}
 
             {tab === 'quote' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 8 }}>
-                {[
-                  { icon: Clock,      text: isRTL ? 'رد خلال 24 ساعة' : 'Response within 24h' },
-                  { icon: DollarSign, text: isRTL ? 'أسعار تنافسية' : 'Competitive pricing' },
-                  { icon: Briefcase,  text: isRTL ? 'خبرة 3+ سنوات' : '3+ years experience' },
-                ].map(({ icon: Icon, text }) => (
-                  <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                      background: 'rgba(99,102,241,0.1)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Icon size={15} color="var(--primary)" />
-                    </div>
-                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', ...ar }}>{text}</span>
-                  </div>
-                ))}
-              </div>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, ...ar }}>
+                {isRTL ? 'يتم إرسال عروض الأسعار خلال 24 ساعة.' : 'Quotes turned around within 24 hours.'}
+              </p>
             )}
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#34d399',
-                boxShadow: '0 0 8px rgba(52,211,153,0.5)', display: 'block', flexShrink: 0 }} />
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent)',
+                display: 'block', flexShrink: 0 }} />
               <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', ...ar }}>
                 {t.contact.response_time}
               </span>
@@ -176,20 +157,14 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
                   style={{ width: 42, height: 42, borderRadius: '50%',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     textDecoration: 'none', color: 'var(--text-muted)',
-                    transition: 'transform 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease' }}
+                    transition: 'color 0.15s ease, border-color 0.15s ease' }}
                   onMouseEnter={e => {
-                    const el = e.currentTarget as HTMLAnchorElement;
-                    el.style.transform = 'scale(1.1)';
-                    el.style.borderColor = 'var(--primary)';
-                    el.style.color = 'var(--primary)';
-                    el.style.boxShadow = '0 6px 22px var(--glow)';
+                    e.currentTarget.style.borderColor = 'var(--primary)';
+                    e.currentTarget.style.color = 'var(--primary)';
                   }}
                   onMouseLeave={e => {
-                    const el = e.currentTarget as HTMLAnchorElement;
-                    el.style.transform = 'scale(1)';
-                    el.style.borderColor = 'var(--border)';
-                    el.style.color = 'var(--text-muted)';
-                    el.style.boxShadow = 'none';
+                    e.currentTarget.style.borderColor = 'var(--border)';
+                    e.currentTarget.style.color = 'var(--text-muted)';
                   }}>
                   <Icon size={16} />
                 </a>
@@ -218,8 +193,8 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
                           value={form[key as keyof typeof form]}
                           onChange={e => setForm({ ...form, [key]: e.target.value })}
                           style={{ ...inputStyle, ...(key==='email' ? { direction:'ltr' } : {}) }}
-                          onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; e.currentTarget.style.boxShadow='0 0 0 3px var(--glow-soft), 0 0 16px var(--glow)'; }}
-                          onBlur={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.boxShadow='none'; }}
+                          onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; }}
+                          onBlur={e => { e.currentTarget.style.borderColor='var(--border)'; }}
                         />
                       </div>
                     ))}
@@ -230,8 +205,8 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
                     <input type="text" required placeholder={t.contact.subject}
                       value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })}
                       style={inputStyle}
-                      onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; e.currentTarget.style.boxShadow='0 0 0 3px var(--glow-soft), 0 0 16px var(--glow)'; }}
-                      onBlur={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.boxShadow='none'; }}
+                      onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; }}
+                      onBlur={e => { e.currentTarget.style.borderColor='var(--border)'; }}
                     />
                   </div>
                   <div>
@@ -240,8 +215,8 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
                     <textarea required rows={5} placeholder={t.contact.message}
                       value={form.message} onChange={e => setForm({ ...form, message: e.target.value })}
                       style={{ ...inputStyle, resize:'none' }}
-                      onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; e.currentTarget.style.boxShadow='0 0 0 3px var(--glow-soft), 0 0 16px var(--glow)'; }}
-                      onBlur={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.boxShadow='none'; }}
+                      onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; }}
+                      onBlur={e => { e.currentTarget.style.borderColor='var(--border)'; }}
                     />
                   </div>
                 </>
@@ -259,8 +234,8 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
                           value={quote[key as keyof typeof quote]}
                           onChange={e => setQuote({ ...quote, [key]: e.target.value })}
                           style={{ ...inputStyle, ...(key==='email' ? { direction:'ltr' } : {}) }}
-                          onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; e.currentTarget.style.boxShadow='0 0 0 3px var(--glow-soft), 0 0 16px var(--glow)'; }}
-                          onBlur={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.boxShadow='none'; }}
+                          onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; }}
+                          onBlur={e => { e.currentTarget.style.borderColor='var(--border)'; }}
                         />
                       </div>
                     ))}
@@ -275,9 +250,9 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
                         <button key={pt} type="button" onClick={() => setQuote({ ...quote, projectType: pt })}
                           style={{
                             padding:'7px 14px', borderRadius:999, fontSize:'0.8rem',
-                            fontWeight:500, cursor:'pointer', transition:'all 0.15s', ...ar,
-                            background: quote.projectType===pt ? 'var(--gradient)' : 'var(--bg)',
-                            color: quote.projectType===pt ? '#fff' : 'var(--text-muted)',
+                            fontWeight:500, cursor:'pointer', transition:'background 0.15s, color 0.15s', ...ar,
+                            background: quote.projectType===pt ? 'var(--accent)' : 'var(--bg)',
+                            color: quote.projectType===pt ? 'var(--on-gradient)' : 'var(--text-muted)',
                             border: `1px solid ${quote.projectType===pt ? 'transparent' : 'var(--border)'}`,
                           }}>{pt}</button>
                       ))}
@@ -293,9 +268,9 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
                         <button key={b} type="button" onClick={() => setQuote({ ...quote, budget: b })}
                           style={{
                             padding:'7px 14px', borderRadius:999, fontSize:'0.8rem',
-                            fontWeight:500, cursor:'pointer', transition:'all 0.15s',
-                            background: quote.budget===b ? 'var(--gradient)' : 'var(--bg)',
-                            color: quote.budget===b ? '#fff' : 'var(--text-muted)',
+                            fontWeight:500, cursor:'pointer', transition:'background 0.15s, color 0.15s',
+                            background: quote.budget===b ? 'var(--accent)' : 'var(--bg)',
+                            color: quote.budget===b ? 'var(--on-gradient)' : 'var(--text-muted)',
                             border: `1px solid ${quote.budget===b ? 'transparent' : 'var(--border)'}`,
                           }}>{b}</button>
                       ))}
@@ -311,9 +286,9 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
                         <button key={tl} type="button" onClick={() => setQuote({ ...quote, timeline: tl })}
                           style={{
                             padding:'7px 14px', borderRadius:999, fontSize:'0.8rem',
-                            fontWeight:500, cursor:'pointer', transition:'all 0.15s', ...ar,
-                            background: quote.timeline===tl ? 'var(--gradient)' : 'var(--bg)',
-                            color: quote.timeline===tl ? '#fff' : 'var(--text-muted)',
+                            fontWeight:500, cursor:'pointer', transition:'background 0.15s, color 0.15s', ...ar,
+                            background: quote.timeline===tl ? 'var(--accent)' : 'var(--bg)',
+                            color: quote.timeline===tl ? 'var(--on-gradient)' : 'var(--text-muted)',
                             border: `1px solid ${quote.timeline===tl ? 'transparent' : 'var(--border)'}`,
                           }}>{tl}</button>
                       ))}
@@ -328,8 +303,8 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
                       placeholder={isRTL ? 'اشرح مشروعك بالتفصيل...' : 'Describe your project in detail...'}
                       value={quote.details} onChange={e => setQuote({ ...quote, details: e.target.value })}
                       style={{ ...inputStyle, resize:'none' }}
-                      onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; e.currentTarget.style.boxShadow='0 0 0 3px var(--glow-soft), 0 0 16px var(--glow)'; }}
-                      onBlur={e => { e.currentTarget.style.borderColor='var(--border)'; e.currentTarget.style.boxShadow='none'; }}
+                      onFocus={e => { e.currentTarget.style.borderColor='var(--primary)'; }}
+                      onBlur={e => { e.currentTarget.style.borderColor='var(--border)'; }}
                     />
                   </div>
                 </>
@@ -338,9 +313,9 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
               {/* Error message */}
               {status === 'error' && (
                 <div style={{ display:'flex', alignItems:'center', gap:8, padding:'12px 16px',
-                  borderRadius:10, background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.3)' }}>
-                  <AlertCircle size={16} color="#ef4444" />
-                  <span style={{ fontSize:'0.85rem', color:'#ef4444', ...ar }}>
+                  borderRadius:'var(--radius-panel)', color:'var(--danger)', background:'var(--danger-bg)', border:'1px solid var(--danger-border)' }}>
+                  <AlertCircle size={16} />
+                  <span style={{ fontSize:'0.85rem', color:'var(--danger)', ...ar }}>
                     {isRTL ? 'فشل الإرسال. حاول مجدداً.' : 'Failed to send. Please try again.'}
                   </span>
                 </div>
@@ -348,12 +323,12 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
 
               <button type="submit" disabled={status==='sending'||status==='success'}
                 style={{
-                  width:'100%', padding:'14px', borderRadius:12, border:'none',
+                  width:'100%', padding:'14px', borderRadius:'var(--radius-panel)', border:'none',
                   cursor: status==='sending'||status==='success' ? 'not-allowed' : 'pointer',
-                  background: status==='success' ? 'linear-gradient(135deg,#10b981,#059669)' : 'var(--gradient)',
-                  color:'#fff', fontWeight:600, fontSize:'0.95rem',
+                  background: 'var(--accent)',
+                  color:'var(--on-gradient)', fontWeight:600, fontSize:'0.95rem',
                   display:'flex', alignItems:'center', justifyContent:'center', gap:8,
-                  opacity: status==='sending' ? 0.8 : 1, transition:'all 0.2s', ...ar,
+                  opacity: status==='sending' ? 0.8 : 1, transition:'opacity 0.2s', ...ar,
                 }}>
                 {status==='success'
                   ? <><CheckCircle size={17}/> {isRTL ? 'تم الإرسال!' : 'Sent Successfully!'}</>

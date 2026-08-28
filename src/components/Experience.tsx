@@ -29,12 +29,6 @@ export default function Experience({ bare = false }: { bare?: boolean } = {}) {
       style={{ padding: bare ? '8px 0 40px' : '96px 0', background: 'transparent',
         color: 'var(--text)', position: 'relative', overflow: 'hidden' }}>
 
-      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-        <div style={{ position: 'absolute', width: 500, height: 500, borderRadius: '50%',
-          background: 'radial-gradient(circle, var(--glow-soft), transparent 70%)',
-          filter: 'blur(90px)', top: '12%', left: '-6%' }} />
-      </div>
-
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', position: 'relative' }}>
         <div style={{ position: 'relative' }}>
           {/* Timeline rail */}
@@ -46,27 +40,17 @@ export default function Experience({ bare = false }: { bare?: boolean } = {}) {
               const badge = typeMeta[exp.type] ?? typeMeta['full-time'];
               return (
                 <article key={i} className="reveal" style={{ position: 'relative',
-                  display: 'flex', gap: 24, animationDelay: `${i * 0.08}s` }}>
+                  display: 'flex', gap: 24 }}>
 
                   {/* Timeline node */}
                   <span aria-hidden="true" style={{ width: 12, height: 12, borderRadius: '50%',
-                    marginTop: 26, flexShrink: 0, zIndex: 1, background: 'var(--gradient)',
+                    marginTop: 26, flexShrink: 0, zIndex: 1, background: 'var(--accent)',
                     boxShadow: '0 0 0 4px var(--bg)' }} />
 
-                  <div className="glass" style={{ flex: 1, padding: '24px 26px', borderRadius: 20,
-                    transition: 'transform 0.2s ease, box-shadow 0.25s ease, border-color 0.2s ease' }}
-                    onMouseEnter={e => {
-                      const el = e.currentTarget as HTMLDivElement;
-                      el.style.transform = 'translateY(-4px)';
-                      el.style.boxShadow = '0 14px 40px var(--glow)';
-                      el.style.borderColor = 'var(--border-strong)';
-                    }}
-                    onMouseLeave={e => {
-                      const el = e.currentTarget as HTMLDivElement;
-                      el.style.transform = 'translateY(0)';
-                      el.style.boxShadow = 'none';
-                      el.style.borderColor = 'var(--border)';
-                    }}
+                  <div className="glass" style={{ flex: 1, padding: '24px 26px', borderRadius: 'var(--radius-panel)',
+                    transition: 'border-color 0.2s ease' }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--border-strong)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; }}
                   >
                     {/* Role + type */}
                     <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap',

@@ -78,7 +78,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; background: #f8f8fc; border-radius: 12px;">
           <div style="background: linear-gradient(135deg, #6366f1, #a855f7); padding: 24px; border-radius: 10px; margin-bottom: 24px;">
-            <h1 style="color: white; margin: 0; font-size: 1.4rem;">✉️ New Message from Portfolio</h1>
+            <h1 style="color: white; margin: 0; font-size: 1.4rem;">New Message from Portfolio</h1>
           </div>
           <div style="background: white; padding: 24px; border-radius: 10px; border: 1px solid #e5e7eb;">
             <p style="margin: 0 0 12px;"><strong style="color: #6366f1;">Name:</strong> ${escapeHtml(name)}</p>

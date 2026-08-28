@@ -9,44 +9,19 @@
     "resume": "Resume"
   },
   "hero": {
-    "greeting": "Hello, I'm",
     "name": "Alaa Fayyad",
     "role1": "Full Stack Developer",
-    "role2": "Python Developer",
-    "role3": "UI/UX Designer",
-    "role4": "API Developer",
-    "role5": "Automation & Scraping Developer",
-    "description": "I craft digital experiences that blend elegant design with powerful engineering. From pixel-perfect interfaces to scalable backends — I build products that people love.",
-    "cta_work": "View My Work",
-    "cta_contact": "Let's Talk",
-    "available": "Available for new projects",
-    "years": "3+",
-    "years_label": "Years Experience",
-    "projects_count": "25+",
-    "projects_label": "Projects Delivered",
-    "clients": "15+",
-    "clients_label": "Happy Clients"
+    "available": "Available for new projects"
   },
   "about": {
-    "label": "About Me",
     "title": "Bridging Design & Engineering",
-    "bio1": "I'm a Full Stack Developer and UI/UX Designer with 3+ years of experience building products that users actually enjoy using. I believe the best digital products are born at the intersection of clean code and thoughtful design.",
-    "bio2": "Based in Lebanon, I currently work as a Python and web developer, taking on freelance projects and building solutions across different industries.",
-    "bio3": "When I'm not coding or designing, I'm exploring new technologies, diving into new frameworks, and constantly pushing to build better, faster, and smarter solutions.",
-    "download_cv": "Download CV",
-    "fact1_title": "Clean Code",
-    "fact1_desc": "I write maintainable, well-structured code that scales with your project.",
-    "fact2_title": "Design-Driven",
-    "fact2_desc": "Every pixel matters. I care deeply about user experience and visual clarity.",
-    "fact3_title": "Fast Delivery",
-    "fact3_desc": "I respect deadlines and deliver production-ready work without cutting corners.",
-    "fact4_title": "Full Ownership",
-    "fact4_desc": "From design to deployment, I own the entire process end to end."
+    "bio1": "I'm a full-stack developer and UI/UX designer based in Beirut. Since January 2024 I've built Django and Flask backends and REST API integrations at Softech, alongside freelance projects I've taken on since 2022.",
+    "bio2": "Recent work: Fattoura, which turns a photo of a restaurant receipt into a split, settled bill using a vision model for OCR; and Happidoo, an inflatable-rental booking site with a Supabase-backed admin. This site — bilingual English/Arabic with full RTL — is one of them. On each I designed the schema, built the API and the interface, and handled deployment myself, rather than implementing a spec someone handed me.",
+    "download_cv": "Download CV"
   },
 "skills": {
-    "label": "My Skills",
     "title": "What I Work With",
-    "subtitle": "A carefully chosen stack for building modern, scalable products",
+    "subtitle": "Grouped by area.",
     "frontend": "Frontend",
     "backend": "Backend",
     "design": "Design & Tools",
@@ -54,22 +29,19 @@
     "devops": "DevOps & Cloud"
   },
   "projects": {
-    "label": "Projects",
     "title": "Selected Work",
-    "subtitle": "Real products built for real users — each project solves a genuine problem",
+    "subtitle": "Three projects, each built end to end.",
     "view_live": "Live Demo",
     "view_code": "GitHub",
     "view_all": "View All Projects"
   },
   "experience": {
-    "label": "Experience",
-    "title": "Career Journey",
-    "subtitle": "Building products across industries and geographies",
-    "present": "Present"
+    "title": "Experience",
+    "subtitle": "Backend and full-stack roles since 2022."
   },
   "contact": {
     "label": "Contact",
-    "title": "Let's Build Something",
+    "title": "Get in touch",
     "subtitle": "Have a project in mind? I'd love to hear about it.",
     "name": "Your Name",
     "email": "Your Email",

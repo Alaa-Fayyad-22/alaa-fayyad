@@ -44,11 +44,11 @@ const NAV_COMMANDS: [string, string][] = [
 const INFO_COMMANDS: [string, string][] = [
   ['help', 'show this list of commands'],
   ['whoami', 'name & role'],
-  ['email', 'open a new email to me ↗'],
-  ['whatsapp', 'open WhatsApp ↗'],
-  ['github', 'open my GitHub ↗'],
-  ['linkedin', 'open my LinkedIn ↗'],
-  ['resume', 'open my résumé / CV ↗'],
+  ['email', 'open a new email to me'],
+  ['whatsapp', 'open WhatsApp'],
+  ['github', 'open my GitHub'],
+  ['linkedin', 'open my LinkedIn'],
+  ['resume', 'open my résumé / CV'],
   ['cls', 'clear the terminal'],
 ];
 
@@ -112,7 +112,7 @@ export function runCommand(raw: string, ctx: TermContext): CommandResult {
     case cmd === 'github':
       return {
         lines: [
-          { text: 'opening GitHub ↗', tone: 'ok' },
+          { text: 'opening GitHub', tone: 'ok' },
           { text: `  ${CONTACT.github}`, tone: 'muted', href: CONTACT.github },
         ],
         action: { type: 'open', href: CONTACT.github },
@@ -121,7 +121,7 @@ export function runCommand(raw: string, ctx: TermContext): CommandResult {
     case cmd === 'linkedin':
       return {
         lines: [
-          { text: 'opening LinkedIn ↗', tone: 'ok' },
+          { text: 'opening LinkedIn', tone: 'ok' },
           { text: `  ${CONTACT.linkedin}`, tone: 'muted', href: CONTACT.linkedin },
         ],
         action: { type: 'open', href: CONTACT.linkedin },
@@ -130,7 +130,7 @@ export function runCommand(raw: string, ctx: TermContext): CommandResult {
     case cmd === 'whatsapp':
       return {
         lines: [
-          { text: 'opening WhatsApp ↗', tone: 'ok' },
+          { text: 'opening WhatsApp', tone: 'ok' },
           { text: `  ${CONTACT.whatsapp}`, tone: 'muted', href: CONTACT.whatsapp },
         ],
         action: { type: 'open', href: CONTACT.whatsapp },
@@ -140,7 +140,7 @@ export function runCommand(raw: string, ctx: TermContext): CommandResult {
     case cmd === 'resume' || cmd === 'cv':
       return {
         lines: [
-          { text: 'opening résumé ↗', tone: 'ok' },
+          { text: 'opening résumé', tone: 'ok' },
           { text: `  ${RESUME}`, tone: 'muted', href: RESUME },
         ],
         action: { type: 'open', href: RESUME },

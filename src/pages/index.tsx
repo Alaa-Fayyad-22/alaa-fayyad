@@ -36,7 +36,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="author" content={SITE_NAME} />
         <meta name="robots" content="index, follow" />
-        <meta name="theme-color" content="#0a0a0f" />
+        <meta name="theme-color" content="#101418" />
         <link rel="canonical" href={SITE_URL} />
         <link rel="icon" href="/favicon.png" style={{ borderRadius: '100%' }} />
         <link rel="apple-touch-icon" href="/favicon.png" />

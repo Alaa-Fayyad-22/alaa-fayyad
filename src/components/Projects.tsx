@@ -4,17 +4,6 @@ import { useTranslation } from '../hooks/useTranslation';
 import { projects } from '../data/portfolio';
 import { ExternalLink, Github, ArrowRight } from 'lucide-react';
 
-const projectColors: Record<string, string> = {
-  'from-violet-500 to-indigo-600':  'linear-gradient(135deg,#7c3aed,#4f46e5)',
-  'from-violet-500 to-purple-600':  'linear-gradient(135deg,#7c3aed,#9333ea)',
-  'from-blue-500 to-cyan-600':      'linear-gradient(135deg,#3b82f6,#0891b2)',
-  'from-blue-500 to-cyan-500':      'linear-gradient(135deg,#3b82f6,#06b6d4)',
-  'from-emerald-500 to-teal-600':   'linear-gradient(135deg,#10b981,#0d9488)',
-  'from-orange-500 to-pink-600':    'linear-gradient(135deg,#f97316,#db2777)',
-  'from-pink-500 to-rose-600':      'linear-gradient(135deg,#ec4899,#e11d48)',
-  'from-amber-500 to-orange-600':   'linear-gradient(135deg,#f59e0b,#ea580c)',
-};
-
 export default function Projects({ bare = false }: { bare?: boolean } = {}) {
   const { t, isRTL } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
@@ -35,16 +24,9 @@ export default function Projects({ bare = false }: { bare?: boolean } = {}) {
     <section id={bare ? undefined : 'projects'} ref={ref} dir={isRTL ? 'rtl' : 'ltr'}
       style={{ padding: bare ? '8px 0 40px' : '96px 0', background:'transparent', color:'var(--text)', position:'relative', overflow:'hidden' }}>
 
-      <div style={{ position:'absolute', inset:0, overflow:'hidden', pointerEvents:'none' }}>
-        <div style={{ position:'absolute', width:500, height:500, borderRadius:'50%',
-          background:'radial-gradient(circle, var(--glow-soft), transparent 70%)',
-          filter:'blur(100px)', bottom:'10%', left:'-5%' }} />
-      </div>
-
       <div style={{ maxWidth:1200, margin:'0 auto', padding:'0 24px', position:'relative' }}>
 
-
-        {/* Bento grid */}
+        {/* Bento grid — the first project spans two columns/rows for weight */}
         <div className="proj-bento">
           {projects.map((p, i) => {
             const isLarge = i === 0;
@@ -53,18 +35,14 @@ export default function Projects({ bare = false }: { bare?: boolean } = {}) {
               <article key={p.id}
                 className={`reveal glass proj-card${isLarge ? ' proj-card--large' : ''}`}
                 style={{
-                  transition:'transform 0.25s, box-shadow 0.25s, border-color 0.25s',
-                  animationDelay:`${i*0.07}s`,
-                  transform: active ? 'translateY(-6px)' : 'translateY(0)',
-                  boxShadow: active ? '0 18px 44px var(--glow)' : 'none',
+                  transition:'border-color 0.2s ease',
                   borderColor: active ? 'var(--border-strong)' : 'var(--border)',
                 }}
                 onMouseEnter={() => setHovered(p.id)}
                 onMouseLeave={() => setHovered(null)}
               >
                 {/* Media */}
-                <div className="proj-media"
-                  style={{ background: projectColors[p.color] || 'linear-gradient(135deg,#818cf8,#a855f7)' }}>
+                <div className="proj-media">
                   {p.image ? (
                     <Image
                       src={p.image}
@@ -81,8 +59,9 @@ export default function Projects({ bare = false }: { bare?: boolean } = {}) {
                       style={{ objectFit:'fill' }}
                     />
                   ) : (
-                    <span style={{ fontSize:48 }}>
-                      {p.category==='web'?'🌐':p.category==='mobile'?'📱':'🎨'}
+                    <span style={{ fontFamily:'var(--font-mono), monospace', fontSize:'1rem',
+                      color:'var(--text-muted)', padding:'0 24px', textAlign:'center' }}>
+                      {isRTL ? p.titleAr : p.title}
                     </span>
                   )}
 
@@ -152,21 +131,11 @@ export default function Projects({ bare = false }: { bare?: boolean } = {}) {
           <a href="https://github.com/Alaa-Fayyad-22" target="_blank" rel="noopener noreferrer"
             className="glass"
             style={{ display:'inline-flex', alignItems:'center', gap:8,
-              padding:'12px 28px', borderRadius:999, fontWeight:600,
+              padding:'12px 28px', borderRadius:'var(--radius-panel)', fontWeight:600,
               color:'var(--text)', textDecoration:'none',
-              transition:'transform 0.2s ease, box-shadow 0.25s ease, border-color 0.2s ease', ...ar }}
-            onMouseEnter={e => {
-              const el = e.currentTarget as HTMLAnchorElement;
-              el.style.transform='translateY(-2px)';
-              el.style.boxShadow='0 8px 30px var(--glow)';
-              el.style.borderColor='var(--border-strong)';
-            }}
-            onMouseLeave={e => {
-              const el = e.currentTarget as HTMLAnchorElement;
-              el.style.transform='translateY(0)';
-              el.style.boxShadow='none';
-              el.style.borderColor='var(--border)';
-            }}>
+              transition:'border-color 0.2s ease', ...ar }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor='var(--primary)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor='var(--border)'; }}>
             {t.projects.view_all} <ArrowRight size={15}/>
           </a>
         </div>

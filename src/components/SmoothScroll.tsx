@@ -35,21 +35,10 @@ export default function SmoothScroll() {
       gsap.ticker.add(update);
       gsap.ticker.lagSmoothing(0);
 
-      // Subtle background parallax — starfield/grid drifts slower than content.
-      const bg = document.querySelector('.bgfx');
-      const bgTween = bg
-        ? gsap.to(bg, {
-            yPercent: -8, ease: 'none',
-            scrollTrigger: { trigger: document.documentElement, start: 'top top', end: 'bottom bottom', scrub: true },
-          })
-        : null;
-
       ScrollTrigger.refresh();
 
       cleanup = () => {
         gsap.ticker.remove(update);
-        bgTween?.scrollTrigger?.kill();
-        bgTween?.kill();
         lenis.destroy();
         delete (window as unknown as { __lenis?: unknown }).__lenis;
       };
