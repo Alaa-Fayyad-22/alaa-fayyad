@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
+import { logEvent } from '../lib/track';
 import { Mail, MapPin, Send, CheckCircle, FileText, AlertCircle, Linkedin } from 'lucide-react';
 import { FaGithub, FaWhatsapp } from 'react-icons/fa';
 
@@ -39,6 +40,8 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
       if (!res.ok) throw new Error('Failed');
 
       setStatus('success');
+      // Anonymous: which form succeeded — never the name/email/message content.
+      logEvent('contact_submit', { form: tab });
       setTimeout(() => {
         setStatus('idle');
         setForm({ name:'', email:'', subject:'', message:'' });
@@ -89,7 +92,7 @@ export default function Contact({ bare = false }: { bare?: boolean } = {}) {
               { key: 'message', icon: Mail,     label: isRTL ? 'رسالة' : 'Send Message' },
               { key: 'quote',   icon: FileText,  label: isRTL ? 'طلب عرض سعر' : 'Request a Quote' },
             ] as const).map(({ key, icon: Icon, label }) => (
-              <button key={key} onClick={() => { setTab(key); setStatus('idle'); }}
+              <button key={key} onClick={() => { if (key !== tab) logEvent('contact_tab_switch', { form: key }); setTab(key); setStatus('idle'); }}
                 style={{
                   display: 'flex', alignItems: 'center', gap: 8,
                   padding: '10px 22px', borderRadius: 'var(--radius-control)', border: 'none',

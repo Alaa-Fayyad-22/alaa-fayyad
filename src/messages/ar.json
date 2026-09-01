@@ -56,6 +56,30 @@
     "location": "بيروت، لبنان",
     "location_label": "الموقع"
   },
+  "workspace": {
+    "explorerLabel": "المستكشف",
+    "classicItem": "classic.tsx",
+    "classicLinkLabel": "التصميم الكلاسيكي",
+    "noProblems": "لا مشاكل",
+    "titlebarPath": "alaa-fayyad — portfolio.workspace",
+    "emptyTitle": "لا ملف مفتوح",
+    "emptyHint": "اختر ملفًا من المستكشف لفتحه",
+    "indent": "مسافات: 2",
+    "closeTab": "إغلاق التبويب",
+    "aboutComment": "من يكتب هذا",
+    "aboutRendered": "المخرجات",
+    "statYears": "سنوات من العمل",
+    "statProjects": "مشاريع منشورة",
+    "statBilingual": "ثنائي اللغة، يدعم RTL",
+    "statTech": "أدوات وتقنيات",
+    "skillsComment": "مجموعة عمل، لا سحابة مصطلحات",
+    "skillsHeadline": "الواجهة الأمامية، والخلفية، والتماس بينهما.",
+    "projectsComment": "كل ما هنا وصل إلى مستخدمين حقيقيين",
+    "projectLive": "مباشر",
+    "projectArchived": "مؤرشف",
+    "experienceHeadline": "تتبّع سريع للمسار.",
+    "contactComment": "أرسل رسالة، أو اطلب عرض سعر"
+  },
   "footer": {
     "built": "علاء فياض",
     "rights": "جميع الحقوق محفوظة."

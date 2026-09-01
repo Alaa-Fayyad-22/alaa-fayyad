@@ -56,6 +56,30 @@
     "location": "Beirut, Lebanon",
     "location_label": "Location"
   },
+  "workspace": {
+    "explorerLabel": "Explorer",
+    "classicItem": "classic.tsx",
+    "classicLinkLabel": "classic design",
+    "noProblems": "no problems",
+    "titlebarPath": "alaa-fayyad — portfolio.workspace",
+    "emptyTitle": "No file open",
+    "emptyHint": "Select a file from the explorer to open it",
+    "indent": "Spaces: 2",
+    "closeTab": "Close tab",
+    "aboutComment": "who's writing this",
+    "aboutRendered": "rendered output",
+    "statYears": "years shipping",
+    "statProjects": "projects shipped",
+    "statBilingual": "bilingual, RTL-native",
+    "statTech": "tools & technologies",
+    "skillsComment": "a working set, not a buzzword cloud",
+    "skillsHeadline": "Frontend, backend, and the seam between.",
+    "projectsComment": "everything here shipped to real users",
+    "projectLive": "live",
+    "projectArchived": "archived",
+    "experienceHeadline": "A quick trace of the path.",
+    "contactComment": "send a message, or request a quote"
+  },
   "footer": {
     "built": "Alaa Fayyad",
     "rights": "All rights reserved."

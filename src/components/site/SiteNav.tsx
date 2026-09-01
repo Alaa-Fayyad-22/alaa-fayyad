@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useTheme } from '../../hooks/useTheme';
 import { smoothScrollTo } from '../../lib/scroll';
+import { logEvent, logEventOnce } from '../../lib/track';
 import { Sun, Moon, Languages } from 'lucide-react';
 
 /**
@@ -47,7 +48,12 @@ export default function SiteNav() {
 
     const observer = new IntersectionObserver(
       entries => {
-        entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id); });
+        entries.forEach(e => {
+          if (!e.isIntersecting) return;
+          setActive(e.target.id);
+          // Once per section per visit — not on every scroll tick.
+          logEventOnce(`section_view:${e.target.id}`, 'section_view', { section: e.target.id });
+        });
       },
       { rootMargin: '-50% 0px -50% 0px', threshold: 0 }
     );
@@ -117,7 +123,19 @@ export default function SiteNav() {
     };
   }, [updateIndicator]);
 
-  const go = (id: string) => { setOpen(false); smoothScrollTo(id); };
+  const go = (id: string) => {
+    logEvent('nav_click', { section: id });
+    setOpen(false);
+    smoothScrollTo(id);
+  };
+  const onToggleTheme = () => {
+    logEvent('toggle', { control: 'theme', value: theme === 'dark' ? 'light' : 'dark' });
+    toggleTheme();
+  };
+  const onToggleLocale = () => {
+    logEvent('toggle', { control: 'language', value: locale === 'en' ? 'ar' : 'en' });
+    toggleLocale();
+  };
   const ThemeIcon = theme === 'dark' ? Sun : Moon;
   const themeLabel = theme === 'dark'
     ? (isRTL ? 'الوضع الفاتح' : 'Switch to light mode')
@@ -134,9 +152,6 @@ export default function SiteNav() {
           {/* Scroll-spy indicator: a ">" + underline that glide (CSS transition
               on left/width) to the active link. */}
           <span aria-hidden="true"
-            className={`snav__arrow ${ind.ready ? 'is-on' : ''}`}
-            style={{ left: ind.arrowAnchor, transition: animate ? undefined : 'none' }}>&gt;</span>
-          <span aria-hidden="true"
             className={`snav__underline ${ind.ready ? 'is-on' : ''}`}
             style={{ left: ind.left, width: ind.width, transition: animate ? undefined : 'none' }} />
           {links.map(l => (
@@ -148,10 +163,10 @@ export default function SiteNav() {
         <div className="snav__actions">
           {/* Bar-only: theme + language live in the header on desktop, but move
               into the hamburger drawer on mobile (hidden here below 760px). */}
-          <button className="snav__icon snav__bar-only" onClick={toggleTheme} aria-label={themeLabel} title={themeLabel}>
+          <button style={{ borderRadius: '100%' }} className="snav__icon snav__bar-only" onClick={onToggleTheme} aria-label={themeLabel} title={themeLabel}>
             <ThemeIcon size={17} />
           </button>
-          <button className="snav__icon snav__icon--text snav__bar-only" onClick={toggleLocale}
+          <button style={{ borderRadius: '20%' }} className="snav__icon snav__icon--text snav__bar-only" onClick={onToggleLocale}
             aria-label={isRTL ? 'English' : 'العربية'}>
             {locale === 'en' ? 'عربي' : 'EN'}
           </button>
@@ -174,13 +189,13 @@ export default function SiteNav() {
 
           {/* Theme + language toggles (mobile only — the drawer is desktop-hidden) */}
           <div className="snav__drawer-toggles">
-            <button className="snav__drawer-toggle" onClick={toggleTheme} aria-label={themeLabel}>
+            <button className="snav__drawer-toggle" onClick={onToggleTheme} aria-label={themeLabel}>
               <ThemeIcon size={18} />
               <span>{theme === 'dark'
                 ? (isRTL ? '' : '')
                 : (isRTL ? '' : '')}</span>
             </button>
-            <button className="snav__drawer-toggle" onClick={toggleLocale}
+            <button className="snav__drawer-toggle" onClick={onToggleLocale}
               aria-label={isRTL ? 'English' : 'العربية'}>
               <Languages size={18} />
               <span>{locale === 'en' ? 'العربية' : 'English'}</span>

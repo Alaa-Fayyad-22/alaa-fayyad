@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { smoothScrollTo } from '../../lib/scroll';
 import { runCommand, type OutputLine, type TermContext } from '../../lib/terminal';
+import { logEvent } from '../../lib/track';
 import { ArrowDown } from 'lucide-react';
 import DecodePuzzle from './DecodePuzzle';
 import FixChallenge from './FixChallenge';
@@ -109,9 +110,17 @@ export default function TerminalHero({ start }: { start: boolean }) {
 
   const submit = (raw: string) => {
     const result = runCommand(raw, ctx());
-    if (raw.trim()) {
+    const trimmed = raw.trim();
+    if (trimmed) {
       cmdHistory.current.push(raw);
       if (cmdHistory.current.length > 50) cmdHistory.current.shift();
+      // Anonymous: the command the visitor typed + what it did. Lower-cased and
+      // length-capped to keep event cardinality sane.
+      const actionType = 'clear' in result ? 'clear' : (result.action?.type ?? 'none');
+      logEvent('terminal_command', {
+        command: trimmed.toLowerCase().replace(/\s+/g, ' ').slice(0, 80),
+        action: actionType,
+      });
     }
     histPos.current = -1;
     setLog(prev => {
@@ -131,6 +140,7 @@ export default function TerminalHero({ start }: { start: boolean }) {
         requestAnimationFrame(() => requestAnimationFrame(() => smoothScrollTo(act.id)));
       } else if (act.type === 'overlay') {
         // Same 120ms beat as opening a link — let the confirmation line paint first.
+        logEvent('modal_open', { modal: act.id });
         const tid = setTimeout(() => setOverlay(act.id), 120);
         actionTimers.current.push(tid);
       } else {

@@ -1,0 +1,642 @@
+/*
+ * Scoped stylesheet for the IDE-workspace homepage design. Ported from the
+ * `conceptdidereference.html` reference implementation. Kept in a CSS Module so
+ * its generic class names can never collide with the global `.term-*` /
+ * `.screen-*` sheet in _document.tsx that still backs the `/classic` design.
+ *
+ * Palette: Catppuccin Mocha-derived. The workspace commits to this one dark look
+ * (like the reference) and does not follow the site's light/dark theme — only
+ * `/classic` does. Typography is JetBrains Mono via the project's existing
+ * `--font-mono` variable; Arabic text falls back to Cairo (`--font-arabic`)
+ * because JetBrains Mono has no Arabic glyphs.
+ *
+ * Class names are flat (no descendant-only classes) so every element can be
+ * addressed with `styles.<name>` in the TSX and nothing depends on cascade
+ * order. Bare element selectors are only used under an already-scoped parent.
+ */
+
+.app {
+  --base: #1e1e2e;
+  --base-2: #181825;
+  --sidebar: #181825;
+  --fg: #cdd6f4;
+  --muted: #6c7086;
+  --blue: #89b4fa;
+  --green: #a6e3a1;
+  --yellow: #f9e2af;
+  --pink: #f38ba8;
+  --mauve: #cba6f7;
+  --line: #313244;
+  --tab-active: #1e1e2e;
+  --tab-inactive: #11111b;
+
+  display: grid;
+  grid-template-rows: 36px 1fr 24px;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--base-2);
+  color: var(--fg);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 14px;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app ::selection {
+  background: var(--blue);
+  color: var(--base);
+}
+
+/* ---------- titlebar ---------- */
+.titlebar {
+  background: var(--tab-inactive);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  padding: 0 0.9rem;
+  gap: 0.6rem;
+  font-size: 12px;
+  color: var(--muted);
+  min-width: 0;
+}
+.dots {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.dots span {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+.dots span:nth-child(1) { background: #f38ba8; }
+.dots span:nth-child(2) { background: #f9e2af; }
+.dots span:nth-child(3) { background: #a6e3a1; }
+.titlebarPath {
+  margin-inline-start: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.titlebarStatus {
+  margin-inline-start: auto;
+  display: flex;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+.statusOk { color: var(--green); }
+
+/* ---------- main split ---------- */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 220px 1fr 180px;
+  overflow: hidden;
+  min-height: 0;
+}
+/* RTL: `direction: rtl` on the grid reverses column order, so the 220px sidebar
+   track lands on the right and the 180px minimap on the left. Logical borders
+   below finish the mirroring. */
+.app[dir='rtl'] .mainGrid { direction: rtl; }
+
+@media (max-width: 900px) {
+  .mainGrid { grid-template-columns: 0 1fr 0; }
+  .sidebar,
+  .minimapRail { display: none; }
+}
+
+/* ---------- sidebar / file tree ---------- */
+.sidebar {
+  background: var(--sidebar);
+  border-inline-end: 1px solid var(--line);
+  padding: 1rem 0;
+  overflow-y: auto;
+  min-width: 0;
+}
+.explorerLabel {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  padding: 0 1rem 0.75rem;
+  text-transform: uppercase;
+}
+.app[dir='rtl'] .explorerLabel { letter-spacing: normal; }
+.treeFolder {
+  padding: 0.5rem 1rem 0.2rem;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+.treeItem {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--muted);
+  background: none;
+  border: none;
+  border-inline-start: 2px solid transparent;
+  text-align: start;
+  font-family: inherit;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.treeItem:hover { background: rgba(205, 214, 244, 0.05); color: var(--fg); }
+.treeItemActive {
+  background: rgba(137, 180, 250, 0.1);
+  color: var(--blue);
+  border-inline-start-color: var(--blue);
+}
+.treeIcon {
+  width: 14px;
+  text-align: center;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+.treeItemClosed { opacity: 0.5; }
+.treeItemClosed:hover { opacity: 0.85; }
+
+/* ---------- editor area ---------- */
+.editorArea {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.tabbar {
+  display: flex;
+  background: var(--tab-inactive);
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-shrink: 0;
+  scrollbar-width: thin;
+}
+.app[dir='rtl'] .tabbar { direction: rtl; }
+.tabbar::-webkit-scrollbar { height: 6px; }
+.tab {
+  padding: 0.6rem 0.6rem 0.6rem 1.1rem;
+  font-size: 12.5px;
+  color: var(--muted);
+  border-inline-end: 1px solid var(--line);
+  white-space: nowrap;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+  user-select: none;
+  background: none;
+  font-family: inherit;
+  border-top: none;
+  border-bottom: none;
+  border-inline-start: none;
+}
+.app[dir='rtl'] .tab { padding: 0.6rem 1.1rem 0.6rem 0.6rem; }
+/* Active tab: only paint changes (background / colour / underline). Never
+   padding, width, or layout — those would reflow the row. */
+.tabActive {
+  background: var(--tab-active);
+  color: var(--fg);
+  box-shadow: inset 0 -2px 0 var(--blue);
+}
+/* The close button is ALWAYS in the DOM at a constant 18x18 flex slot for every
+   tab in every state, so a tab's box model never changes on hover and no
+   sibling ever shifts. Hover / active toggle ONLY opacity + pointer-events +
+   the hover-square background — never display, width, or presence. (There is
+   deliberately no status dot in the tab.) */
+.tabClose {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+.tab:hover .tabClose,
+.tabActive .tabClose { opacity: 1; pointer-events: auto; }
+.tabClose:hover { background: rgba(255, 255, 255, 0.12); color: var(--fg); }
+.tabDragging { opacity: 0.35; cursor: grabbing; }
+.tabDragOverLeft { box-shadow: inset 2px 0 0 var(--blue); }
+.tabDragOverRight { box-shadow: inset -2px 0 0 var(--blue); }
+
+.canvas {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+}
+.filePane {
+  position: absolute;
+  inset: 0;
+  padding: 2rem 2.5rem;
+  overflow-y: auto;
+  opacity: 0;
+  transform: translateX(24px);
+  pointer-events: none;
+  transition: opacity 0.32s ease, transform 0.32s ease;
+}
+.app[dir='rtl'] .filePane { transform: translateX(-24px); }
+.filePaneVisible {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+.filePaneLeaving { transform: translateX(-24px); }
+.app[dir='rtl'] .filePaneLeaving { transform: translateX(24px); }
+@media (prefers-reduced-motion: reduce) {
+  .filePane {
+    transition: opacity 0.01ms;
+    transform: none !important;
+  }
+}
+
+.emptyState {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 12.5px;
+  text-align: center;
+  background: var(--base);
+  z-index: 2;
+}
+.emptyBig {
+  font-size: 2rem;
+  opacity: 0.5;
+  margin-bottom: 0.5rem;
+}
+.emptyDim { opacity: 0.7; }
+
+/* ---------- code lines + syntax ---------- */
+/* Code is always presented left-to-right — gutter on the left, text
+   left-aligned — even when the workspace is in RTL, exactly like a real
+   editor. Only the prose / cards below a file's code register mirror. */
+.line {
+  display: flex;
+  margin-bottom: 0.15rem;
+  direction: ltr;
+}
+.ln {
+  width: 2.4rem;
+  flex-shrink: 0;
+  color: #45475a;
+  text-align: right;
+  padding-right: 1rem;
+  user-select: none;
+  font-size: 12.5px;
+}
+.code {
+  white-space: pre-wrap;
+  line-height: 1.75;
+  font-size: 13.5px;
+  text-align: left;
+}
+.kw { color: var(--mauve); }
+.fn { color: var(--blue); }
+.str { color: var(--green); }
+.cm { color: var(--muted); font-style: italic; }
+.num { color: var(--pink); font-variant-numeric: tabular-nums; }
+.type { color: var(--yellow); }
+.prose {
+  color: var(--fg);
+  font-family: var(--font-mono), monospace;
+}
+
+.headline {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--fg);
+  margin: 0.5rem 0 1.25rem;
+  line-height: 1.3;
+}
+.headline .kw {
+  font-size: 1rem;
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+.proseText {
+  font-size: 13px;
+  line-height: 1.8;
+  opacity: 0.9;
+  color: var(--fg);
+  max-width: 62ch;
+}
+.app[dir='rtl'] .headline,
+.app[dir='rtl'] .proseText,
+.app[dir='rtl'] .statL,
+.app[dir='rtl'] .skillItem,
+.app[dir='rtl'] .projDesc,
+.app[dir='rtl'] .commitMsg,
+.app[dir='rtl'] .commitMeta {
+  font-family: var(--font-arabic), 'Segoe UI', Tahoma, sans-serif;
+}
+.app[dir='rtl'] .proseText { max-width: none; }
+
+.tagRow {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1.25rem 0;
+}
+.tagRow span {
+  font-size: 11px;
+  padding: 0.3rem 0.65rem;
+  border-radius: 4px;
+  background: rgba(137, 180, 250, 0.1);
+  color: var(--blue);
+  border: 1px solid rgba(137, 180, 250, 0.25);
+}
+
+.statGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+  max-width: 520px;
+}
+.statBox {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.015);
+}
+.statN {
+  color: var(--pink);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+.statL {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 0.2rem;
+}
+
+.skillBlock { margin-bottom: 1.5rem; }
+.skillCat {
+  color: var(--yellow);
+  font-size: 12px;
+  margin-bottom: 0.5rem;
+  direction: ltr;
+  text-align: start;
+}
+.skillItems {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.skillItem {
+  background: var(--base-2);
+  border: 1px solid var(--line);
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--fg);
+}
+
+.projCard {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  background: rgba(255, 255, 255, 0.015);
+  transition: border-color 0.2s ease;
+}
+.projCard:hover { border-color: var(--blue); }
+.projName {
+  color: var(--blue);
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+.projDesc {
+  color: var(--fg);
+  font-size: 12.5px;
+  line-height: 1.65;
+  opacity: 0.85;
+  margin-bottom: 0.6rem;
+}
+.projMeta {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 11px;
+  color: var(--muted);
+  flex-wrap: wrap;
+  align-items: center;
+}
+.projLive { color: var(--green); }
+.projMeta a {
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.projMeta a:hover { color: var(--blue); border-bottom-color: var(--blue); }
+
+.commit {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.1rem;
+  align-items: flex-start;
+}
+.commitHash {
+  color: var(--pink);
+  font-size: 12px;
+  flex-shrink: 0;
+  padding-top: 0.1rem;
+  direction: ltr;
+}
+.commitMsg { color: var(--fg); font-size: 13px; }
+.commitMeta {
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 0.2rem;
+}
+
+.btnRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+.btn {
+  font-family: var(--font-mono), monospace;
+  font-size: 12.5px;
+  text-decoration: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  color: var(--fg);
+  background: none;
+  cursor: pointer;
+  transition: opacity 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.btnPrimary {
+  background: var(--blue);
+  color: var(--base);
+  border-color: var(--blue);
+  font-weight: 600;
+}
+.btnPrimary:hover { opacity: 0.88; }
+.btn:not(.btnPrimary):hover { border-color: var(--blue); color: var(--blue); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ---------- contact file forms ---------- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  max-width: 520px;
+  margin-top: 1.25rem;
+}
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+@media (max-width: 560px) {
+  .formRow { grid-template-columns: 1fr; }
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.field label {
+  font-size: 11px;
+  color: var(--muted);
+}
+.input,
+.textarea {
+  background: var(--base-2);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0.55rem 0.7rem;
+  font-family: var(--font-mono), monospace;
+  /* 16px keeps iOS Safari from auto-zooming the page on focus. */
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.15s ease;
+  width: 100%;
+}
+.input:focus,
+.textarea:focus { border-color: var(--blue); }
+.textarea { resize: vertical; min-height: 96px; }
+.formStatus {
+  font-size: 12px;
+  margin: 0.25rem 0 0;
+}
+.formStatusOk { color: var(--green); }
+.formStatusErr { color: var(--pink); }
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 1rem 0 0.25rem;
+}
+.segBtn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.segBtnOn { background: rgba(137, 180, 250, 0.14); color: var(--blue); }
+
+/* ---------- minimap ---------- */
+.minimapRail {
+  background: var(--tab-inactive);
+  border-inline-start: 1px solid var(--line);
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  overflow-y: auto;
+}
+.mmFile {
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 4px;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: start;
+  transition: background 0.2s ease;
+}
+.mmFile:hover,
+.mmFileActive { background: rgba(137, 180, 250, 0.08); }
+.mmLabel {
+  font-size: 9px;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  direction: ltr;
+}
+.mmLines {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.mmLines div {
+  height: 2px;
+  border-radius: 1px;
+  background: var(--line);
+}
+.mmFileActive .mmLines div { background: var(--blue); opacity: 0.6; }
+
+/* ---------- statusbar ---------- */
+.statusbar {
+  background: var(--blue);
+  color: var(--base);
+  display: flex;
+  align-items: center;
+  padding: 0 0.9rem;
+  gap: 1.25rem;
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 0;
+  overflow: hidden;
+}
+.statusbar span,
+.statusbar a {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+.statusbar a {
+  color: var(--base);
+  text-decoration: none;
+  opacity: 0.85;
+}
+.statusbar a:hover { opacity: 1; text-decoration: underline; }
+.statusPush { margin-inline-start: auto; }
+
+/* ---------- scrollbars ---------- */
+.app ::-webkit-scrollbar { width: 10px; height: 10px; }
+.app ::-webkit-scrollbar-track { background: transparent; }
+.app ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 5px; }
+.app ::-webkit-scrollbar-thumb:hover { background: var(--muted); }

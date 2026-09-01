@@ -1,31 +1,23 @@
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
-import SiteNav from '../components/site/SiteNav';
-import BootOverlay from '../components/site/BootOverlay';
-import TerminalHero from '../components/site/TerminalHero';
-import SmoothScroll from '../components/SmoothScroll';
-import ScreenFrame from '../components/deck/ScreenFrame';
-import About from '../components/About';
-import Skills from '../components/Skills';
-import Projects from '../components/Projects';
-import Experience from '../components/Experience';
-import Contact from '../components/Contact';
-import Footer from '../components/Footer';
+import { useEffect } from 'react';
+import WorkspaceShell from '../components/workspace/WorkspaceShell';
 import { useTranslation } from '../hooks/useTranslation';
 import { SITE_URL, SITE_NAME, SITE_TITLE, SITE_DESCRIPTION, OG_IMAGE } from '../lib/site';
 import { buildJsonLd } from '../lib/jsonLd';
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
+/**
+ * Homepage — the "portfolio.workspace" IDE design. The previous terminal-style
+ * design lives on unchanged at `/classic`.
+ */
 export default function Home() {
-  const { t, isRTL, locale } = useTranslation();
-  const [booted, setBooted] = useState(false);
+  const { isRTL, locale } = useTranslation();
 
-  // Apply RTL direction and font to <html> and <body> reactively
+  // Reflect the active locale/direction on <html>, same as the classic page.
   useEffect(() => {
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
     document.documentElement.lang = locale;
-    document.body.style.fontFamily = isRTL ? 'var(--font-arabic), sans-serif' : 'var(--font-body), sans-serif';
   }, [isRTL, locale]);
 
   return (
@@ -36,7 +28,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="author" content={SITE_NAME} />
         <meta name="robots" content="index, follow" />
-        <meta name="theme-color" content="#101418" />
+        <meta name="theme-color" content="#1E1E2E" />
         <link rel="canonical" href={SITE_URL} />
         <link rel="icon" href="/favicon.png" style={{ borderRadius: '100%' }} />
         <link rel="apple-touch-icon" href="/favicon.png" />
@@ -65,49 +57,16 @@ export default function Home() {
         <meta name="twitter:image:alt" content={OG_IMAGE.alt} />
 
         {/* Structured data — built from the real project/skill data. `<` is
-            escaped so a `</script>` substring in any field (e.g. a future
-            project description) can't break out of the script tag. */}
+            escaped so a `</script>` substring in any field can't break out. */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd()).replace(/</g, '\\u003c') }}
         />
       </Head>
 
-      {!booted && <BootOverlay onDone={() => setBooted(true)} />}
-
-      <SmoothScroll />
-      <SiteNav />
-
       <main>
-        <TerminalHero start={booted} />
-
-        <ScreenFrame id="about" num={1}
-          title={t.about.title} isRTL={isRTL}>
-          <About bare />
-        </ScreenFrame>
-
-        <ScreenFrame id="skills" num={2}
-          title={t.skills.title} subtitle={t.skills.subtitle} isRTL={isRTL}>
-          <Skills bare />
-        </ScreenFrame>
-
-        <ScreenFrame id="projects" num={3}
-          title={t.projects.title} subtitle={t.projects.subtitle} isRTL={isRTL}>
-          <Projects bare />
-        </ScreenFrame>
-
-        <ScreenFrame id="experience" num={4}
-          title={t.experience.title} subtitle={t.experience.subtitle} isRTL={isRTL}>
-          <Experience bare />
-        </ScreenFrame>
-
-        <ScreenFrame id="contact" num={5}
-          title={t.contact.title} subtitle={t.contact.subtitle} isRTL={isRTL}>
-          <Contact bare />
-        </ScreenFrame>
+        <WorkspaceShell />
       </main>
-
-      <Footer />
 
       <Analytics/>
       <SpeedInsights/>

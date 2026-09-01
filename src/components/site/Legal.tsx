@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
+import { logEvent } from '../../lib/track';
 import Modal from './Modal';
 
 // Fixed on purpose — NOT new Date(). This is the date the wording below last
@@ -48,11 +49,13 @@ export default function Legal() {
   return (
     <>
       <nav className="legal-links" aria-label={legal.navLabel}>
-        <button type="button" className="legal-link" onClick={() => setOpen('privacy')}>
+        <button type="button" className="legal-link"
+          onClick={() => { logEvent('modal_open', { modal: 'privacy' }); setOpen('privacy'); }}>
           {legal.privacy.title}
         </button>
         <span className="legal-sep" aria-hidden="true">·</span>
-        <button type="button" className="legal-link" onClick={() => setOpen('terms')}>
+        <button type="button" className="legal-link"
+          onClick={() => { logEvent('modal_open', { modal: 'terms' }); setOpen('terms'); }}>
           {legal.terms.title}
         </button>
       </nav>

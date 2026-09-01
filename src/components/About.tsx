@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
+import { logEvent } from '../lib/track';
 import { Download, Eye } from 'lucide-react';
 
 /** Subtle count-up that runs once when scrolled into view (respects reduced motion). */
@@ -69,8 +70,8 @@ export default function About({ bare = false }: { bare?: boolean } = {}) {
               {[
                 { value: 3,  plus: true,  label: isRTL ? 'سنوات خبرة' : 'years experience' },
                 { value: 10, plus: true,  label: isRTL ? 'تقنية' : 'technologies' },
-                { value: 2,  plus: false, label: isRTL ? 'تخصّصان' : 'disciplines',
-                  sub: isRTL ? 'تطوير + تصميم' : 'dev + design' },
+                { value: 2,  plus: false, label: isRTL ? 'تخصّصان' : 'disciplines', },
+                  // sub: isRTL ? 'تطوير + تصميم' : 'dev + design' },
               ].map((s, i) => (
                 <div key={i} style={{ textAlign: 'center', padding: '4px 8px',
                   borderInlineStart: i > 0 ? '1px solid var(--border)' : 'none' }}>
@@ -85,12 +86,12 @@ export default function About({ bare = false }: { bare?: boolean } = {}) {
                     color: 'var(--text-muted)', ...ar }}>
                     {s.label}
                   </div>
-                  {s.sub && (
+                  {/* {s.sub && (
                     <div style={{ marginTop: 4, fontSize: '0.68rem',
                       color: 'var(--text-muted)', opacity: 0.72, ...ar }}>
                       {s.sub}
                     </div>
-                  )}
+                  )} */}
                 </div>
               ))}
             </div>
@@ -110,7 +111,8 @@ export default function About({ bare = false }: { bare?: boolean } = {}) {
                 <Eye size={16} />
                 {isRTL ? 'عرض السيرة الذاتية' : 'View CV'}
               </a>
-              <a href="/Alaa_Fayyad_CV.pdf" download className="btn-primary" style={{ ...ar, width: 'fit-content' }}>
+              <a href="/Alaa_Fayyad_CV.pdf" download className="btn-primary" style={{ ...ar, width: 'fit-content' }}
+                onClick={() => logEvent('cta_click', { cta: 'download_cv' })}>
                 <Download size={16} />
                 {t.about.download_cv}
               </a>

@@ -1,25 +1,26 @@
 import type { GetServerSideProps } from 'next';
 import { SITE_URL } from '../lib/site';
 
-// The site is a single page: the locale toggle and every section (#about,
-// #projects, …) live on one URL, so one <url> entry is the honest sitemap.
-// Fragment URLs are not separate documents and must not be listed.
-//
-// Both locales are served from that same URL, so they are declared as xhtml
-// alternates rather than as extra <url> entries.
+// Two real documents: `/` (the IDE-workspace homepage) and `/classic` (the
+// preserved terminal design). Section fragments (#about, #projects, …) are not
+// separate documents and must not be listed. Both locales are served from each
+// URL, so they are declared as xhtml alternates rather than extra <url> entries.
 function body(lastmod: string) {
+  const page = (path: string, priority: string) => `  <url>
+    <loc>${SITE_URL}${path}</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="${SITE_URL}${path}" />
+    <xhtml:link rel="alternate" hreflang="ar" href="${SITE_URL}${path}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}${path}" />
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>${priority}</priority>
+  </url>`;
+
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  <url>
-    <loc>${SITE_URL}/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="${SITE_URL}/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="${SITE_URL}/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE_URL}/" />
-    <lastmod>${lastmod}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
-  </url>
+${page('/', '1.0')}
+${page('/classic', '0.7')}
 </urlset>
 `;
 }

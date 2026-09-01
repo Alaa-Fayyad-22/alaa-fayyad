@@ -351,7 +351,7 @@ export default function Document() {
           }
 
           /* ════════════════ BENTO / LAYOUT GRIDS ════════════════ */
-          .proj-bento, .skills-bento {
+          .skills-bento {
             display: grid;
             grid-template-columns: 1fr;
             gap: 18px;
@@ -359,18 +359,41 @@ export default function Document() {
           .about-grid, .contact-grid {
             grid-template-columns: 1fr;
           }
+
+          /* Projects — a horizontal, swipeable scroll-snap carousel. One card
+             per view on mobile; two per view (and per prev/next "page") from
+             720px up, with the next card peeking to signal there's more.
+             Cards are all the same size: equal flex basis, a fixed-aspect
+             image box, and a line-clamped description so copy length can't
+             drive card height. Only /classic renders this. */
+          .proj-carousel { position: relative; }
+          .proj-bento {
+            display: flex;
+            gap: 18px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-x: contain;
+            scrollbar-width: none;               /* Firefox */
+            padding-bottom: 6px;
+          }
+          .proj-bento::-webkit-scrollbar { display: none; }  /* WebKit */
+          @media (prefers-reduced-motion: reduce) {
+            .proj-bento { scroll-behavior: auto; }
+          }
           .proj-card {
+            flex: 0 0 100%;
+            scroll-snap-align: start;
             display: flex;
             flex-direction: column;
-            height: 100%;
             border-radius: var(--radius-panel);
             overflow: hidden;
           }
           .proj-media {
             position: relative;
             overflow: hidden;
-            flex: 1 1 auto;
-            min-height: 190px;
+            aspect-ratio: 16 / 10;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -381,13 +404,37 @@ export default function Document() {
             flex-direction: column;
             flex-grow: 1;
           }
+          /* Clamp every description to the same line count so all cards match
+             height regardless of copy length. Full text stays in the DOM. */
+          .proj-desc {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+          /* Prev/next controls — pointer affordance from tablet up; touch users
+             just swipe, so they're hidden on narrow viewports. */
+          .proj-nav { display: none; }
+          .proj-nav button {
+            width: 38px; height: 38px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--primary);
+            background: var(--surface-solid); border: 1px solid var(--border);
+            transition: border-color 0.15s ease, opacity 0.15s ease;
+          }
+          .proj-nav button:hover:not(:disabled) { border-color: var(--primary); }
+          .proj-nav button:disabled { opacity: 0.35; cursor: default; }
+
           @media (min-width: 680px) {
             .skills-bento { grid-template-columns: repeat(2, 1fr); }
             .skills-bento > :nth-child(1) { grid-column: span 2; }
           }
           @media (min-width: 720px) {
-            .proj-bento { grid-template-columns: repeat(2, 1fr); }
-            .proj-card--large { grid-column: span 2; }
+            .proj-card { flex-basis: calc((100% - 18px) / 2); }
+            .proj-nav {
+              display: flex; gap: 8px; justify-content: flex-end;
+              margin-bottom: 14px;
+            }
           }
           @media (min-width: 860px) {
             .about-grid { grid-template-columns: 0.85fr 1.15fr; }
@@ -396,17 +443,6 @@ export default function Document() {
           @media (min-width: 1000px) {
             .skills-bento { grid-template-columns: repeat(3, 1fr); }
             .skills-bento > :nth-child(1) { grid-column: span 2; }
-            .proj-bento { grid-template-columns: repeat(3, 1fr); grid-auto-rows: minmax(248px, 1fr); }
-            .proj-card--large { grid-column: span 2; grid-row: span 2; }
-            .proj-card--large .proj-media { min-height: 300px; }
-            /* Smaller tiles: clamp the long description visually; full text stays
-               in the DOM for assistive tech. */
-            .proj-card:not(.proj-card--large) .proj-desc {
-              display: -webkit-box;
-              -webkit-line-clamp: 3;
-              -webkit-box-orient: vertical;
-              overflow: hidden;
-            }
           }
 
           /* Stacked scrolling sections */
@@ -711,6 +747,8 @@ export default function Document() {
           .snav__drawer-link::before { content: '>'; position: absolute; inset-inline-start: -14px;
             font-family: var(--font-mono), monospace; color: var(--primary);
             opacity: 0; transition: opacity 0.2s ease; }
+          /* Mirror the ">" marker in RTL, same as .snav__arrow above. */
+          [dir="rtl"] .snav__drawer-link::before { transform: scaleX(-1); }
           .snav__drawer-link:hover, .snav__drawer-link:focus-visible { color: var(--primary); }
           .snav__drawer-link:hover::before, .snav__drawer-link:focus-visible::before { opacity: 1; }
           .snav__drawer-link.is-active { color: var(--primary); }

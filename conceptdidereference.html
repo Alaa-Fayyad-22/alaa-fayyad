@@ -1,0 +1,583 @@
+<title>portfolio.workspace</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+:root{
+  --base:#1E1E2E;
+  --base-2:#181825;
+  --sidebar:#181825;
+  --fg:#CDD6F4;
+  --muted:#6C7086;
+  --blue:#89B4FA;
+  --green:#A6E3A1;
+  --yellow:#F9E2AF;
+  --pink:#F38BA8;
+  --mauve:#CBA6F7;
+  --line:#313244;
+  --tab-active:#1E1E2E;
+  --tab-inactive:#11111B;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ height:100%; }
+body{
+  background:var(--base-2);
+  color:var(--fg);
+  font-family:'JetBrains Mono', ui-monospace, monospace;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+  font-size:14px;
+}
+@media (prefers-reduced-motion: reduce){ *{ animation-duration:0.01ms !important; transition-duration:0.01ms !important; scroll-behavior:auto !important; } }
+::selection{ background:var(--blue); color:var(--base); }
+
+.app{
+  display:grid;
+  grid-template-rows:36px 1fr 24px;
+  height:100vh;
+}
+
+/* ---------- titlebar ---------- */
+.titlebar{
+  background:var(--tab-inactive);
+  border-bottom:1px solid var(--line);
+  display:flex; align-items:center; padding:0 0.9rem; gap:0.6rem;
+  font-size:12px; color:var(--muted);
+}
+.dots{ display:flex; gap:6px; }
+.dots span{ width:11px; height:11px; border-radius:50%; }
+.dots span:nth-child(1){ background:#F38BA8; }
+.dots span:nth-child(2){ background:#F9E2AF; }
+.dots span:nth-child(3){ background:#A6E3A1; }
+.titlebar .path{ margin-left:0.5rem; }
+.titlebar .status{ margin-left:auto; display:flex; gap:1rem; }
+.titlebar .status .ok{ color:var(--green); }
+
+/* ---------- main split ---------- */
+.split{ display:grid; grid-template-columns:220px 1fr 180px; overflow:hidden; }
+@media (max-width: 900px){ .split{ grid-template-columns:0 1fr 0; } .sidebar, .minimap-rail{ display:none; } }
+
+/* ---------- sidebar / file tree ---------- */
+.sidebar{
+  background:var(--sidebar);
+  border-right:1px solid var(--line);
+  padding:1rem 0;
+  overflow-y:auto;
+}
+.sidebar .explorer-label{
+  font-size:10px; letter-spacing:0.1em; color:var(--muted); padding:0 1rem 0.75rem;
+  text-transform:uppercase;
+}
+.tree-item{
+  display:flex; align-items:center; gap:0.5rem;
+  padding:0.4rem 1rem; cursor:pointer; font-size:13px; color:var(--muted);
+  border-left:2px solid transparent;
+  transition:all .15s ease;
+}
+.tree-item:hover{ background:rgba(205,214,244,0.05); color:var(--fg); }
+.tree-item.active{ background:rgba(137,180,250,0.1); color:var(--blue); border-left-color:var(--blue); }
+.tree-item .icon{ width:14px; text-align:center; opacity:0.8; }
+.tree-item.closed{ opacity:0.5; }
+.tree-item.closed:hover{ opacity:0.85; }
+.tree-folder{ padding:0.5rem 1rem 0.2rem; font-size:11px; color:var(--muted); letter-spacing:0.04em; }
+
+/* ---------- editor canvas: horizontally scrollable row of "files" ---------- */
+.editor-area{ position:relative; overflow:hidden; display:flex; flex-direction:column; }
+.tabbar{
+  display:flex; background:var(--tab-inactive); border-bottom:1px solid var(--line);
+  overflow-x:auto; overflow-y:hidden; flex-shrink:0;
+  scrollbar-width:thin;
+}
+.tabbar::-webkit-scrollbar{ height:6px; }
+.tab{
+  padding:0.6rem 0.6rem 0.6rem 1.1rem; font-size:12.5px; color:var(--muted);
+  border-right:1px solid var(--line); white-space:nowrap; cursor:grab;
+  display:flex; align-items:center; gap:0.5rem;
+  transition:background .2s ease, color .2s ease;
+  flex-shrink:0;
+  user-select:none;
+}
+.tab[hidden]{ display:none; }
+.tab.active{ background:var(--tab-active); color:var(--fg); box-shadow:inset 0 -2px 0 var(--blue); }
+.tab .dot{ width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.tab .tab-close{
+  width:18px; height:18px; border-radius:4px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--muted); font-size:13px; line-height:1;
+  opacity:0; transition:opacity .15s ease, background .15s ease, color .15s ease;
+  cursor:pointer;
+}
+.tab:hover .tab-close, .tab.active .tab-close{ opacity:1; }
+.tab .tab-close:hover{ background:rgba(255,255,255,0.12); color:var(--fg); }
+.tab.active .dot{ display:none; }
+.tab.active .tab-close{ opacity:1; }
+.tab:not(.active):hover .dot{ display:none; }
+.tab.dragging{ opacity:0.35; cursor:grabbing; }
+.tab.drag-over-left{ box-shadow:inset 2px 0 0 var(--blue); }
+.tab.drag-over-right{ box-shadow:inset -2px 0 0 var(--blue); }
+
+.canvas-scroll{
+  flex:1; position:relative;
+  overflow:hidden;
+}
+.file-pane{
+  position:absolute; inset:0;
+  padding:2rem 2.5rem;
+  overflow-y:auto;
+  opacity:0;
+  transform:translateX(24px);
+  pointer-events:none;
+  transition:opacity .32s ease, transform .32s ease;
+}
+.file-pane.visible{
+  opacity:1;
+  transform:translateX(0);
+  pointer-events:auto;
+}
+.file-pane.leaving{
+  transform:translateX(-24px);
+}
+@media (prefers-reduced-motion: reduce){
+  .file-pane{ transition:opacity .01ms; transform:none !important; }
+}
+
+.empty-state{
+  position:absolute; inset:0; display:none; flex-direction:column;
+  align-items:center; justify-content:center; gap:0.5rem;
+  color:var(--muted); font-size:12.5px; text-align:center;
+  background:var(--base); z-index:2;
+}
+.empty-state:not([hidden]){ display:flex; }
+.empty-state .big{ font-size:2rem; opacity:0.5; margin-bottom:0.5rem; }
+
+.line{ display:flex; margin-bottom:0.15rem; }
+.ln{ width:2.4rem; flex-shrink:0; color:#45475A; text-align:right; padding-right:1rem; user-select:none; font-size:12.5px; }
+.code{ white-space:pre-wrap; line-height:1.75; font-size:13.5px; }
+.kw{ color:var(--mauve); } .fn{ color:var(--blue); } .str{ color:var(--green); }
+.cm{ color:var(--muted); font-style:italic; } .num{ color:var(--pink); font-variant-numeric:tabular-nums; }
+.prose{ color:var(--fg); font-family:'JetBrains Mono',monospace; }
+.type{ color:var(--yellow); }
+
+.headline{
+  font-size:1.7rem; font-weight:700; color:var(--fg); margin:0.5rem 0 1.25rem;
+  line-height:1.3;
+}
+.headline .kw{ font-size:1rem; display:block; margin-bottom:0.4rem; font-weight:500;}
+
+.tag-row{ display:flex; gap:0.5rem; flex-wrap:wrap; margin:1.25rem 0; }
+.tag-row span{
+  font-size:11px; padding:0.3rem 0.65rem; border-radius:4px;
+  background:rgba(137,180,250,0.1); color:var(--blue); border:1px solid rgba(137,180,250,0.25);
+}
+
+.stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin:1.5rem 0; }
+.stat-box{ border:1px solid var(--line); border-radius:6px; padding:1rem; background:rgba(255,255,255,0.015); }
+.stat-box .n{ color:var(--pink); font-size:1.5rem; font-weight:700; }
+.stat-box .l{ color:var(--muted); font-size:11px; margin-top:0.2rem; }
+
+.skill-block{ margin-bottom:1.5rem; }
+.skill-block .cat{ color:var(--yellow); font-size:12px; margin-bottom:0.5rem; }
+.skill-block .items{ display:flex; flex-wrap:wrap; gap:0.4rem; }
+.skill-block .items span{ background:var(--base-2); border:1px solid var(--line); padding:0.25rem 0.6rem; border-radius:4px; font-size:12px; color:var(--fg); }
+
+.proj-card{
+  border:1px solid var(--line); border-radius:8px; padding:1.25rem; margin-bottom:1rem;
+  background:rgba(255,255,255,0.015);
+  transition:border-color .2s ease;
+}
+.proj-card:hover{ border-color:var(--blue); }
+.proj-card .name{ color:var(--blue); font-weight:600; margin-bottom:0.4rem; }
+.proj-card .desc{ color:var(--fg); font-size:12.5px; line-height:1.65; opacity:0.85; margin-bottom:0.6rem; }
+.proj-card .meta{ display:flex; gap:0.75rem; font-size:11px; color:var(--muted); }
+.proj-card .meta .live{ color:var(--green); }
+
+.commit{ display:flex; gap:0.75rem; margin-bottom:1.1rem; align-items:flex-start; }
+.commit .hash{ color:var(--pink); font-size:12px; flex-shrink:0; padding-top:0.1rem; }
+.commit .msg{ color:var(--fg); font-size:13px; }
+.commit .meta{ color:var(--muted); font-size:11px; margin-top:0.2rem; }
+
+.btn-row{ display:flex; gap:0.75rem; margin-top:1.5rem; flex-wrap:wrap; }
+.btn{
+  font-family:'JetBrains Mono',monospace; font-size:12.5px; text-decoration:none;
+  padding:0.7rem 1.2rem; border-radius:6px; border:1px solid var(--line); color:var(--fg);
+  transition:all .2s ease;
+}
+.btn.primary{ background:var(--blue); color:var(--base); border-color:var(--blue); font-weight:600; }
+.btn.primary:hover{ opacity:0.88; }
+.btn:not(.primary):hover{ border-color:var(--blue); color:var(--blue); }
+
+/* ---------- minimap ---------- */
+.minimap-rail{
+  background:var(--tab-inactive); border-left:1px solid var(--line);
+  padding:1rem 0.75rem; display:flex; flex-direction:column; gap:0.4rem;
+  overflow-y:auto;
+}
+.mm-file{
+  cursor:pointer; padding:0.4rem; border-radius:4px; transition:background .2s ease;
+}
+.mm-file:hover, .mm-file.active{ background:rgba(137,180,250,0.08); }
+.mm-file .mm-label{ font-size:9px; color:var(--muted); margin-bottom:0.3rem; text-transform:uppercase; letter-spacing:0.05em; }
+.mm-file .mm-lines{ display:flex; flex-direction:column; gap:2px; }
+.mm-file .mm-lines div{ height:2px; border-radius:1px; background:var(--line); }
+.mm-file.active .mm-lines div{ background:var(--blue); opacity:0.6; }
+
+/* ---------- statusbar ---------- */
+.statusbar{
+  background:var(--blue); color:var(--base);
+  display:flex; align-items:center; padding:0 0.9rem; gap:1.25rem;
+  font-size:11px; font-weight:600;
+}
+.statusbar span{ display:flex; align-items:center; gap:0.35rem; }
+
+::-webkit-scrollbar{ width:10px; height:10px; }
+::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar-thumb{ background:var(--line); border-radius:5px; }
+::-webkit-scrollbar-thumb:hover{ background:var(--muted); }
+</style>
+
+<div class="app">
+  <div class="titlebar">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <div class="path">alaa-fayyad — portfolio.workspace</div>
+    <div class="status"><span class="ok">● no problems</span><span>UTF-8</span></div>
+  </div>
+
+  <div class="split">
+    <div class="sidebar">
+      <div class="explorer-label">Explorer</div>
+      <div class="tree-folder">▾ src/</div>
+      <div class="tree-item active" data-target="0"><span class="icon">◆</span>about.tsx</div>
+      <div class="tree-item" data-target="1"><span class="icon">◇</span>skills.json</div>
+      <div class="tree-folder">▾ projects/</div>
+      <div class="tree-item" data-target="2"><span class="icon">◆</span>index.tsx</div>
+      <div class="tree-item" data-target="3"><span class="icon">◇</span>experience.log</div>
+      <div class="tree-item" data-target="4"><span class="icon">◆</span>contact.ts</div>
+      <div class="tree-folder" style="margin-top:1rem; border-top:1px solid var(--line); padding-top:1rem;">TIMELINE</div>
+      <div class="tree-item" style="opacity:0.6; cursor:default;"><span class="icon">✓</span>3 commits today</div>
+    </div>
+
+    <div class="editor-area">
+      <div class="tabbar" id="tabbar">
+        <div class="tab active" data-target="0" draggable="true"><span class="dot" style="background:var(--blue);"></span>about.tsx<span class="tab-close" data-close="0">×</span></div>
+        <div class="tab" data-target="1" draggable="true"><span class="dot" style="background:var(--yellow);"></span>skills.json<span class="tab-close" data-close="1">×</span></div>
+        <div class="tab" data-target="2" draggable="true"><span class="dot" style="background:var(--blue);"></span>index.tsx<span class="tab-close" data-close="2">×</span></div>
+        <div class="tab" data-target="3" draggable="true"><span class="dot" style="background:var(--green);"></span>experience.log<span class="tab-close" data-close="3">×</span></div>
+        <div class="tab" data-target="4" draggable="true"><span class="dot" style="background:var(--blue);"></span>contact.ts<span class="tab-close" data-close="4">×</span></div>
+      </div>
+
+      <div class="canvas-scroll" id="canvasScroll">
+        <div class="empty-state" id="emptyState" hidden>
+          <div class="big">⌘</div>
+          <div>No file open</div>
+          <div style="opacity:0.7;">Select a file from the explorer to open it</div>
+        </div>
+        <!-- FILE 0: about.tsx -->
+        <div class="file-pane" data-file="0">
+          <div class="line"><span class="ln">1</span><span class="code"><span class="cm">// src/about.tsx — who's writing this</span></span></div>
+          <div class="line"><span class="ln">2</span><span class="code"><span class="kw">import</span> { Beirut } <span class="kw">from</span> <span class="str">'./lib/geo'</span>;</span></div>
+          <div class="line"><span class="ln">3</span><span class="code"></span></div>
+          <div class="line"><span class="ln">4</span><span class="code"><span class="kw">export const</span> <span class="fn">Author</span> = {</span></div>
+          <div class="line"><span class="ln">5</span><span class="code">&nbsp;&nbsp;name: <span class="str">'Alaa Fayyad'</span>,</span></div>
+          <div class="line"><span class="ln">6</span><span class="code">&nbsp;&nbsp;role: <span class="str">'Full-stack developer & UI/UX designer'</span>,</span></div>
+          <div class="line"><span class="ln">7</span><span class="code">&nbsp;&nbsp;base: <span class="fn">Beirut</span>(),</span></div>
+          <div class="line"><span class="ln">8</span><span class="code">};</span></div>
+
+          <div class="headline"><span class="kw cm">/** rendered output */</span>Products, designed and shipped end to end.</div>
+          <div class="prose" style="font-size:13px; line-height:1.8; opacity:0.9; max-width:56ch;">
+            I don't hand off between "design" and "build" — I do both, on the same file, in the same afternoon.
+            That means fewer handoff bugs and interfaces that feel considered down to the transition curve.
+          </div>
+
+          <div class="stat-grid">
+            <div class="stat-box"><div class="n">6+</div><div class="l">years shipping product</div></div>
+            <div class="stat-box"><div class="n">20+</div><div class="l">projects launched</div></div>
+            <div class="stat-box"><div class="n">EN/AR</div><div class="l">bilingual, RTL-native</div></div>
+            <div class="stat-box"><div class="n">0</div><div class="l">handoff meetings needed</div></div>
+          </div>
+          <div class="line" style="margin-top:1rem;"><span class="ln">9</span><span class="code"><span class="cm">// scroll right, or use the file tree →</span></span></div>
+        </div>
+
+        <!-- FILE 1: skills.json -->
+        <div class="file-pane" data-file="1">
+          <div class="line"><span class="ln">1</span><span class="code">{</span></div>
+          <div class="line"><span class="ln">2</span><span class="code">&nbsp;&nbsp;<span class="type">"file"</span>: <span class="str">"skills.json"</span>,</span></div>
+          <div class="line"><span class="ln">3</span><span class="code">&nbsp;&nbsp;<span class="type">"description"</span>: <span class="str">"a working set, not a buzzword cloud"</span></span></div>
+          <div class="line"><span class="ln">4</span><span class="code">}</span></div>
+
+          <div class="headline">Frontend, backend, and the seam between.</div>
+
+          <div class="skill-block">
+            <div class="cat">"frontend": [</div>
+            <div class="items"><span>TypeScript</span><span>React</span><span>Next.js</span><span>GSAP</span><span>Design tokens</span></div>
+          </div>
+          <div class="skill-block">
+            <div class="cat">"backend": [</div>
+            <div class="items"><span>Node.js</span><span>PostgreSQL</span><span>Supabase</span><span>REST APIs</span><span>Auth & rate-limiting</span></div>
+          </div>
+          <div class="skill-block">
+            <div class="cat">"design": [</div>
+            <div class="items"><span>UI/UX</span><span>Prototyping</span><span>Accessibility</span><span>Bilingual/RTL</span></div>
+          </div>
+        </div>
+
+        <!-- FILE 2: projects/index.tsx -->
+        <div class="file-pane" data-file="2" style="max-width:880px;">
+          <div class="line"><span class="ln">1</span><span class="code"><span class="kw">export const</span> <span class="fn">projects</span> = [</span></div>
+          <div class="line"><span class="ln">2</span><span class="code">&nbsp;&nbsp;<span class="cm">// three things I'd actually show you</span></span></div>
+          <div class="line"><span class="ln">3</span><span class="code">];</span></div>
+
+          <div class="headline">Selected work</div>
+
+          <div class="proj-card">
+            <div class="name">01 · Fattoura</div>
+            <div class="desc">Invoicing and quoting for freelancers — PDF generation, client-facing payment status, built to feel instant on a slow connection.</div>
+            <div class="meta"><span class="live">● live</span><span>Next.js</span><span>Postgres</span><span>Stripe</span></div>
+          </div>
+          <div class="proj-card">
+            <div class="name">02 · Collaborative Puzzle Engine</div>
+            <div class="desc">A shared, stateful riddle chain that thousands of visitors solve together — same server state, same stage, for everyone watching.</div>
+            <div class="meta"><span class="live">● live</span><span>Supabase</span><span>Realtime</span></div>
+          </div>
+          <div class="proj-card">
+            <div class="name">03 · Terminal-First Portfolio</div>
+            <div class="desc">A developer-facing personal site with a real command parser, boot sequence, and full bilingual RTL support.</div>
+            <div class="meta"><span>archived</span><span>TypeScript</span><span>i18n</span></div>
+          </div>
+        </div>
+
+        <!-- FILE 3: experience.log -->
+        <div class="file-pane" data-file="3">
+          <div class="line"><span class="ln">1</span><span class="code"><span class="cm">$ git log --oneline --graph --all</span></span></div>
+
+          <div class="headline">A quick trace of the path.</div>
+
+          <div class="commit">
+            <span class="hash">a3f0c9e</span>
+            <div><div class="msg">Senior Full-Stack Developer, Freelance</div><div class="meta">2024 — Present · end-to-end builds across MENA and Europe</div></div>
+          </div>
+          <div class="commit">
+            <span class="hash">7b21de4</span>
+            <div><div class="msg">Product Designer & Engineer</div><div class="meta">2022 — 2024 · owned interaction design for a 10k WAU SaaS dashboard</div></div>
+          </div>
+          <div class="commit">
+            <span class="hash">14cc882</span>
+            <div><div class="msg">Frontend Developer</div><div class="meta">2020 — 2022 · component libraries & marketing sites, agency-side</div></div>
+          </div>
+        </div>
+
+        <!-- FILE 4: contact.ts -->
+        <div class="file-pane" data-file="4">
+          <div class="line"><span class="ln">1</span><span class="code"><span class="kw">async function</span> <span class="fn">sayHello</span>() {</span></div>
+          <div class="line"><span class="ln">2</span><span class="code">&nbsp;&nbsp;<span class="kw">return</span> <span class="fn">fetch</span>(<span class="str">'/contact'</span>);</span></div>
+          <div class="line"><span class="ln">3</span><span class="code">}</span></div>
+
+          <div class="headline">Say hello, or send a brief.</div>
+          <div class="prose" style="font-size:13px; line-height:1.8; opacity:0.9; max-width:50ch;">
+            Open to select freelance work and full-time roles where design and engineering
+            aren't separate departments.
+          </div>
+          <div class="btn-row">
+            <a href="#" class="btn primary">Send a message</a>
+            <a href="#" class="btn">Request a quote</a>
+            <a href="#" class="btn">Résumé.pdf</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="minimap-rail" id="minimapRail"></div>
+  </div>
+
+  <div class="statusbar">
+    <span>⎇ main</span>
+    <span id="status-file">about.tsx</span>
+    <span style="margin-left:auto;">Ln 9, Col 1</span>
+    <span>Spaces: 2</span>
+    <span>TypeScript</span>
+  </div>
+</div>
+
+<script>
+(function(){
+  const files = Array.from(document.querySelectorAll('.file-pane'));
+  const treeItems = Array.from(document.querySelectorAll('.tree-item[data-target]'));
+  const tabbar = document.getElementById('tabbar');
+  const statusFile = document.getElementById('status-file');
+  const minimapRail = document.getElementById('minimapRail');
+  const emptyState = document.getElementById('emptyState');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const fileNames = ['about.tsx','skills.json','index.tsx','experience.log','contact.ts'];
+  let current = 0;
+  // which file indices currently have an open tab, in tab order
+  let openOrder = [0,1,2,3,4];
+
+  function tabEl(idx){ return tabbar.querySelector('.tab[data-target="'+idx+'"]'); }
+  function treeEl(idx){ return treeItems.find(t => t.dataset.target == idx); }
+
+  // build minimap
+  files.forEach((f, i) => {
+    const mm = document.createElement('div');
+    mm.className = 'mm-file' + (i===0 ? ' active' : '');
+    mm.dataset.target = i;
+    const lineCount = 8 + (i % 3) * 3;
+    let linesHtml = '<div class="mm-lines">';
+    for (let l=0; l<lineCount; l++){
+      const w = 30 + Math.random()*60;
+      linesHtml += '<div style="width:'+w+'%"></div>';
+    }
+    linesHtml += '</div>';
+    mm.innerHTML = '<div class="mm-label">'+fileNames[i]+'</div>' + linesHtml;
+    minimapRail.appendChild(mm);
+  });
+  const mmFiles = Array.from(minimapRail.children);
+
+  // only file 0 starts visible
+  files[0].classList.add('visible');
+
+  function showEmptyState(show){
+    emptyState.hidden = !show;
+    statusFile.textContent = show ? '(no file open)' : fileNames[current];
+  }
+
+  function goTo(idx){
+    if (!openOrder.includes(idx)) return; // tab must be open first
+    idx = Math.max(0, Math.min(files.length - 1, idx));
+    if (idx === current) {
+      showEmptyState(false);
+      return;
+    }
+    const prev = files[current];
+    const next = files[idx];
+
+    if (prev) {
+      prev.classList.add('leaving');
+      prev.classList.remove('visible');
+    }
+    next.classList.remove('leaving');
+    void next.offsetWidth;
+    next.classList.add('visible');
+
+    if (prev) {
+      if (!reduced) {
+        setTimeout(() => prev.classList.remove('leaving'), 340);
+      } else {
+        prev.classList.remove('leaving');
+      }
+    }
+
+    current = idx;
+    showEmptyState(false);
+    treeItems.forEach(t => t.classList.toggle('active', t.dataset.target == idx));
+    tabbar.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.target == idx));
+    mmFiles.forEach((m,i) => m.classList.toggle('active', i==idx));
+    statusFile.textContent = fileNames[idx];
+  }
+
+  function openTab(idx){
+    const alreadyOpen = openOrder.includes(idx);
+    if (!alreadyOpen) {
+      openOrder.push(idx);
+      const t = tabEl(idx);
+      t.hidden = false;
+      const tree = treeEl(idx);
+      if (tree) tree.classList.remove('closed');
+    }
+    goTo(idx);
+  }
+
+  function closeTab(idx, evt){
+    if (evt) evt.stopPropagation();
+    const t = tabEl(idx);
+    if (t) t.hidden = true;
+    openOrder = openOrder.filter(i => i !== idx);
+    const tree = treeEl(idx);
+    if (tree) tree.classList.add('closed');
+    files[idx].classList.remove('visible');
+
+    if (current === idx) {
+      if (openOrder.length > 0) {
+        // focus the nearest remaining open tab
+        current = openOrder[openOrder.length - 1];
+        const wasIdx = idx;
+        // temporarily allow goTo to run even though "current" already changed
+        const target = current;
+        current = wasIdx; // reset so goTo's early-return-on-equal doesn't trip
+        goTo(target);
+      } else {
+        current = -1;
+        showEmptyState(true);
+        treeItems.forEach(t2 => t2.classList.remove('active'));
+        tabbar.querySelectorAll('.tab').forEach(t2 => t2.classList.remove('active'));
+        mmFiles.forEach(m => m.classList.remove('active'));
+      }
+    }
+  }
+
+  treeItems.forEach(item => item.addEventListener('click', () => openTab(parseInt(item.dataset.target))));
+  tabbar.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => goTo(parseInt(tab.dataset.target)));
+    const closeBtn = tab.querySelector('.tab-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', (e) => closeTab(parseInt(tab.dataset.target), e));
+    }
+    // middle-click to close, like most editors
+    tab.addEventListener('auxclick', (e) => {
+      if (e.button === 1) closeTab(parseInt(tab.dataset.target), e);
+    });
+  });
+  mmFiles.forEach((m,i) => m.addEventListener('click', () => openTab(i)));
+
+  // keyboard navigation between open tabs
+  window.addEventListener('keydown', (e) => {
+    if (current === -1 || openOrder.length === 0) return;
+    const pos = openOrder.indexOf(current);
+    if (e.key === 'ArrowRight' && pos < openOrder.length - 1) goTo(openOrder[pos + 1]);
+    if (e.key === 'ArrowLeft' && pos > 0) goTo(openOrder[pos - 1]);
+  });
+
+  // ---- drag-to-reorder tabs ----
+  let dragSrc = null;
+  tabbar.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('dragstart', (e) => {
+      dragSrc = tab;
+      tab.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', tab.dataset.target);
+    });
+    tab.addEventListener('dragend', () => {
+      tab.classList.remove('dragging');
+      tabbar.querySelectorAll('.tab').forEach(t => t.classList.remove('drag-over-left','drag-over-right'));
+    });
+    tab.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      if (!dragSrc || dragSrc === tab) return;
+      const rect = tab.getBoundingClientRect();
+      const before = (e.clientX - rect.left) < rect.width / 2;
+      tab.classList.toggle('drag-over-left', before);
+      tab.classList.toggle('drag-over-right', !before);
+    });
+    tab.addEventListener('dragleave', () => {
+      tab.classList.remove('drag-over-left','drag-over-right');
+    });
+    tab.addEventListener('drop', (e) => {
+      e.preventDefault();
+      tab.classList.remove('drag-over-left','drag-over-right');
+      if (!dragSrc || dragSrc === tab) return;
+      const rect = tab.getBoundingClientRect();
+      const before = (e.clientX - rect.left) < rect.width / 2;
+      if (before) {
+        tabbar.insertBefore(dragSrc, tab);
+      } else {
+        tabbar.insertBefore(dragSrc, tab.nextSibling);
+      }
+      // rebuild openOrder to match the new visual order
+      const srcIdx = parseInt(dragSrc.dataset.target);
+      const domOrder = Array.from(tabbar.querySelectorAll('.tab'))
+        .map(t => parseInt(t.dataset.target))
+        .filter(i => openOrder.includes(i));
+      openOrder = domOrder;
+      dragSrc = null;
+    });
+  });
+})();
+</script>

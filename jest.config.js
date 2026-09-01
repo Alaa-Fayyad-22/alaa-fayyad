@@ -1,7 +1,7 @@
 /** @type {import('jest').Config} */
 const config = {
   testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['@testing-library/jest-dom'],
+  setupFilesAfterEnv: ['@testing-library/jest-dom', '<rootDir>/jest.setup.js'],
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', {
       tsconfig: {
@@ -23,6 +23,9 @@ const config = {
     // Jest resolves the package to its IIFE build otherwise; point it at the ESM
     // entry that the transform above can actually handle.
     '^lenis$': '<rootDir>/node_modules/lenis/dist/lenis.mjs',
+    // @vercel/analytics is ESM-only; lib/track.ts treats it as best-effort, so
+    // a no-op `track` stub keeps component tests runnable.
+    '^@vercel/analytics$': '<rootDir>/__mocks__/analyticsMock.js',
   },
 };
 
