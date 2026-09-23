@@ -16,6 +16,22 @@ export const projects = [
   color: "from-amber-500 to-orange-600"
 },
 {
+  id: 4,
+  title: "3adasa",
+  titleAr: "عدسة",
+  description: "Portfolio and booking site for Jad Daou, a Beirut-based photographer. Clients browse his work by category, then book a session by picking a date, session type, and exact location on a Google Maps pin; the photographer confirms or declines with a one-tap signed link, no dashboard or login needed. Double bookings are blocked at both the API and database level. It also features a scroll-driven 3D lens built in Three.js and a hand-rolled prerendering pipeline for fast, SEO-friendly pages.",
+  descriptionAr: "موقع لعرض الأعمال وحجز الجلسات للمصوّر جاد ضو المقيم في بيروت. يتصفّح العملاء أعماله حسب الفئة، ثم يحجزون جلسة باختيار التاريخ ونوع الجلسة والموقع الدقيق عبر دبوس على خرائط Google؛ ويؤكّد المصوّر الحجز أو يرفضه بنقرة واحدة عبر رابط موقَّع، دون لوحة تحكم أو تسجيل دخول. يُمنع الحجز المزدوج على مستوى الواجهة البرمجية وقاعدة البيانات معاً. ويضمّ أيضاً عدسة ثلاثية الأبعاد تتفكّك مع التمرير مبنية بـ Three.js، ونظام عرض مسبق مبنياً يدوياً لصفحات سريعة ومهيّأة لمحركات البحث.",
+  image: "/3adasa_cover.png",
+  imageAlt: "3adasa site showing the scroll-driven 3D exploded camera lens in the Behind the Lens section.",
+  imageAltAr: "موقع عدسة، ويظهر فيه نموذج العدسة ثلاثي الأبعاد المفكَّك في قسم «خلف العدسة».",
+  tags: ["React", "Three.js", "Supabase"],
+  category: "web",
+  live: "https://3adasa-lb.vercel.app/",
+  github: "https://github.com/Alaa-Fayyad-22/3adasa",
+  featured: true,
+  color: "from-emerald-500 to-teal-600"
+},
+{
   id: 1,
   title: "Happidoo",
   titleAr: "هابيدو",
