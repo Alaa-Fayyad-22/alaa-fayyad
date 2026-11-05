@@ -39,15 +39,6 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
-  async redirects() {
-  return [
-    {
-      source: "/",
-      destination: "/classic",
-      permanent: false,
-    },
-  ];
-},
   reactStrictMode: true,
   poweredByHeader: false,
   images: {

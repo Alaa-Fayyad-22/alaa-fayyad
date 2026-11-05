@@ -211,5 +211,158 @@
         }
       ]
     }
+  },
+  "home": {
+    "loader": {
+      "brand": "Alaa Fayyad",
+      "brandSuffix": "· Portfolio",
+      "tagline": "Full-stack · UI/UX · EN / عربي",
+      "name": "Alaa Fayyad",
+      "cmd": "$ npm run portfolio",
+      "compiling": "COMPILING THE WORK",
+      "greeting": "مرحباً · Hello",
+      "lines": [
+        "✓ compiled about.tsx",
+        "✓ compiled skills.json",
+        "✓ compiled projects/",
+        "✓ ready in 1.4s"
+      ]
+    },
+    "nav": {
+      "brand": "Alaa Fayyad",
+      "ariaMain": "Main",
+      "home": "Home",
+      "work": "Work",
+      "story": "My story",
+      "contact": "Contact",
+      "city": "Beirut",
+      "langLabel": "عربي",
+      "langAria": "Switch language to Arabic"
+    },
+    "cord": {
+      "aria": "Pull the cord to toggle light and dark mode",
+      "hint": "pull me"
+    },
+    "hero": {
+      "eyebrow": "Available for work · Remote from Beirut",
+      "greeting": "Hi, I'm Alaa.",
+      "build": "I build as a",
+      "roles": [
+        "Full-stack Dev",
+        "UI/UX Designer",
+        "Next.js Builder"
+      ],
+      "roleHint": "click",
+      "flipAria": "Show next role",
+      "hire": "Hire me",
+      "seeWork": "See my work",
+      "terminal": ">_ open terminal",
+      "terminalTitle": "Opens the classic terminal page",
+      "editorAria": "A code snippet describing Alaa",
+      "cv": "CV ↓",
+      "stripAvailable": "AVAILABLE FOR WORK",
+      "stripStack": "FULL-STACK · UI/UX · EN / AR",
+      "stripScroll": "SCROLL TO EXPLORE"
+    },
+    "work": {
+      "eyebrow": "My work",
+      "title1": "Three arches,",
+      "title2": "one builder.",
+      "intro": "Inspired by the triple-arch windows of old Beirut houses. Pick a door and step inside.",
+      "swipe": "← swipe →",
+      "frontend": {
+        "title": "Frontend",
+        "plaque1": "FRONTEND",
+        "plaque2": "",
+        "stack": "React · Next.js · TypeScript"
+      },
+      "design": {
+        "title": "UI/UX Design",
+        "plaque1": "UI/UX",
+        "plaque2": "DESIGN",
+        "stack": "Figma · Design systems · RTL"
+      },
+      "backend": {
+        "title": "Backend & Data",
+        "plaque1": "BACKEND",
+        "plaque2": "& DATA",
+        "stack": "Node · Supabase · APIs"
+      }
+    },
+    "story": {
+      "eyebrow": "My story",
+      "title1": "Let's rewind",
+      "title2": "the commits.",
+      "log": "git log --oneline --since=2023",
+      "now": "NOW"
+    },
+    "contact": {
+      "eyebrow": "Available for new work",
+      "title1": "Need something built?",
+      "title2": "Let's ship it.",
+      "copy": "Websites, web apps and interfaces, in English or Arabic. Tell me what you need and I'll reply within [24 hours].",
+      "tabsAria": "Message type",
+      "tabMessage": "Message",
+      "tabQuote": "Get a quote",
+      "name": "Name",
+      "email": "Email",
+      "subject": "Subject",
+      "projectType": "Project type",
+      "budget": "Budget",
+      "timeline": "Timeline",
+      "message": "What do you need?",
+      "choose": "Select…",
+      "projectTypes": [
+        "Web App",
+        "Mobile App",
+        "Dashboard",
+        "E-commerce",
+        "UI/UX Design",
+        "Other"
+      ],
+      "budgets": [
+        "Under $200",
+        "$200 - $300",
+        "$400 - $800",
+        "$800 - $1,000",
+        "$1,000+"
+      ],
+      "timelines": [
+        "Under 3 weeks",
+        "1 month",
+        "1-3 months",
+        "3-6 months",
+        "Flexible"
+      ],
+      "sendMessage": "Send message",
+      "sendQuote": "Request quote",
+      "sending": "Sending...",
+      "sent": "Sent Successfully!",
+      "error": "Failed to send. Please try again."
+    },
+    "footer": {
+      "bio": "Full-stack developer & UI/UX designer, building from Beirut.",
+      "workHeading": "WORK",
+      "navHeading": "NAVIGATE",
+      "statusHeading": "STATUS",
+      "ariaWork": "Work",
+      "ariaNavigate": "Navigate",
+      "home": "Home",
+      "story": "My story",
+      "terminal": "Terminal mode >_",
+      "available": "● Available for work",
+      "remote": "Remote-first, worldwide",
+      "city": "Beirut",
+      "credit": "Designed and built by me.",
+      "backToTop": "Back to top ↑",
+      "backToTopAria": "Back to top"
+    },
+    "workPage": {
+      "back": "Back to the arches",
+      "empty": "This room is empty for now.",
+      "frontend": "Frontend",
+      "design": "UI/UX Design",
+      "backend": "Backend & Data"
+    }
   }
 }

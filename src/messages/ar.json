@@ -211,5 +211,158 @@
         }
       ]
     }
+  },
+  "home": {
+    "loader": {
+      "brand": "علاء فياض",
+      "brandSuffix": "· Portfolio",
+      "tagline": "Full-stack · UI/UX · EN / عربي",
+      "name": "علاء فياض",
+      "cmd": "$ npm run portfolio",
+      "compiling": "جاري تجميع الأعمال",
+      "greeting": "مرحباً · Hello",
+      "lines": [
+        "✓ compiled about.tsx",
+        "✓ compiled skills.json",
+        "✓ compiled projects/",
+        "✓ ready in 1.4s"
+      ]
+    },
+    "nav": {
+      "brand": "علاء فياض",
+      "ariaMain": "الرئيسية",
+      "home": "الرئيسية",
+      "work": "أعمالي",
+      "story": "قصتي",
+      "contact": "تواصل",
+      "city": "بيروت",
+      "langLabel": "EN",
+      "langAria": "تبديل اللغة إلى الإنجليزية"
+    },
+    "cord": {
+      "aria": "اسحب الحبل لتبديل الوضع الفاتح والداكن",
+      "hint": "اسحبني"
+    },
+    "hero": {
+      "eyebrow": "متاح للعمل · عن بُعد من بيروت",
+      "greeting": "أهلاً، أنا علاء.",
+      "build": "أبني كـ",
+      "roles": [
+        "مطوّر Full-stack",
+        "مصمم UI/UX",
+        "بانٍ بـ Next.js"
+      ],
+      "roleHint": "اضغط",
+      "flipAria": "عرض الدور التالي",
+      "hire": "وظّفني",
+      "seeWork": "شاهد أعمالي",
+      "terminal": ">_ افتح الطرفية",
+      "terminalTitle": "يفتح صفحة الطرفية الكلاسيكية",
+      "editorAria": "مقطع برمجي يعرّف بعلاء",
+      "cv": "CV ↓",
+      "stripAvailable": "متاح للعمل",
+      "stripStack": "FULL-STACK · UI/UX · EN / AR",
+      "stripScroll": "مرّر للاستكشاف"
+    },
+    "work": {
+      "eyebrow": "أعمالي",
+      "title1": "ثلاث قناطر،",
+      "title2": "وبانٍ واحد.",
+      "intro": "مستوحاة من القناطر الثلاث في بيوت بيروت القديمة. اختر باباً وادخل.",
+      "swipe": "← اسحب →",
+      "frontend": {
+        "title": "الواجهات الأمامية",
+        "plaque1": "FRONTEND",
+        "plaque2": "",
+        "stack": "React · Next.js · TypeScript"
+      },
+      "design": {
+        "title": "تصميم UI/UX",
+        "plaque1": "UI/UX",
+        "plaque2": "DESIGN",
+        "stack": "Figma · Design systems · RTL"
+      },
+      "backend": {
+        "title": "الخوادم والبيانات",
+        "plaque1": "BACKEND",
+        "plaque2": "& DATA",
+        "stack": "Node · Supabase · APIs"
+      }
+    },
+    "story": {
+      "eyebrow": "قصتي",
+      "title1": "لنرجع",
+      "title2": "بالـ commits.",
+      "log": "git log --oneline --since=2023",
+      "now": "الآن"
+    },
+    "contact": {
+      "eyebrow": "متاح لمشاريع جديدة",
+      "title1": "بدك شي ينبنى؟",
+      "title2": "يلا نطلقه.",
+      "copy": "مواقع، تطبيقات ويب وواجهات، بالعربي أو الإنجليزي. خبّرني شو بدك وبرد عليك خلال [24 ساعة].",
+      "tabsAria": "نوع الرسالة",
+      "tabMessage": "رسالة",
+      "tabQuote": "اطلب عرض سعر",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "subject": "الموضوع",
+      "projectType": "نوع المشروع",
+      "budget": "الميزانية",
+      "timeline": "الجدول الزمني",
+      "message": "شو بتحتاج؟",
+      "choose": "اختر…",
+      "projectTypes": [
+        "موقع ويب",
+        "تطبيق موبايل",
+        "لوحة تحكم",
+        "متجر إلكتروني",
+        "تصميم UI/UX",
+        "أخرى"
+      ],
+      "budgets": [
+        "أقل من $200",
+        "$200 - $300",
+        "$400 - $800",
+        "$800 - $1,000",
+        "$1,000+"
+      ],
+      "timelines": [
+        "أقل من 3 أسابيع",
+        "شهر",
+        "1-3 أشهر",
+        "3-6 أشهر",
+        "مرن"
+      ],
+      "sendMessage": "أرسل",
+      "sendQuote": "طلب عرض السعر",
+      "sending": "جاري الإرسال...",
+      "sent": "تم الإرسال!",
+      "error": "فشل الإرسال. حاول مجدداً."
+    },
+    "footer": {
+      "bio": "مطوّر Full-stack ومصمم UI/UX، من بيروت.",
+      "workHeading": "الأعمال",
+      "navHeading": "تصفّح",
+      "statusHeading": "الحالة",
+      "ariaWork": "الأعمال",
+      "ariaNavigate": "تصفّح",
+      "home": "الرئيسية",
+      "story": "قصتي",
+      "terminal": "وضع الطرفية >_",
+      "available": "● متاح للعمل",
+      "remote": "عن بُعد، حول العالم",
+      "city": "بيروت",
+      "credit": "صمّمته وبنيته بنفسي.",
+      "backToTop": "العودة للأعلى ↑",
+      "backToTopAria": "العودة للأعلى"
+    },
+    "workPage": {
+      "back": "رجوع للقناطر",
+      "empty": "هالغرفة فاضية حالياً.",
+      "frontend": "الواجهات الأمامية",
+      "design": "تصميم UI/UX",
+      "backend": "الخوادم والبيانات"
+    }
   }
 }
