@@ -1,6 +1,5 @@
 import Head from 'next/head';
-import { useEffect } from 'react';
-import WorkspaceShell from '../components/workspace/WorkspaceShell';
+import HomePage from '../components/home/HomePage';
 import { useTranslation } from '../hooks/useTranslation';
 import { SITE_URL, SITE_NAME, SITE_TITLE, SITE_DESCRIPTION, OG_IMAGE } from '../lib/site';
 import { buildJsonLd } from '../lib/jsonLd';
@@ -8,17 +7,18 @@ import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
 /**
- * Homepage — the "portfolio.workspace" IDE design. The previous terminal-style
- * design lives on unchanged at `/classic`.
+ * Homepage — the redesign (components/home). The IDE-workspace design that used
+ * to live here is now at `/vs`; the terminal-style design is still `/classic`.
  */
-export default function Home() {
-  const { isRTL, locale } = useTranslation();
+// Runs in <head>, before first paint. If the loader should not play (already
+// seen this session, or reduced motion) it flags <html>, and the stylesheet
+// hides the server-rendered loader from that flag, so it never flashes.
+const LOADER_GATE = `(function(){try{var d=document.documentElement,s=false;try{s=!!sessionStorage.getItem('home-loaded')}catch(e){}if(s||matchMedia('(prefers-reduced-motion: reduce)').matches)d.setAttribute('data-home-loaded','')}catch(e){}})();`;
+// No JS = the loader could never finish, so hide it.
+const LOADER_NOSCRIPT = '<style>[data-home-loader]{display:none!important}</style>';
 
-  // Reflect the active locale/direction on <html>, same as the classic page.
-  useEffect(() => {
-    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
-    document.documentElement.lang = locale;
-  }, [isRTL, locale]);
+export default function Home() {
+  const { isRTL } = useTranslation();
 
   return (
     <>
@@ -28,7 +28,9 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="author" content={SITE_NAME} />
         <meta name="robots" content="index, follow" />
-        <meta name="theme-color" content="#1E1E2E" />
+        <meta name="theme-color" content="#161413" />
+        <script dangerouslySetInnerHTML={{ __html: LOADER_GATE }} />
+        <noscript dangerouslySetInnerHTML={{ __html: LOADER_NOSCRIPT }} />
         <link rel="canonical" href={SITE_URL} />
         <link rel="icon" href="/favicon.png" style={{ borderRadius: '100%' }} />
         <link rel="apple-touch-icon" href="/favicon.png" />
@@ -64,9 +66,7 @@ export default function Home() {
         />
       </Head>
 
-      <main>
-        <WorkspaceShell />
-      </main>
+      <HomePage />
 
       <Analytics/>
       <SpeedInsights/>

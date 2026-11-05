@@ -1,460 +1,571 @@
-# Project Report — `my-portfolio-v2`
+# PROJECT_REPORT — `my-portfolio-v2` (package name `my-portfolio`)
 
-> Read-only investigation. Nothing in the codebase was modified to produce this document.
-> Prepared as an onboarding brief for a human or AI assistant about to make changes.
-
----
-
-## 1. Overview
-
-This is the personal portfolio website of **Alaa Fayyad**, a full-stack developer and UI/UX
-designer based in Beirut, Lebanon. It is a single-page marketing/portfolio site with a
-deliberately "developer" aesthetic: an animated boot sequence, an interactive shell-style
-terminal hero, and section-numbered content panels ("01 | About", "02 | Skills", …).
-
-The page presents five content sections — About, Skills, Projects, Experience, Contact — plus
-a hero. Content is fully **bilingual (English + Arabic) with real right-to-left support**, and
-the site has a **dark/light theme** toggle. Two contact forms ("Send a message" and "Request a
-quote") send email to the owner. There is also a hidden **collaborative puzzle** (`/decode`, a
-4-stage riddle chain backed by a shared database) and a built-but-currently-unreachable
-**bug-fix mini-game** (`/fix`), both launched from the terminal.
-
-The audience is prospective clients and employers. There is no CMS, no user accounts, and no
-analytics dashboard — the owner edits data directly in a TypeScript file and redeploys.
+> Handoff report for an assistant that **cannot see the codebase**. Everything here was read from the
+> repo on 2026-11-05 (branch `main`, HEAD `8fccaec`). Anything not directly verified is tagged **(unverified)**.
+> Secrets are never reproduced: values are written as `[REDACTED]`.
+> This file **replaces** an older, stale `PROJECT_REPORT.md` (committed 2026-08-28 in `a155a3c`).
 
 ---
 
-## 2. Tech stack
+## 1. OVERVIEW
 
-| Area | Choice |
-|---|---|
-| Language | TypeScript 5 (`strict: false`, but `strictNullChecks: true`), plus some plain JS config files |
-| Framework | **Next.js `^16.2.12`** using the **Pages Router** (`src/pages/**`), React `^18` / ReactDOM `^18` |
-| Dev bundler | Turbopack (Next 16 default; `.next/dev/**` contains Turbopack chunks). `dev` script is a bare `next dev`. |
-| Styling | **No CSS framework.** One large inline `<style>` block in `src/pages/_document.tsx` holds all global CSS + design tokens; `_app.tsx` adds a `styled-jsx` block for font variables; components use inline `style={{…}}` objects. The `tags`/skills copy mentions "Tailwind CSS" but that refers to *other* projects — Tailwind is **not** a dependency here. |
-| Animation | `gsap` `^3.15` (+ ScrollTrigger), `lenis` `^1.3` (smooth/momentum scroll) |
-| Icons | `lucide-react` `^0.344`, `react-icons` `^5` |
-| Email | `resend` `^6.9` (transactional email from the two forms) |
-| Bot protection | `botid` `^1.5` (Vercel BotID) on the two form POSTs |
-| Database client | `@supabase/supabase-js` `^2.110` — used **only** by the `/decode` puzzle API |
-| Platform SDKs | `@vercel/analytics` `^1.6`, `@vercel/speed-insights` `^2.0` |
-| Package manager | **npm** (`package-lock.json` present; CI uses `npm ci`). No yarn/pnpm lockfile. |
-| Runtime | Node **22** in CI (`.github/workflows/ci.yml`); local dev observed on Node v22.22.3. `BootOverlay` cosmetically prints "node v22.0.0". |
-| Tests | `jest` `^29.7` + `ts-jest` `^29.4` + `@testing-library/react` `^16` + `jest-environment-jsdom` |
-| Lint | `eslint` `^10.4` with `eslint-config-next` `^16`; **two** configs present (see §11) |
-| Deploy target | **Vercel** (project `alaa-fayyad`, `.vercel/repo.json`); live at `https://alaafayyad.vercel.app` |
+**What it is.** The personal portfolio website of **Alaa Fayyad** (full-stack developer + UI/UX designer, Beirut, Lebanon). Live at `https://alaafayyad.vercel.app` (fallback value in `src/lib/site.ts:9`; README.md also states it).
 
-`package.json` pins security overrides for transitive deps: `postcss ^8.5.19`, `sharp ^0.35.3`,
-`brace-expansion ^5.0.8`, `js-yaml ^4.3.0`. `postcss` is also a direct dependency but there is
-no `postcss.config.*` — it appears vestigial.
+**Audience.** Prospective clients and employers. Visitors read the portfolio, download a CV (`public/Alaa_Fayyad_CV.pdf`), and send either a "message" or a "quote request" that is emailed to the owner.
 
----
+**Two complete designs live in one app:**
 
-## 3. Architecture
-
-It is a **single Next.js app**, not a monorepo and not a split front/back deployment. The
-"backend" is a handful of Next.js **Pages Router API routes** running as Vercel serverless
-functions (Node.js runtime). There is no custom server, no microservices, no message queue.
-
-**Rendering model**
-
-- `src/pages/index.tsx` is effectively the entire website — one route, all five sections
-  stacked, no client-side routing between "pages". It renders mostly on the client after
-  hydration (fonts, theme, i18n, animations, and the terminal are all client concerns).
-- `robots.txt` and `sitemap.xml` are implemented as **SSR routes** (`getServerSideProps`
-  writes the response directly) so the site origin comes from one constant.
-- The API routes are request/response handlers with no shared framework layer beyond small
-  helper modules in `src/lib/`.
-
-**Data flow**
-
-1. **Static content** (projects, experience, skills, all UI copy) lives in
-   `src/data/portfolio.ts` and `src/messages/{en,ar}.json`, imported at build time. Editing
-   the portfolio = editing these files.
-2. **Contact / Quote**: browser form → `POST /api/contact` or `/api/quote` → same-origin
-   check → BotID check → in-memory rate-limit → field sanitisation → email-format +
-   disposable-domain + **DNS MX** validation → `resend.emails.send(...)` to the owner's
-   Gmail. **Nothing is persisted** — there is no database write on this path.
-3. **/decode puzzle**: terminal command `:wq` → `DecodePuzzle` modal → `GET/POST /api/decode`
-   → **Supabase** (`puzzle_state`, `puzzle_theories` tables). Guesses are graded server-side
-   against `PUZZLE_ANSWERS` (env var, never sent to the client). This is the only stateful
-   feature.
-
-**Cross-cutting concerns**
-
-- **Theme**: a no-flash inline script in `_document.tsx` sets `<html data-theme>` from
-  `localStorage`/OS preference before first paint; `useTheme()` syncs React state afterwards.
-- **i18n**: a hand-rolled `useTranslation()` hook (module-level `globalLocale` + a `Set` of
-  listeners; **not** React Context, **not** `next-intl`/`next-i18next`). Locale persists in
-  `localStorage('lang')`. `index.tsx` flips `document.documentElement.dir`/`lang` on change.
-- **Smooth scroll**: `SmoothScroll.tsx` boots Lenis + GSAP on mount and publishes the Lenis
-  instance on `window.__lenis`; nav links and terminal navigation call `lib/scroll.ts`
-  (`smoothScrollTo`) which prefers that instance.
-- **Security headers / CSP**: centralised in `next.config.js` via `withBotId(...)`.
-
-Recognisable pattern: **data-driven single-page app on Next.js Pages Router**, with a thin
-serverless API and a clear split between "content data files" and "presentational components".
-
----
-
-## 4. Directory structure
-
-```
-my-portfolio-v2/
-├─ .github/workflows/ci.yml     CI: typecheck → lint → test → npm audit → build → Vercel deploy
-├─ .vercel/repo.json            Vercel project link (project "alaa-fayyad")
-├─ __mocks__/fileMock.js        Jest stub for CSS imports
-├─ __tests__/                   Jest test files (2)
-│   ├─ Navbar.test.tsx          Tests the LEGACY Navbar + Footer (see §10/§11)
-│   └─ Legal.test.tsx           Thorough a11y + Lenis-wheel tests for the legal modals
-├─ public/                      Static assets: CV pdf, logos, favicons, project screenshots,
-│                               manifest.json, fattoura_cover.svg, plus create-next-app SVGs
-├─ src/
-│   ├─ pages/
-│   │   ├─ _app.tsx             Font loading (next/font: Inter, JetBrains Mono, Cairo) + font CSS vars
-│   │   ├─ _document.tsx        No-flash theme script + the ENTIRE global stylesheet (~830 lines)
-│   │   ├─ index.tsx            The whole site: <Head> SEO, BootOverlay, SiteNav, TerminalHero,
-│   │   │                       5× ScreenFrame(section), Footer, Analytics, SpeedInsights
-│   │   ├─ robots.txt.ts        SSR text route
-│   │   ├─ sitemap.xml.ts       SSR XML route (single-URL sitemap with hreflang alternates)
-│   │   └─ api/
-│   │       ├─ contact.ts       "Send a message" form → Resend email
-│   │       ├─ quote.ts         "Request a quote" form → Resend email
-│   │       └─ decode.ts        /decode puzzle: GET state+theories, POST a guess (Supabase)
-│   ├─ components/
-│   │   ├─ site/                Current site chrome + interactive bits
-│   │   │   ├─ SiteNav.tsx      Fixed top nav, scroll-spy, traveling underline/arrow, mobile drawer
-│   │   │   ├─ BootOverlay.tsx  ~2.1s non-skippable fake boot screen
-│   │   │   ├─ TerminalHero.tsx Interactive terminal hero (auto-typed intro + real command input)
-│   │   │   ├─ DecodePuzzle.tsx /decode modal UI (fetches /api/decode)
-│   │   │   ├─ FixChallenge.tsx /fix bug-fix mini-game modal (built; UI entry point disabled)
-│   │   │   ├─ Modal.tsx        Reusable accessible dialog (focus trap, scroll lock incl. Lenis)
-│   │   │   └─ Legal.tsx        Privacy / Terms modals, content from messages JSON
-│   │   ├─ deck/
-│   │   │   ├─ ScreenFrame.tsx  Section wrapper: "NN | Title" header + reveal animation
-│   │   │   └─ SectionEyebrow.tsx  The big "01" index number + vertical rule
-│   │   ├─ About.tsx / Skills.tsx / Projects.tsx / Experience.tsx / Contact.tsx / Footer.tsx
-│   │   ├─ SmoothScroll.tsx     Lenis + GSAP bootstrap; exposes window.__lenis
-│   │   └─ Navbar.tsx           LEGACY nav — not rendered anywhere; only referenced by a test
-│   ├─ data/portfolio.ts        Projects, experiences, skillCategories (bilingual fields)
-│   ├─ messages/{en,ar}.json    All UI copy + full legal text; keys are parallel (159 lines each)
-│   ├─ hooks/
-│   │   ├─ useTranslation.ts    Custom global-locale hook (no Context)
-│   │   └─ useTheme.ts          Reads/writes <html data-theme> + localStorage
-│   ├─ lib/
-│   │   ├─ site.ts              SITE_URL / titles / OG image / author constants (single source)
-│   │   ├─ jsonLd.ts            Builds schema.org @graph from portfolio.ts + site.ts
-│   │   ├─ terminal.ts          Pure command engine for the hero terminal (+ easter eggs)
-│   │   ├─ fixBugs.ts           Pool of 6 self-contained broken HTML snippets for /fix
-│   │   ├─ scroll.ts            smoothScrollTo() — Lenis-aware programmatic scroll
-│   │   ├─ security.ts          escapeHtml, field caps, header sanitisation, isSameOrigin,
-│   │   │                       safeIp, in-memory rateLimit
-│   │   ├─ supabase.ts          Lazy service-role Supabase client + hand-written DB types
-│   │   └─ botid.ts             Shared BotID options (dev bypass switch)
-│   └─ instrumentation-client.ts  Registers BotID protection for the two form paths
-├─ eslint.config.mjs           Flat ESLint config (active)
-├─ .eslintrc.json              Legacy ESLint config (also present — redundant)
-├─ jest.config.js              ts-jest + jsdom; special handling for lenis ESM
-├─ next.config.js              CSP + security headers, withBotId wrapper, image formats
-├─ next-env.d.ts               Next-generated (currently shows an uncommitted whitespace/path diff)
-├─ tsconfig.json               Path alias "@/*" → ./src/*
-├─ vercel.json                 Only overrides installCommand ("npm install --include=dev")
-└─ README.md                   Still the default create-next-app boilerplate (stale — see §11)
-```
-
-Not tracked but present on disk: `.next/` (dev build cache), `.vercel/`, `.env.local`
-(all in `.gitignore`).
-
----
-
-## 5. Entry points
-
-- **`src/pages/_app.tsx`** — Next.js custom App. Loads the three web fonts via `next/font/google`
-  (self-hosted at build time) and exposes them as CSS variables. Wraps every page.
-- **`src/pages/_document.tsx`** — Next.js custom Document. Injects the pre-paint theme script
-  and the entire global stylesheet. This is where all site-wide CSS lives.
-- **`src/pages/index.tsx`** — the site. Composes every visible section. This is the file to
-  start from for almost any content or layout change.
-- **`src/pages/api/contact.ts`, `quote.ts`, `decode.ts`** — serverless function entry points.
-- **`src/pages/robots.txt.ts`, `sitemap.xml.ts`** — SSR utility routes.
-- **`src/instrumentation-client.ts`** — Next.js client instrumentation hook; runs once on the
-  client to register BotID for `/api/contact` and `/api/quote`.
-- **CLI**: `npm run dev` → `next dev`; `npm run build` → `next build`; `npm start` → `next start`.
-
----
-
-## 6. Key modules / components
-
-1. **`src/pages/index.tsx`** — top-level composition + all `<Head>` SEO (canonical, Open Graph,
-   Twitter, JSON-LD). Owns the `booted` state that gates the `BootOverlay` and the terminal's
-   start. Renders each section inside a `ScreenFrame` with a `bare` child. Depends on almost
-   everything below.
-
-2. **`src/pages/_document.tsx`** — the de-facto stylesheet. Defines the `--bg/--primary/--text/…`
-   design tokens for both themes, plus every component class (`.term-*`, `.snav__*`, `.modal-*`,
-   `.decode-*`, `.fix-*`, `.screen-*`, `.boot2__*`). Any visual change that isn't an inline
-   style is made here. No other component depends on it by import — only by class name.
-
-3. **`src/components/site/TerminalHero.tsx`** — the interactive hero. Auto-types a short intro,
-   then exposes a real focusable input. Delegates command parsing to `lib/terminal.ts`, runs
-   the returned side-effect (`open` link / `scroll` to section via `lib/scroll.ts` / `overlay`
-   to open `DecodePuzzle` or `FixChallenge`). Has command history (Arrow Up/Down), a11y live
-   region, and careful timeout cleanup. Depends on `useTranslation`, `lib/terminal`, `lib/scroll`,
-   `DecodePuzzle`, `FixChallenge`.
-
-4. **`src/lib/terminal.ts`** — pure, framework-free command engine. `runCommand(raw, ctx)` →
-   `{ lines, action? } | { clear: true }`. Handles `help`, section navigation, `email`/`github`/
-   `linkedin`/`whatsapp`/`resume`, `cls`, and easter eggs (`sudo`, `echo`, `date`, `joke`,
-   `:wq` → open `/decode`). The `/fix` trigger is **commented out** here, so `FixChallenge` is
-   currently unreachable from the UI.
-
-5. **`src/components/site/SiteNav.tsx`** — fixed top navigation. Scroll-spy via
-   `IntersectionObserver`, a shared "traveling" underline+arrow indicator measured off the
-   active link (with `ResizeObserver`/`document.fonts.ready` re-measurement), scrolled-state
-   background, and a fully animated mobile hamburger drawer with theme + language toggles.
-   Depends on `useTranslation`, `useTheme`, `lib/scroll`.
-
-6. **`src/components/site/Modal.tsx`** — reusable accessible dialog used by `Legal`,
-   `DecodePuzzle`, and `FixChallenge`. `role="dialog"` + `aria-modal`, Tab/Shift+Tab focus
-   trap, Escape / overlay-click / X to close, focus restore to trigger, and background scroll
-   lock that explicitly stops Lenis. Rendered via `createPortal` to `document.body`. Contains
-   detailed comments about a Lenis `data-lenis-prevent` interaction — the `Legal.test.tsx`
-   suite is a regression guard for exactly that.
-
-7. **`src/pages/api/contact.ts` & `quote.ts`** — near-identical form handlers. Order of checks:
-   method → `isSameOrigin` → `checkBotId` → rate-limit (per client IP, in-memory) → coerce/cap
-   fields → email format + disposable-domain blocklist + DNS `resolveMx` → `resend.emails.send`.
-   Email HTML escapes every interpolated value. Recipient is hard-coded
-   (`alaafayyadp1@gmail.com`); `from` is `onboarding@resend.dev` with the sender's name as the
-   display name; `replyTo` is the submitter.
-
-8. **`src/pages/api/decode.ts` + `src/components/site/DecodePuzzle.tsx` + `src/lib/supabase.ts`**
-   — the collaborative puzzle. Server tracks `current_stage` in `puzzle_state` and appends
-   every guess to `puzzle_theories`. `judge()` compares a guess to the stage's answer
-   (whole-word regex) and to a per-stage "close" keyword list. Correct guess advances the
-   shared stage for **all** visitors. The client does optimistic insertion with rollback, a
-   25s cooldown, and a "reveal the ending" completion state. Every Supabase call's `error` is
-   checked explicitly (the client is configured not to throw).
-
-9. **`src/data/portfolio.ts`** — the content model: `projects[]` (id, `title`/`titleAr`,
-   `description`/`descriptionAr`, `image`, `tags`, `live`, `github`, `featured`, `color`),
-   `experiences[]`, `skillCategories[]`. Consumed by `Projects.tsx`, `Experience.tsx`,
-   `Skills.tsx`, and `lib/jsonLd.ts`. Editing this + the message JSON is the intended way to
-   update the site.
-
-10. **`src/hooks/useTranslation.ts`** — the i18n mechanism. A module-global `globalLocale` and
-    a `Set<() => void>` of subscribers; every `useTranslation()` consumer re-renders on
-    `toggleLocale()`. `t` is the whole `messages[locale]` object. `isRTL = locale === 'ar'`.
-
----
-
-## 7. Data layer
-
-- **Primary datastore: none for most of the site.** Portfolio content is static TypeScript/JSON
-  compiled into the bundle. The contact and quote forms **do not write anywhere** — submissions
-  become email and are then gone (the privacy copy states this explicitly).
-- **Supabase (PostgreSQL)** is used **only** by `/api/decode`:
-  - `puzzle_state` — single row (`id = 1`): `current_stage`, `stage_solved_at` (JSON map of
-    stage → ISO timestamp), `updated_at`.
-  - `puzzle_theories` — append-only log: `id`, `created_at`, `content` (the raw guess),
-    `stage`, `is_correct`, `visitor_key` (nullable, currently never set by the API).
-  - Access is server-only with the **service-role key** via a lazily-created client in
-    `src/lib/supabase.ts`. That file also holds a **hand-written** `Database` type — there is
-    no generated types file.
-- **No ORM.** Direct `@supabase/supabase-js` query builder calls.
-- **No migrations in the repo.** The two tables (and the seed `puzzle_state` row) must be
-  created directly in Supabase; the schema exists only implicitly in `supabase.ts` and
-  `decode.ts`. Row-Level Security posture is not visible from the code (the service-role key
-  bypasses RLS regardless).
-- **Browser storage**: `localStorage` keys `lang` and `theme` only. No cookies.
-
----
-
-## 8. External integrations
-
-| Service | Purpose | Env vars |
+| Route | Design | Files |
 |---|---|---|
-| **Vercel** | Hosting, CI deploy, Analytics, Speed Insights, BotID | `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID` (CI secrets); `VERCEL_OIDC_TOKEN` (local, auto) |
-| **Resend** | Transactional email for both contact forms | `RESEND_API_KEY` |
-| **Supabase** | Postgres backing the `/decode` puzzle | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` |
-| **Vercel BotID** | Invisible bot check on form POSTs | none in prod; `BOTID_DEV_BYPASS` = `HUMAN`/`BAD-BOT`/`GOOD-BOT` for local testing only |
-| **DNS (Node `dns.resolveMx`)** | Validates that a submitted email domain can receive mail | none |
-| **Google Fonts** | Inter / JetBrains Mono / Cairo — **downloaded at build time** by `next/font`, self-hosted; no runtime request to Google | none |
+| `/` | **"IDE workspace"** — a VS Code–like shell (titlebar, file-tree sidebar, tabs, minimap, statusbar). Each portfolio section is a "file" you open in a tab. Fixed Catppuccin-Mocha dark palette; does NOT follow light/dark theme. | `src/pages/index.tsx`, `src/components/workspace/**` |
+| `/classic` | **Original terminal-style single scrolling page** — boot overlay → interactive terminal hero → 5 numbered sections → footer. Teal single-accent design with light/dark theme toggle. | `src/pages/classic.tsx`, `src/components/*.tsx`, `src/components/site/**`, `src/components/deck/**` |
 
-Application env vars used in code:
+Both are **bilingual (English + Arabic, real RTL)** and read content from the same data (`src/data/portfolio.ts`, `src/messages/{en,ar}.json`).
 
-- `RESEND_API_KEY` — `api/contact.ts`, `api/quote.ts` (required for email to work).
-- `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` — `lib/supabase.ts` (throws if missing when
-  `/decode` is hit).
-- `PUZZLE_ANSWERS` — comma-separated, one answer keyword per stage; read by `api/decode.ts`.
-  Never sent to the client.
-- `NEXT_PUBLIC_SITE_URL` — optional override of the public origin in `lib/site.ts` (defaults to
-  `https://alaafayyad.vercel.app`); flows into canonical/OG/JSON-LD/robots/sitemap.
-- `BOTID_DEV_BYPASS` — dev-only; ignored in production.
+**Extras:** two email forms (contact / quote, via Resend, protected by Vercel BotID), a hidden collaborative 4-stage riddle game (`/decode`, Supabase-backed, opened by typing `:wq` in the classic terminal), an interactive terminal with commands, anonymous Vercel Analytics custom events, SEO (OG/Twitter/JSON-LD/sitemap/robots/manifest), strict security headers + CSP.
 
-`.env.local` on disk contains: `RESEND_API_KEY`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
-`PUZZLE_ANSWERS`, `VERCEL_OIDC_TOKEN`. There is **no `.env.example`** committed.
+**No** CMS, no user accounts, no admin UI, no ORM/migrations in this repo. Content is edited in TS/JSON files and redeployed.
 
-Outbound hosts allowed by the CSP in `next.config.js`: `va.vercel-scripts.com` (Analytics
-script), `vitals.vercel-insights.com` (Speed Insights beacon). Everything else is `'self'`;
-`img-src` also allows `data:`.
+### Current state
+
+| Area | State (verified) |
+|---|---|
+| `npx jest` | **PASS** — 3 suites, 35 tests (run 2026-11-05) |
+| `npx tsc --noEmit` | **PASS** (no output) |
+| `npm run lint` | **PASS** (no output) |
+| `next build` | not run in this session **(unverified)** |
+| **Uncommitted change** | `next.config.js` — the `/` → `/classic` redirect is **commented out in the working tree**. At HEAD the redirect is **active**, so *committed* production serves `/classic` at `/` and the workspace design is unreachable on `/`. See §14/§15. |
+| `/fix` bug-fix mini-game | Component + data exist and are mounted, but the terminal command that opens it is **commented out** (`src/lib/terminal.ts:174-175`) → unreachable. |
+| `Navbar.tsx` | Dead code — imported only by a test. |
+| Project image `/3adasa_cover.png` | **Missing file** (public/ has `3adasa.png`). Broken image in classic Projects + JSON-LD. |
 
 ---
 
-## 9. Build, run, and test
+## 2. TECH STACK
 
-All commands are npm scripts from `package.json` (the README is stale and should not be relied
-on):
+### Language / runtime
+- TypeScript `5.9.3` installed (`^5` declared), `strict: false`, `strictNullChecks: true` (`tsconfig.json`). Some plain JS config files.
+- Node: dev machine `v22.22.3`; CI uses Node `22` (`.github/workflows/ci.yml`). **No `engines` field** in package.json.
+
+### Dependencies (declared → installed, from `npm ls`)
+| Package | Declared | Installed | Used for |
+|---|---|---|---|
+| `next` | ^16.2.12 | **16.3.3** | Framework, **Pages Router** (NOT App Router) |
+| `react` / `react-dom` | ^18 | 18.3.1 | UI |
+| `@supabase/supabase-js` | ^2.110.9 | 2.112.4 | `/api/decode` only |
+| `resend` | ^6.9.3 | 6.24.0 | Email in `/api/contact`, `/api/quote` |
+| `botid` | ^1.5.11 | 1.5.11 | Vercel BotID bot protection |
+| `@vercel/analytics` | ^1.6.1 | 1.6.1 | Page analytics + custom events |
+| `@vercel/speed-insights` | ^2.0.0 | 2.0.0 | Web vitals |
+| `gsap` | ^3.15.0 | 3.15.0 | ScrollTrigger (classic only) |
+| `lenis` | ^1.3.24 | 1.3.26 | Smooth scroll (classic only) |
+| `lucide-react` | ^0.344.0 | — | Icons |
+| `react-icons` | ^5.0.0 | — | `FaGithub`, `FaWhatsapp` in `Contact.tsx` |
+| `postcss` | ^8.5.19 | — | Listed as a *dependency* (also in `overrides`); no postcss config file exists — likely unnecessary **(unverified)** |
+
+Dev: `eslint ^10.4.1` (10.9.1), `eslint-config-next ^16.2.12`, `@eslint/js ^10.0.1`, `@eslint/eslintrc ^3.3.5`, `jest ^29.7.0`, `jest-environment-jsdom ^29.7.0`, `ts-jest ^29.4.11`, `@testing-library/{react ^16.3.2, jest-dom ^6.9.1, user-event ^14.6.1}`, `@types/{jest ^30, node ^20, react ^18, react-dom ^18}`, `next ^16.2.12` is in **devDependencies** (not dependencies) — works because Vercel installs with `--include=dev` (`vercel.json`).
+`overrides`: `postcss ^8.5.19`, `sharp ^0.35.3`, `brace-expansion ^5.0.8`, `js-yaml ^4.3.0`.
+
+`eslint.config.mjs` imports `@next/eslint-plugin-next` and `typescript-eslint`, which are **not declared** in package.json (resolved transitively via `eslint-config-next`) — fragile.
+
+**Not used:** Tailwind (only mentioned as skill text), any CSS framework, state library, ORM, test e2e.
+
+### External services
+| Service | Role | Env |
+|---|---|---|
+| Vercel | Hosting, Analytics, Speed Insights, BotID | `VERCEL_OIDC_TOKEN` appears in `.env.local` (CLI-managed) |
+| Resend | Sends contact/quote emails (from `onboarding@resend.dev`, to `alaafayyadp1@gmail.com`) | `RESEND_API_KEY` |
+| Supabase (Postgres) | Backs `/decode` riddle game (shared with a separate "Happidoo" project per `.env.local` comment) | `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` |
+| Google Fonts (build-time only) | `next/font/google` self-hosts Inter, JetBrains Mono, Cairo | — |
+| DNS MX lookup | `dns.resolveMx` to validate sender email domains (Node `dns`) | — |
+
+---
+
+## 3. HOW TO RUN IT
 
 ```bash
-# Install (CI uses `npm ci`; vercel.json forces dev deps on the platform)
-npm install
-
-# Local dev server → http://localhost:3000
-npm run dev
-
-# Production build / serve
-npm run build
-npm start
-
-# Lint (flat config in eslint.config.mjs)
-npm run lint          # eslint . --ext .ts,.tsx,.js,.jsx
-
-# Tests (jest + ts-jest + jsdom)
-npm test              # runs jest
-
-# Type check (used by CI; no dedicated script)
-npx tsc --noEmit
+npm install            # Vercel uses: npm install --include=dev  (vercel.json). CI uses: npm ci
+npm run dev            # next dev (Turbopack default in Next 16) -> http://localhost:3000
+npm run build          # next build
+npm run start          # next start (after build)
+npm run lint           # eslint . --ext .ts,.tsx,.js,.jsx
+npm test               # jest   (== npx jest; config: jest.config.js)
+npx tsc --noEmit       # type check (CI step)
+npm audit --audit-level=high   # CI step; can fail the pipeline
 ```
 
-To exercise the forms and puzzle locally you need `.env.local` populated with the §8 vars.
-BotID behaviour in dev is controlled by `BOTID_DEV_BYPASS` (e.g.
-`BOTID_DEV_BYPASS=BAD-BOT npm run dev` to make the handlers return 403).
+**Deploy.** Two paths exist **(possible duplication, unverified which is active)**:
+1. Vercel Git integration (project `alaa-fayyad`, id/org in `.vercel/repo.json`).
+2. CI job in `.github/workflows/ci.yml` runs `npx vercel --token=${{ secrets.VERCEL_TOKEN }} --prod --yes` on push to `main` (needs secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`).
 
-**CI pipeline** (`.github/workflows/ci.yml`, on push/PR to `main`): checkout → Node 22 →
-restore `.next/cache` → `npm ci` → `npx tsc --noEmit` → `npm run lint` → `npm run test` →
-`npm audit --audit-level=high` → `npm run build` → **on push to `main` only**, deploy to Vercel
-production via `npx vercel --prod --yes`.
+### Environment variables
+Local file: `.env.local` (git-ignored via `.env.local` and `.env*` in `.gitignore`). Names found:
 
----
+| Variable | Purpose | Example format | Required for |
+|---|---|---|---|
+| `RESEND_API_KEY` | Resend API key | `re_xxx` → **[REDACTED]** | `/api/contact`, `/api/quote` |
+| `SUPABASE_URL` | Supabase project URL | `https://<ref>.supabase.co` → **[REDACTED]** | `/api/decode` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service-role key, **server only** | JWT → **[REDACTED]** | `/api/decode` |
+| `PUZZLE_ANSWERS` | Comma-separated answers, one per stage (4) | `a,b,c,d` → **[REDACTED]** | `/api/decode` |
+| `VERCEL_OIDC_TOKEN` | Written by Vercel CLI (`vercel env pull`) | → **[REDACTED]** | Vercel tooling |
+| `NEXT_PUBLIC_SITE_URL` | Optional override of public origin (previews) | `https://my-preview.vercel.app` | `src/lib/site.ts` (default `https://alaafayyad.vercel.app`) |
+| `BOTID_DEV_BYPASS` | Optional dev-only: `HUMAN` (default) / `BAD-BOT` / `GOOD-BOT` | `BAD-BOT` | `src/lib/botid.ts` |
 
-## 10. Current state
+Without `RESEND_API_KEY` the forms 500; without Supabase vars `/api/decode` 500s (`getSupabase()` throws). The rest of the site works.
 
-- **Type check**: `npx tsc --noEmit` passes cleanly (verified in this investigation).
-- **Test suite**: `npm test` — **2 suites, 16 tests, all passing** (~145s; ts-jest cold start
-  is slow). Two files only —
-  - `__tests__/Legal.test.tsx` — substantial: dialog semantics, focus move/restore, Escape,
-    Tab trap, background scroll lock, content assertions, and three tests that spin up a **real
-    Lenis instance** to guard the modal wheel-scroll behaviour. Good coverage of `Modal` +
-    `Legal`.
-  - `__tests__/Navbar.test.tsx` — tests `src/components/Navbar.tsx` and `Footer.tsx`. **`Navbar`
-    is dead code** (the site renders `site/SiteNav.tsx` instead), so this file asserts against a
-    component no visitor sees. `Footer` is live and its one assertion (`aria-label="arrowUp"`
-    button) is valid.
-  - No tests for the API routes, the terminal engine (`lib/terminal.ts`), `lib/security.ts`,
-    the puzzle, i18n, or the section components. Overall coverage is low and skewed to one area.
-- **CI/CD**: present and complete (see §9). Auto-deploys `main` to Vercel production.
-- **Branches**: `main` plus two stale remotes — `origin/seo/cwv-favicon-manifest-speedinsights`
-  and `origin/ci/remove-docker-build`. Each contains a single commit whose change is already in
-  `main` (same commit messages, pre-squash hashes). Both can be deleted.
-- **Uncommitted working-tree changes** (in-progress polish, not a feature):
-  - `src/components/Contact.tsx` — form input font-size `0.9rem` → `1rem` (iOS Safari
-    focus-zoom fix) + explanatory comment.
-  - `src/pages/_document.tsx` — same 16px-minimum fix for `.term-input`, `.decode-input`,
-    `.fix-code`; bump `.snav__icon`/`.snav__burger` hit areas `36px` → `44px` (WCAG touch
-    target).
-  - `next-env.d.ts`, `tsconfig.tsbuildinfo` — Next/TS generated churn.
-- **Recent history**: many commits are just `mod` / `mods` / `fix` — low signal. Recent
-  themed commits: Next.js 16 + ESLint 10 upgrade, security-vuln resolution, dropping a Docker
-  build step from CI, and an SEO/Core-Web-Vitals pass (favicons, web manifest, Speed Insights).
-- **Explicitly incomplete / dormant features**:
-  - `/fix` bug-fix game: `FixChallenge.tsx` and `lib/fixBugs.ts` (6 challenges) are fully
-    built and still wired into `TerminalHero`, but the `/fix` command is commented out in
-    `lib/terminal.ts`, so there is no way to open it.
-  - Large blocks of commented-out code: ~half the `joke` list, `pwd` command, Instagram
-    social link (`Contact.tsx`), `projects` link + a second `smoothScroll` impl in the dead
-    `Navbar.tsx`.
-- **TODO/FIXME markers**: none literally (`TODO`/`FIXME` strings not used); intent is instead
-  captured in prose comments (many "BUG:" strings exist but are *intentional* — they mark the
-  planted bugs in `lib/fixBugs.ts`).
+### Setup / seed / migrations
+- **No migrations or seed files in this repo.** The Supabase schema (tables `puzzle_theories`, `puzzle_state` (row `id=1` must exist), `puzzle_stage_solves`) was "shared in chat" per the `.env.local` comment — **not in the repo**. Only the TS shape exists in `src/lib/supabase.ts:6-25`.
 
 ---
 
-## 11. Notable issues / tech debt
+## 4. FOLDER & FILE STRUCTURE
 
-- **All CSS in one inline string.** `_document.tsx` is ~830 lines, most of it a single CSS
-  blob with no tooling (no autoprefixer pipeline, no linting, no co-location). Editing styles
-  means scrolling one giant template literal and matching class names by hand. High friction,
-  easy to introduce dead rules.
-- **Two competing lint configs.** Both `.eslintrc.json` (legacy `extends: next/*`) and
-  `eslint.config.mjs` (flat) exist. ESLint 10 uses the flat config and ignores the legacy one;
-  the flat config also turns off `no-unused-vars`, `no-explicit-any`, and `no-empty`, so lint
-  is quite permissive. `.eslintrc.json` should be deleted to avoid confusion.
-- **Dead component still under test.** `src/components/Navbar.tsx` is not imported by any
-  rendered code; `SiteNav.tsx` replaced it. Keeping `Navbar.test.tsx` green gives a false sense
-  of nav coverage and will silently rot. Either delete both, or point the test at `SiteNav`.
-- **Stale README.** Still the `create-next-app` template — references `pages/api/hello.ts`
-  (doesn't exist), the Geist font (the site uses Inter/JetBrains Mono/Cairo), and gives no
-  project-specific setup, env, or architecture notes.
-- **Rate limiting is in-memory per serverless instance** (`lib/security.ts` says so in a
-  comment). On Vercel this is best-effort only — a determined flood across warm instances is
-  not blocked. BotID + same-origin are the real guards; a shared store (Upstash/Redis) or the
-  Vercel WAF would be needed for a hard limit.
-- **Puzzle schema is undocumented and unversioned.** No migration files; the two Supabase
-  tables + seed row exist only in prose/types. Standing up a fresh environment requires
-  reverse-engineering `decode.ts` and `supabase.ts`. RLS expectations are not expressed
-  anywhere in the repo.
-- **`tsconfig` is loose** — `strict: false` (only `strictNullChecks` on), `allowJs`,
-  `no-explicit-any` disabled in lint. New code won't get full type safety by default.
-- **Duplicated form logic.** `api/contact.ts` and `api/quote.ts` share ~70% identical code
-  (the `validateEmail` function, IP extraction, rate-limit block, email-HTML shell) copy-pasted
-  rather than factored into `lib/`.
-- **Three hand-rolled smooth-scroll implementations** exist: `lib/scroll.ts` (the good one,
-  Lenis-aware), plus separate eased-rAF copies inside `Navbar.tsx` (dead) and `Footer.tsx`
-  (live, for the "back to top" button). The Footer one should call `lib/scroll.ts`.
-- **Stale build artifacts hint at a removed feature.** `.next/` (untracked) still contains
-  chunks named `src/components/os/Starfield.tsx`, `src/components/r3f/Experience3D.tsx`, and
-  bundles for `three` / `@react-three/fiber`. None of that is in `src/` or `package.json`
-  anymore — there was evidently a 3D/WebGL version of the hero that has been fully removed.
-  Harmless, but `.next/` should be cleared before trusting any local build inspection.
-- **i18n has no typing safety across locales.** `en.json` and `ar.json` are kept parallel by
-  hand (both 159 quoted lines). A missing key in `ar.json` would surface as `undefined` at
-  runtime, not a build error.
-- **`vercel.json` forces `npm install --include=dev`** — implies a past problem with Vercel
-  pruning dev deps needed at build time; worth knowing before touching the dependency split.
-- **`postcss` is a direct dependency with an override but no config file** — likely removable.
-- **Single monolithic page, client-heavy.** Everything hydrates and runs on the client
-  (i18n, theme, animation, terminal). Fine for a portfolio, but there is no error boundary and
-  no custom `404`/`500`, so a client throw in `index.tsx` blanks the whole site.
+(Excluding `node_modules`, `.git`, `.next`.)
 
----
-
-## 12. Open questions
-
-1. **Supabase schema / setup**: Is there a migration or SQL snippet anywhere outside the repo
-   for `puzzle_state` and `puzzle_theories` (and the seed `puzzle_state` row with `id = 1`)?
-   What RLS policies are expected on those tables given the API uses the service-role key?
-2. **`PUZZLE_ANSWERS`**: How many stages/answers are configured in production, and is the
-   `visitor_key` column intended to be populated later (it's in the schema/type but the API
-   never writes it)?
-3. **`/fix` game**: Is it deliberately disabled, or is un-commenting the `/fix` case in
-   `lib/terminal.ts` the only step left to ship it? Anything blocking it?
-4. **Dead `Navbar.tsx` + its test**: safe to delete both, or is `Navbar` kept intentionally as
-   a fallback/reference?
-5. **Stale remote branches** (`seo/cwv-favicon-manifest-speedinsights`, `ci/remove-docker-build`):
-   confirm they're fully merged and can be pruned.
-6. **Removed 3D hero**: was the `three` / `@react-three/fiber` version abandoned for
-   performance, or parked for later? Affects whether to design new hero work around a
-   potential return.
-7. **Resend sending domain**: forms send `from: onboarding@resend.dev` (Resend's shared
-   sandbox sender). Is a verified custom domain planned, and does deliverability to the
-   owner's Gmail currently rely on that sandbox address?
-8. **Analytics**: `@vercel/analytics` and `@vercel/speed-insights` are both mounted — is the
-   Vercel project on a plan where Speed Insights actually collects, or is that component a
-   no-op right now?
-9. **Lint strictness**: is the permissive flat config (no-unused-vars / no-explicit-any /
-   no-empty all off) a deliberate choice, or drift from the ESLint 10 migration that should be
-   tightened?
-10. **Intended editing workflow**: is `src/data/portfolio.ts` + `src/messages/*.json` the only
-    place content should change, or is a CMS/headless source planned?
 ```
+.
+├── .claude/settings.local.json     # Claude Code local permissions (globally git-ignored, not in repo)
+├── .env.local                      # secrets (git-ignored) — names in §3
+├── .eslintrc.json                  # legacy ESLint config (ignored by flat config / ESLint 10) 
+├── .github/workflows/ci.yml        # CI: tsc, lint, test, audit, build, deploy to Vercel
+├── .gitignore                      # node_modules, .next, .env*, .vercel, *.zip, .DS_Store
+├── .qodo/{agents,workflows}/       # empty dirs from Qodo tool
+├── .vercel/repo.json               # Vercel project link (git-ignored)
+├── AGENTS.md / CLAUDE.md           # "This is NOT the Next.js you know" — read node_modules/next/dist/docs/ first
+├── README.md                       # create-next-app boilerplate + live URL + CI badge (stale: mentions pages/index.tsx, /api/hello)
+├── PROJECT_REPORT.md               # this file
+├── conceptdidereference.html       # static HTML reference mock of the workspace design (imports Google Fonts; not part of app)
+├── eslint.config.mjs               # active flat ESLint config
+├── jest.config.js / jest.setup.js  # Jest + ts-jest + jsdom; matchMedia shim
+├── __mocks__/{fileMock,analyticsMock}.js
+├── __tests__/{Legal,Navbar,workspace}.test.tsx
+├── next.config.js                  # headers/CSP, withBotId, (commented-out) redirect   ← MODIFIED, uncommitted
+├── next-env.d.ts, tsconfig.json
+├── tsconfig.tsbuildinfo            # build cache (276 KB) — TRACKED in git by mistake (not in .gitignore)
+├── vercel.json                     # {"installCommand":"npm install --include=dev"}
+├── package.json / package-lock.json
+├── public/
+│   ├── Alaa_Fayyad_CV.pdf          # CV (linked from About + terminal `resume`)
+│   ├── favicon.png / favicon.ico / icon-512.png / manifest.json
+│   ├── portfolio_screen.png        # OG/Twitter image (1360×642) + project image
+│   ├── happidoo.png, fattoura_cover.svg, 3adasa.png   # project images (see bug: data points to /3adasa_cover.png)
+│   └── logo.png, logo_2.png, happidoo_screen.png, file/globe/next/vercel/window.svg  # UNREFERENCED in src
+└── src/
+    ├── data/portfolio.ts           # projects[], experiences[], skillCategories[] (bilingual content)
+    ├── messages/{en,ar}.json       # UI strings; 76 keys each, identical key sets (verified)
+    ├── hooks/useTranslation.ts     # global-store locale hook
+    ├── hooks/useTheme.ts           # light/dark hook (classic only)
+    ├── instrumentation-client.ts   # initBotId({protect:[contact,quote POST]})
+    ├── lib/
+    │   ├── site.ts                 # SITE_URL, titles, OG image, author constants
+    │   ├── jsonLd.ts               # schema.org @graph (Person, WebSite, CreativeWork[])
+    │   ├── security.ts             # escapeHtml, field, headerField, sanitizeDisplayName, isSameOrigin, safeIp, rateLimit
+    │   ├── botid.ts                # botIdOptions (dev bypass)
+    │   ├── supabase.ts             # server-only service-role client + Database type
+    │   ├── track.ts                # logEvent/logEventOnce → @vercel/analytics
+    │   ├── terminal.ts             # pure command engine for hero terminal
+    │   ├── scroll.ts               # smoothScrollTo (Lenis or rAF fallback)
+    │   └── fixBugs.ts              # 6 broken-HTML challenges for /fix
+    ├── pages/
+    │   ├── _app.tsx                # next/font (Inter, JetBrains Mono, Cairo) + font CSS vars
+    │   ├── _document.tsx           # 809 lines: no-flash theme script + ALL global CSS (design tokens, classic styles)
+    │   ├── index.tsx               # "/" → <WorkspaceShell/> + SEO head
+    │   ├── classic.tsx             # "/classic" → full classic page
+    │   ├── robots.txt.ts, sitemap.xml.ts   # SSR-generated
+    │   └── api/{contact,quote,decode}.ts
+    └── components/
+        ├── workspace/              # "/" design
+        │   ├── WorkspaceShell.tsx  # root: reducer, keyboard nav, layout
+        │   ├── state.ts            # pure reducer (open/activate/close/reorder/step)
+        │   ├── files.ts            # WS_FILES registry (5 "files")
+        │   ├── meta.ts             # derived stats + pseudoHash
+        │   ├── {TitleBar,Sidebar,TabBar,FilePane,Minimap,StatusBar,Code}.tsx, cx.ts
+        │   ├── workspace.module.css# 642 lines, scoped CSS module, Catppuccin palette
+        │   └── files/{About,Skills,Projects,Experience,Contact}File.tsx
+        ├── site/                   # classic-only: SiteNav, BootOverlay, TerminalHero, DecodePuzzle, FixChallenge, Modal, Legal
+        ├── deck/{ScreenFrame,SectionEyebrow}.tsx   # classic section wrapper + "01 |" label
+        ├── About/Skills/Projects/Experience/Contact/Footer.tsx   # classic sections (accept `bare` prop)
+        ├── SmoothScroll.tsx        # Lenis + GSAP ticker (classic)
+        └── Navbar.tsx              # DEAD (only imported by __tests__/Navbar.test.tsx)
+```
+
+---
+
+## 5. ARCHITECTURE
+
+Single Next.js (Pages Router) app on Vercel. No separate backend/worker. Three API routes run as Node serverless functions.
+
+```mermaid
+flowchart LR
+  subgraph Browser
+    I["/ index.tsx → WorkspaceShell"]
+    C["/classic → BootOverlay/TerminalHero/Sections"]
+    B[BotID client script<br/>instrumentation-client.ts]
+  end
+  subgraph "Next.js on Vercel"
+    D[_document.tsx global CSS + theme script]
+    A1[/api/contact/]
+    A2[/api/quote/]
+    A3[/api/decode/]
+    R[robots.txt, sitemap.xml SSR]
+  end
+  I -->|fetch POST| A1 & A2
+  C -->|fetch POST| A1 & A2
+  C -->|":wq" → DecodePuzzle| A3
+  B -. proof-of-human headers .-> A1 & A2
+  A1 & A2 -->|resend.emails.send| Resend[(Resend)]
+  A1 & A2 -->|dns.resolveMx| DNS[(DNS)]
+  A3 -->|service-role| SB[(Supabase)]
+  I & C -->|track()| VA[(Vercel Analytics)]
+```
+
+### Key flows
+
+**1. Page load `/`.** `_document.tsx` injects the no-flash theme script + global `<style>` → `_app.tsx` wraps in font-variable div → `index.tsx` renders `<Head>` SEO + `<WorkspaceShell/>` + `<Analytics/>` + `<SpeedInsights/>`. `WorkspaceShell` uses `useReducer(workspaceReducer, WS_FILE_IDS, initWorkspace)` (all 5 tabs open, first active), sets `document.body.style.overflow='hidden'`, renders `FilePane`s for open tabs (active = visible, previous = `leaving` for 340 ms slide).
+
+**2. Locale.** `useTranslation()` keeps a module-level `globalLocale` + a `Set` of listeners; reads `localStorage['lang']` on mount; `toggleLocale()` flips + notifies all. `isRTL` drives `dir`. Pages set `<html dir/lang>` in `useEffect`.
+
+**3. Contact/quote submit.** `ContactFile.tsx` (workspace) or `Contact.tsx` (classic) → `fetch('/api/contact'|'/api/quote', POST JSON)` → handler: method check → `isSameOrigin` → `checkBotId` → rate limit (5/60 s per IP, in-memory) → `field()/headerField()` trim+cap → email format + disposable-domain list + `dns.resolveMx` → `resend.emails.send` with HTML-escaped body → `{success:true}`. Client shows success/error for 4 s then resets.
+
+**4. Terminal (classic).** `TerminalHero` auto-types an intro, then a real `<input>`; `runCommand(raw, ctx)` (pure, `lib/terminal.ts`) returns lines + optional action (`open` link / `scroll` / `overlay`). `:wq` → overlay `decode` → `DecodePuzzle` modal.
+
+**5. /decode.** Modal GET `/api/decode` → current stage + latest 300 theories for that stage. POST `{guess}` → rate limit 1 per 25 s per IP per stage → `judge()` (whole-word regex vs `PUZZLE_ANSWERS[stage-1]`, then `CLOSE_KEYWORDS`) → insert into `puzzle_theories` → if correct, advance `puzzle_state.current_stage` and stamp `stage_solved_at`. State is **global** (all visitors share one puzzle).
+
+**6. Analytics.** `lib/track.ts` → `track(name,{sessionId,...})`; per-tab random UUID in `sessionStorage['sid']`; honours Do-Not-Track; failures swallowed.
+
+### Patterns / conventions
+- Pure logic split from UI (`state.ts`, `terminal.ts`, `security.ts`, `meta.ts`).
+- Data-driven: all copy lives in `portfolio.ts` + `messages/*.json`; workspace stats are *derived* (`meta.ts`).
+- Classic sections take `bare` prop (render content only; `ScreenFrame` supplies header/anchor id).
+- Hand-rolled i18n (no library). Hand-rolled theming via CSS custom properties on `[data-theme]`.
+
+---
+
+## 6. FEATURES
+
+### 6.1 Workspace homepage (`/`)
+- **User sees:** IDE chrome; 5 tabs (`about.tsx`, `skills.json`, `index.tsx` (projects), `experience.log`, `contact.ts`); click sidebar/minimap to open; × or middle-click closes; drag tabs to reorder (native HTML5 DnD); ←/→ arrow keys step tabs (ignored while typing in form fields); EN/عربي toggle in statusbar; links to `/classic`.
+- **Files:** `WorkspaceShell.tsx`, `state.ts`, `files.ts`, `TabBar.tsx`, `Sidebar.tsx`, `Minimap.tsx`, `StatusBar.tsx`, `TitleBar.tsx`, `FilePane.tsx`, `Code.tsx`, `workspace.module.css`, `files/*File.tsx`.
+- **Internals:** Reducer with `openTabs`, `activeId`, `mru`; closing the active tab activates most-recently-used open tab. Minimap bars use `Math.random()` inside `useMemo`.
+- **Limitations:** No theme toggle on `/` (always dark Catppuccin). No Legal/Privacy/Terms links on `/` (Legal is only in classic `Footer`) — yet the site collects analytics + form data. Skill proficiency `level` is never displayed anywhere. No terminal/decode on `/`. Mobile: grid collapses at ≤900px (`workspace.module.css:101`).
+
+### 6.2 Classic page (`/classic`)
+- Flow: `BootOverlay` (~2.15 s fixed timer) → `SmoothScroll` (Lenis+GSAP) + `SiteNav` (scroll-spy, theme + lang toggles, hamburger drawer) → `TerminalHero` → `ScreenFrame` sections (About, Skills, Projects carousel, Experience timeline, Contact) → `Footer` (+`Legal` modals, scroll-to-top).
+- `About.tsx` stat values are **hardcoded** (`3+ years`, `10+ technologies`, `2 disciplines` at `About.tsx:71-73`) whereas the workspace derives them.
+- `Footer.tsx` scroll-to-top uses its own rAF easing, ignoring Lenis.
+
+### 6.3 Interactive terminal (`lib/terminal.ts`, `site/TerminalHero.tsx`)
+Commands: `help, whoami, about, skills|ls skills, projects|ls projects, experience, contact, email, github, linkedin, whatsapp, resume|cv, clear|cls, ls, sudo…, echo …, date, hi|hello|hey, joke, :wq`. History via ↑/↓ (max 50). Unknown → `command not found`. Hidden: `:wq` (not in `help`). `/fix` is commented out. Each command is logged to analytics (lower-cased, ≤80 chars). Contact info duplicated as constants in `terminal.ts:26-31`.
+
+### 6.4 Contact & Quote forms
+- Two modes (message / quote) in both designs; same payload shapes: message `{name,email,subject,message}`, quote `{name,email,projectType,budget,timeline,details}`.
+- Server validation described in §5 flow 3 and §8. Duplicate code: `validateEmail` is copy-pasted in `contact.ts` and `quote.ts`.
+- Workspace form uses free-text inputs for project type/budget/timeline; classic uses option lists (e.g. budgets `Under $200 … $1,000+`).
+- Limitation: `to:` address hard-coded; sender is Resend's sandbox `onboarding@resend.dev` (Resend restricts this sender to the account owner's address — works only because `to` is the owner).
+
+### 6.5 /decode puzzle
+Described in §5/§8. Client: `DecodePuzzle.tsx` (riddle text for all 4 stages is in client source; answers are server-only). Optimistic theory insertion with rollback; client cooldown 25 s; typing `exit` closes. Limitations: not BotID-protected; in-memory rate limit per instance; stage advance is a read-modify-write without a transaction (two simultaneous correct guesses could both advance — benign); riddle text is public in the bundle.
+
+### 6.6 /fix challenge (disabled)
+`FixChallenge.tsx` + `lib/fixBugs.ts` (6 bugs). Edits HTML in a textarea, previews in `<iframe sandbox="allow-scripts" srcDoc>`, tests via `postMessage` (checks `e.source === iframe.contentWindow`). Unreachable: command commented out.
+
+### 6.7 Theme (classic)
+`useTheme` + inline `NO_FLASH_SCRIPT` in `_document.tsx` set `<html data-theme>` from `localStorage['theme']` or OS preference.
+
+### 6.8 Legal modals (classic footer)
+`Legal.tsx` → two `Modal`s (Privacy, Terms) whose text lives in `messages/*.json` `legal.*`; `LAST_UPDATED = '2026-07-14'` (`Legal.tsx:9`, deliberately fixed). `Modal.tsx`: portal, focus trap, ESC, scroll lock (stops Lenis), `data-lenis-prevent` on scroll region. Tested.
+
+### 6.9 SEO
+`jsonLd.ts` @graph; OG/Twitter tags in both pages; `robots.txt` (Disallow `/api/`), `sitemap.xml` (`/`, `/classic`, hreflang alternates, `lastmod`=today); `manifest.json`; canonical per page.
+
+---
+
+## 7. DATA MODEL
+
+### Supabase (external; schema NOT in repo — reconstructed from code)
+`src/lib/supabase.ts:6-25`:
+```ts
+puzzle_theories: { id:number; created_at:string; content:string; stage:number; is_correct:boolean; visitor_key:string|null }
+puzzle_state:    { id:number; current_stage:number; stage_solved_at:Record<string,string>; updated_at:string }
+```
+- `puzzle_state` must contain row `id = 1` (`decode.ts:45`). `current_stage > 4` ⇒ completed.
+- `puzzle_theories` is insert-only from the API: `{content, stage, is_correct}`; `visitor_key` is never written by code. Guesses are stored **verbatim, unmoderated, and shown publicly** to all visitors.
+- `.env.local` comment also mentions `puzzle_stage_solves` — **not referenced by any code**.
+- Indexes/constraints/RLS: unknown **(unverified)**. Service-role key bypasses RLS.
+
+### Static content types (implicit, `src/data/portfolio.ts`)
+```ts
+projects[]  { id:number; title; titleAr; description; descriptionAr; image; imageAlt; imageAltAr;
+              tags:string[]; category:'web'; live:string; github:string; featured:boolean; color:string }   // 4 items (ids 3,4,1,2)
+experiences[] { role; roleAr; company; companyAr; period; periodAr; description; descriptionAr; tech:string[]; type:'full-time' }  // 3 items
+skillCategories[] { key:'frontend'|'backend'|'design'|'databases'|'devops'; skills:{name:string; level:number}[] }
+```
+`color` (Tailwind-style gradient string) is unused by the single-accent UI. `type` only has `'full-time'` values though `Experience.tsx` maps a `'freelance'` label too.
+
+### Other types
+- `WorkspaceState/Action` (`workspace/state.ts`), `WsFile` (`workspace/files.ts`), `Command/Action/TermContext` (`lib/terminal.ts`), `FixBug` (`lib/fixBugs.ts`), `EventProps` (`lib/track.ts`).
+- Translation shape = `typeof en` (`useTranslation.ts:6`); `ar.json` must keep identical keys (not type-enforced — `messages[locale]` is typed as `Messages` so TS *would* flag a missing key only if JSON import types differ).
+
+---
+
+## 8. API
+
+All are Pages-Router handlers in `src/pages/api/`. No auth. Common guards from `src/lib/security.ts`.
+
+| Method | Path | Handler |
+|---|---|---|
+| POST | `/api/contact` | `src/pages/api/contact.ts` |
+| POST | `/api/quote` | `src/pages/api/quote.ts` |
+| GET, POST | `/api/decode` | `src/pages/api/decode.ts` |
+| GET | `/robots.txt` | `src/pages/robots.txt.ts` (getServerSideProps) |
+| GET | `/sitemap.xml` | `src/pages/sitemap.xml.ts` (getServerSideProps) |
+
+### POST `/api/contact`
+Body: `{name≤100, email≤254, subject≤150 (CR/LF stripped), message≤5000}` — all required.
+Order: 405 non-POST → 403 `isSameOrigin` fails → 403 `{error:'Access denied'}` if `checkBotId(botIdOptions).isBot` → 429 if >5 req/60 s per IP → 400 `All fields are required` → 400 email errors (`Invalid email format` / `Please use a real email address` (17-domain blocklist) / `Email domain does not exist` / `Email domain could not be verified`) → Resend send → `200 {success:true}` or `500 {error:'Failed to send email'}`.
+```ts
+await resend.emails.send({ from: `${sanitizeDisplayName(name)} <onboarding@resend.dev>`,
+  to: 'alaafayyadp1@gmail.com', replyTo: email, subject: `[Portfolio] ${subject}`, html: /* escapeHtml everywhere */ });
+```
+
+### POST `/api/quote`
+Body: `{name, email, details}` required; `projectType≤100, budget≤100, timeline≤100` optional. Same guards; `400 {error:'Required fields missing'}`; subject `[Quote Request] <projectType|New Project> — <name>`.
+
+### GET `/api/decode`
+Rate limit 20/10 s per IP. Returns `{currentStage, completed, completedAt, totalTheoryCount, theories:[{id,created_at,content,stage}]}` (≤300 newest of current stage; empty list when completed). 500 on Supabase error.
+
+### POST `/api/decode`
+Body `{guess≤500}`. Same-origin check; no BotID. Rate limit **1 per 25 s per IP per stage** → 429. Response: `{verdict:'incorrect'|'close', theory}` or `{verdict:'correct', theory, stage, nextStage|null, completed, theoryCountAtSolve, totalTheoryCount}`. If already complete → `200 {verdict:'correct', completed:true}`. 405 otherwise with `Allow: GET, POST`.
+
+### External calls
+Resend (`resend.emails.send`), Supabase (REST via supabase-js), DNS MX (`dns.resolveMx`), BotID verification (`checkBotId`), Vercel Analytics beacon (client).
+
+---
+
+## 9. FRONTEND
+
+### Routes
+`/` workspace; `/classic` classic; `/robots.txt`; `/sitemap.xml`. (No 404/500 custom pages.)
+
+### Hierarchy
+```
+/  index.tsx
+ └ WorkspaceShell
+    ├ TitleBar
+    ├ Sidebar (files[], link → /classic)
+    ├ TabBar (drag/drop) ; FilePane[] → files/{About,Skills,Projects,Experience,Contact}File
+    ├ Minimap
+    └ StatusBar (lang toggle, link → /classic)
+
+/classic  classic.tsx
+ ├ BootOverlay → SmoothScroll → SiteNav
+ ├ TerminalHero ─ DecodePuzzle(Modal) , FixChallenge(Modal)
+ ├ ScreenFrame(1..5) → SectionEyebrow + About|Skills|Projects|Experience|Contact (bare)
+ └ Footer → Legal → Modal×2
+```
+
+### State management
+No library. `useReducer` (workspace tabs), module-level pub/sub for locale (`useTranslation`), `useState` elsewhere; `localStorage`: `lang`, `theme`; `sessionStorage`: `sid`, `sid:once`, `fix-last-bugs`.
+
+### Styling
+- **Global CSS is inline** in `src/pages/_document.tsx` (single `<style dangerouslySetInnerHTML>`; tokens `--bg --text --text-muted --border --accent …`, `:root,[data-theme="dark"]` / `[data-theme="light"]`; classes `.snav*`, `.term-*`, `.boot2*`, `.screen-*`, `.modal-*`, `.legal-*`, `.proj-*`, `.decode-*`, `.fix-*`). There is no `globals.css`.
+- **Workspace** uses the CSS Module `workspace.module.css` with its own palette scoped on `.app` (not the global tokens). Uses `cx()` helper.
+- Classic section components use heavy **inline `style={{}}`** objects plus global classes `.glass`, `.reveal/.revealed`, `.btn-primary`, `.btn-outline`.
+- Fonts: `next/font/google` Inter (`--font-body`), JetBrains Mono (`--font-mono`), Cairo (`--font-arabic`). Never reference font names directly; use the CSS vars.
+- Global `* { user-select: none }` in `_document.tsx:35-38` — affects the whole site including form fields (Safari may block typing in inputs with `-webkit-user-select:none` **(unverified)**).
+
+### Forms / validation
+Native `required`/`type="email"`; server does the real validation. Status machine `idle|sending|success|error`.
+
+### Navigation
+Workspace: tab state only (no URL changes/hash). Classic: `smoothScrollTo(id)` (Lenis) + IntersectionObserver scroll-spy.
+
+---
+
+## 10. AUTH & SECURITY
+
+- **No auth, sessions, roles, or protected routes.** All endpoints are public.
+- **Security headers** (`next.config.js`) on every path except BotID's prefix `149e9513-01fa-4fb0-aad4-566afd725d1b`: CSP (`default-src 'self'`; `script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com`; `style-src 'self' 'unsafe-inline'`; `connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com`; `img-src 'self' data:`; `frame-ancestors 'none'`; `object-src 'none'`; `upgrade-insecure-requests`…), `X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, HSTS 2y + preload, `Permissions-Policy` (camera/mic/geo off), `poweredByHeader:false`.
+- **Bot protection:** BotID on `/api/contact` & `/api/quote` only (client registered in `src/instrumentation-client.ts`, server `checkBotId`). Dev bypass is ignored in production.
+- **Input handling:** all email HTML is built with `escapeHtml`; subject/display-name stripped of CR/LF/`<>"`.
+- **Concerns noticed:**
+  1. Rate limiter is per-instance in-memory (`security.ts:87`) — easily bypassed on serverless. Documented in the code comment.
+  2. `/api/decode` has no BotID, and its content is public: anyone can post arbitrary text that other visitors see (stored XSS is avoided because React escapes, but moderation/abuse is possible). 
+  3. `isSameOrigin` allows requests with neither Origin nor Referer (curl).
+  4. `safeIp` trusts the first `x-forwarded-for` entry; on Vercel that header is platform-set, elsewhere spoofable **(unverified for hosting)**.
+  5. Owner email, WhatsApp number (`+961 3 748 496` via `wa.me/9613748496`), appear hardcoded in source in several places (public by design).
+  6. CSP requires `'unsafe-inline'` scripts/styles (acknowledged in comment).
+  7. `.env.local` contains `VERCEL_OIDC_TOKEN` and service-role key; ensure never committed (git-ignored — verified).
+  8. `FixChallenge` iframe uses `sandbox="allow-scripts"` (no `allow-same-origin`) — safe; messages validated by `e.source`.
+  9. CI runs `npm audit --audit-level=high` and fails on findings.
+
+---
+
+## 11. CONFIGURATION
+
+| File | Controls |
+|---|---|
+| `package.json` | scripts, deps, `overrides` (see §2) |
+| `next.config.js` | `reactStrictMode:true`, `poweredByHeader:false`, `images.formats avif/webp`, `headers()` (CSP etc.), wrapped by `withBotId()`. **Redirect `/`→`/classic` is commented out (uncommitted).** |
+| `tsconfig.json` | target ES2017, `strict:false`, `strictNullChecks:true`, `moduleResolution:bundler`, `jsx:react-jsx`, path alias `@/*` → `./src/*` (alias not used in code — all relative imports) |
+| `eslint.config.mjs` | flat config: js recommended + typescript-eslint recommended + Next plugin rules; turns **off** `no-unused-vars`, `no-explicit-any`, `no-empty`; ignores `.next`, `node_modules` |
+| `.eslintrc.json` | legacy `next/core-web-vitals`, `next/typescript` — redundant/ignored under flat config |
+| `jest.config.js` | jsdom; ts-jest for ts/tsx and `.mjs` (for lenis ESM); `transformIgnorePatterns` allows `lenis`; mapper: css → `__mocks__/fileMock.js`, `lenis` → `dist/lenis.mjs`, `@vercel/analytics` → `__mocks__/analyticsMock.js` |
+| `jest.setup.js` | `matchMedia` shim |
+| `vercel.json` | `installCommand: npm install --include=dev` |
+| `.github/workflows/ci.yml` | on push/PR to `main`: checkout → Node 22 + npm cache → `.next/cache` cache → `npm ci` → `npx tsc --noEmit` → `npm run lint` → `npm run test` → `npm audit --audit-level=high` → `npm run build` → **deploy (push to main only)** `npx vercel --prod --yes` |
+| `public/manifest.json` | PWA manifest (`display: standalone`, bg/theme `#101418`; note `index.tsx` sets `theme-color #1E1E2E`) |
+| `.gitignore` | `node_modules/ .next/ .env .env.local .DS_Store *.zip .vercel .env*` |
+
+No Prettier, no Husky/lint-staged, no Dockerfile (CI Docker step was removed in `1beaae8`), no Tailwind/PostCSS config.
+
+---
+
+## 12. TESTS
+
+Run: `npm test` (35 tests, all passing as of 2026-11-05, ~24 s).
+
+| File | Covers |
+|---|---|
+| `__tests__/workspace.test.tsx` | `workspaceReducer` (init, activate, close/MRU, open, step, reorder, `moveInOrder`), `WorkspaceShell` integration (tabs, close via ×, reopen via sidebar, arrow keys, minimap click), RTL render |
+| `__tests__/Legal.test.tsx` | `Legal` modals: dialog semantics, focus management, ESC, Tab trap, scroll lock, Lenis wheel behaviour, privacy/terms copy |
+| `__tests__/Navbar.test.tsx` | `Navbar` (dead component!) renders logo/links/hire button/lang toggle; `Footer` renders `arrowUp` button only |
+
+**Not tested:** all API routes (`contact`, `quote`, `decode`), `security.ts` helpers, `terminal.ts` engine, `TerminalHero`, `DecodePuzzle`, `FixChallenge`, classic sections, `SiteNav`, `useTranslation`/`useTheme`, `jsonLd`, `sitemap/robots`, i18n key parity, any E2E. Coverage not measured (no coverage config).
+
+---
+
+## 13. CODE CONVENTIONS
+
+- File naming: PascalCase components; camelCase hooks/libs; workspace "files" end with `File.tsx`; CSS Module class names camelCase and accessed as `styles.x`.
+- Components are default exports; props typed inline; `'use client'` is **not** used (Pages Router).
+- Relative imports (no `@/` alias in practice).
+- Comments are long and explain *why* (accessibility, Lenis quirks, security). Match that density when adding code.
+- i18n: add the key to **both** `en.json` and `ar.json`; data entries need `…Ar` siblings; components choose via `isRTL ? x.ar : x`.
+- Errors: API routes return `{error: string}` JSON with proper status; server errors logged with `console.error('[tag] …')`; client shows generic message. Supabase calls always check `error` explicitly.
+- Client analytics: only via `logEvent/logEventOnce`; never include PII.
+- Accessibility: roles/aria on tabs, dialogs, logs; `prefers-reduced-motion` honored.
+- Styling: new global styles go in the `_document.tsx` string; workspace styles in the CSS module. Use design-token variables, not raw hex (classic). Single-accent rule: no new hues in classic.
+- Lint is lenient (`any`, unused vars off); `strict` TS is off.
+
+---
+
+## 14. GIT CONTEXT
+
+- Branch: `main` (tracking `origin/main`). Other remote branches: `origin/ci/remove-docker-build`, `origin/seo/cwv-favicon-manifest-speedinsights`.
+- Git user: AlaaFayyad.
+- **Uncommitted:** `M next.config.js` — comments out the `redirects()` that sent `/` → `/classic` (302).
+- Last 20 commits:
+```
+8fccaec 2026-09-23 mod
+4a90ed9 2026-09-01 mod
+e7c78c4 2026-08-28 mod:
+a155a3c 2026-08-28 mods
+1019b3b 2026-07-29 mod
+f642a12 2026-07-29 mod
+8119ecf 2026-07-15 mod
+bb75f81 2026-07-15 perf(seo): shrink favicons, add web manifest + Speed Insights
+1beaae8 2026-07-15 ci: drop dead Docker build step from build-and-check
+7b420d4 2026-07-14 mods
+4b46e2d 2026-07-02 mod
+8c20910 2026-06-30 mod
+fc3b6ed 2026-06-30 mods
+35d7630 2026-06-30 mods
+d218e37 2026-06-29 mods to v2
+03ccd86 2026-06-29 updatwd portfolio
+a725c97 2026-06-12 fix
+3277177 2026-06-12 add project
+f4ec940 2026-06-08 add projects
+fe0208e 2026-06-08 fix
+```
+(Commit messages are mostly uninformative.)
+- **TODO/FIXME/HACK/XXX:** none found in source. Related markers: `// BUG:` comments inside `src/lib/fixBugs.ts` are intentional challenge content, not real bugs. Large blocks of commented-out code: `src/lib/terminal.ts` (jokes, `pwd`, `/fix`, lines ~162-228), `src/components/About.tsx:74,89-94`, `Contact.tsx:154`, `next.config.js:42-50`.
+
+---
+
+## 15. PROBLEMS & RISKS
+
+**Likely bugs / broken**
+1. **Redirect state**: committed HEAD redirects `/`→`/classic`; working tree removes it. Committing this changes production landing page. Sitemap lists both URLs and canonical on `/` points to itself.
+2. **Missing image**: `src/data/portfolio.ts:24` → `/3adasa_cover.png` doesn't exist (`public/3adasa.png` does). Also feeds `jsonLd.ts` image.
+3. **Dead `/fix`**: component, 6-bug data, CSS, mount in `TerminalHero` all shipped but unreachable.
+4. **Dead `Navbar.tsx`** + its test (tests a component not used on any page; test asserts `'ALAA FAYYAD'`/"Let's connect"). Real nav is `site/SiteNav.tsx`, which is untested.
+5. Workspace `/` lacks Privacy/Terms links although the Privacy text exists (classic footer only).
+6. `README.md` is create-next-app boilerplate with wrong paths (`pages/index.tsx`, `/api/hello` don't exist).
+
+**Duplication / dead code**
+- `validateEmail` + IP-extraction duplicated in `contact.ts`/`quote.ts` (and IP code in `decode.ts`); email HTML templates nearly identical.
+- Two parallel implementations of every section (classic components vs `workspace/files/*File.tsx`), incl. two contact forms.
+- `smoothScroll` re-implemented in `Navbar.tsx`, `Footer.tsx`, `lib/scroll.ts`.
+- Unused assets: `public/logo.png`, `logo_2.png` (~1.7 MB), `happidoo_screen.png`, `file/globe/next/vercel/window.svg`.
+- `tsconfig.tsbuildinfo` tracked in git; `conceptdidereference.html` tracked; two ESLint configs; `@/*` alias unused; project `color` field unused; skill `level` unused.
+- `postcss` as a runtime dependency; `next` in devDependencies.
+
+**Performance / fragility**
+- `_document.tsx` is an 809-line string of global CSS — hard to maintain; cannot be code-split.
+- Large unoptimized PNGs in `public/` (e.g. `happidoo.png` 608 KB, `portfolio_screen.png` 232 KB, `3adasa.png` 317 KB); classic uses `next/image` for projects, workspace shows none.
+- Workspace `Minimap` random bars → SSR/CSR hydration mismatch risk (`Math.random()` in `useMemo`, rendered under `aria-hidden`) **(unverified at runtime)**.
+- Locale hook initial state is `'en'` then switches after mount → flash of English for Arabic users; `<html dir>` set in effect.
+- Module-level locale state is not SSR-safe by design (client-only reads) but works since reads happen in effects.
+- `rateLimit` Map grows unbounded (no eviction) within an instance.
+- Hardcoded About stats in classic can drift from data.
+- `about` stat `years shipping` computed from `new Date()` at module load.
+- Flat `user-select:none` hurts copying text / maybe form inputs.
+- CI deploys and Vercel Git integration may double-deploy **(unverified)**; `npm audit` gate can block deploys on upstream advisories.
+
+**Outdated / pinned**: Using React 18 with Next 16; ESLint 10; `@types/node ^20` vs Node 22. Not audited for CVEs in this session.
+
+---
+
+## 16. MODIFICATION GUIDE
+
+| Change | Touch |
+|---|---|
+| Edit bio/hero/labels/legal text | `src/messages/en.json` **and** `ar.json` (keep keys identical); hero name/role keys `hero.*` |
+| Add/edit project | `src/data/portfolio.ts` `projects[]` (+ `titleAr`, `descriptionAr`, `imageAlt(Ar)`); put image in `public/`. Auto-propagates to classic Projects, workspace ProjectsFile, JSON-LD, project count stat |
+| Add/edit job | `portfolio.ts` `experiences[]` (period must contain a 4-digit year — `meta.ts` derives `yearsShipping` from it) |
+| Add skill | `skillCategories[]`; new category also needs labels in `messages/*.json` `skills.*` and in `SkillsFile.tsx`/`Skills.tsx` `labels` maps |
+| Change colours (classic) | `_document.tsx` tokens `:root` + `[data-theme="light"]` (+ `theme-color` meta in pages, `manifest.json`) |
+| Change colours (workspace) | `.app { --… }` at top of `workspace.module.css` |
+| Add a workspace "file"/tab | create `workspace/files/XFile.tsx`, add entry to `WS_FILES` in `files.ts` (id/name/icon/language), add any strings to both JSON files; tests assume 5 files |
+| Add terminal command | `lib/terminal.ts` `runCommand` (+ `NAV_COMMANDS`/`INFO_COMMANDS` for `help`) |
+| Re-enable `/fix` | uncomment `lib/terminal.ts:174-175` |
+| Make `/` the homepage in prod | commit the `next.config.js` change (or delete the commented block) |
+| Make `/classic` the homepage again | restore the `redirects()` in `next.config.js` |
+| Change recipient / sender | `contact.ts` & `quote.ts` (`to`, `from`); set up a verified Resend domain first |
+| Change site URL / SEO | `lib/site.ts` (+ `NEXT_PUBLIC_SITE_URL`), `jsonLd.ts`, `index.tsx`/`classic.tsx` heads, `sitemap.xml.ts` |
+| Add analytics event | `lib/track.ts` `logEvent` (no PII) |
+| Add API route | `src/pages/api/x.ts`; reuse `security.ts` guards; add path to `initBotId` `protect` list in `instrumentation-client.ts` if it needs BotID |
+| Tighten CSP for a new third party | `next.config.js` `csp` array |
+
+**Couplings**
+- `en.json` ⇄ `ar.json` key parity (no automated check).
+- `portfolio.ts` ⇄ `jsonLd.ts`, `meta.ts`, classic + workspace sections.
+- `instrumentation-client.ts` protect list ⇄ API routes that call `checkBotId`.
+- CSP ⇄ any new script/img/connect origin (will silently break otherwise).
+- `BOTID_PATH_PREFIX` constant in `next.config.js` is a fixed value tied to the botid package — do not change.
+- `PUZZLE_ANSWERS` order ⇄ `STAGE_COUNT=4` in `decode.ts` and `DecodePuzzle.tsx` ⇄ `STAGE_RIDDLES`/`CLOSE_KEYWORDS`.
+- Jest mappers ⇄ ESM-only packages (`lenis`, `@vercel/analytics`); new ESM-only deps need mocks.
+- CSS Module class `.app[dir='rtl']` rules ⇄ `dir` attr set by `WorkspaceShell`.
+
+**Dangerous to edit**
+- `_document.tsx` (single string; a stray backtick or `${` breaks every page).
+- `useTranslation.ts` (global store shared by every component).
+- `next.config.js` headers/BotID wrapper (breaking BotID or CSP silently degrades protection).
+- `.github/workflows/ci.yml` deploy step (ships straight to production).
+- Anything involving `SUPABASE_SERVICE_ROLE_KEY` — never import `lib/supabase.ts` from client code.
+
+---
+
+## 17. OPEN QUESTIONS (for the owner)
+
+1. Should `/` ship as the workspace design? (Uncommitted `next.config.js` change.) Is `/classic` meant to stay long-term?
+2. Is the Vercel Git integration also enabled, or does only the GitHub Actions job deploy?
+3. Is `/fix` meant to be revived or deleted? Same for `Navbar.tsx` and its test.
+4. Where is the Supabase schema (tables, RLS, indexes, `puzzle_stage_solves`)? Should it be added to the repo as SQL?
+5. Is the `3adasa_cover.png` image supposed to exist (rename of `3adasa.png`)?
+6. Do you want Privacy/Terms links on the workspace homepage?
+7. Intended Resend sender domain (currently sandbox `onboarding@resend.dev`)?
+8. Should `.claude`, `.qodo`, `tsconfig.tsbuildinfo`, `conceptdidereference.html` be handled/ignored in git?
+9. Is Arabic copy reviewed by a native speaker? (not verifiable from code)
+10. `next build` was not run here — is the production build currently green?

@@ -1,5 +1,5 @@
 import type { AppProps } from 'next/app';
-import { Inter, JetBrains_Mono, Cairo } from 'next/font/google';
+import { Inter, JetBrains_Mono, Cairo, Bricolage_Grotesque } from 'next/font/google';
 
 // Fonts are self-hosted: next/font downloads and serves them from our own origin
 // at build time, so a visitor's browser never talks to fonts.googleapis.com or
@@ -27,6 +27,16 @@ const cairo = Cairo({
   variable: '--font-arabic',
 });
 
+// Display face for the redesigned homepage (components/home). Variable font so
+// the optical-size axis the design relies on (opsz 12..96) is available.
+const bricolage = Bricolage_Grotesque({
+  subsets: ['latin'],
+  weight: 'variable',
+  axes: ['opsz'],
+  display: 'swap',
+  variable: '--font-display',
+});
+
 export default function App({ Component, pageProps }: AppProps) {
   // Smooth scrolling is owned entirely by Lenis (see SmoothScroll.tsx). We
   // deliberately do NOT set a native `scroll-behavior: smooth` here — that would
@@ -38,9 +48,10 @@ export default function App({ Component, pageProps }: AppProps) {
           --font-body: ${inter.style.fontFamily};
           --font-mono: ${jetbrainsMono.style.fontFamily};
           --font-arabic: ${cairo.style.fontFamily};
+          --font-display: ${bricolage.style.fontFamily};
         }
       `}</style>
-      <div className={`${inter.variable} ${jetbrainsMono.variable} ${cairo.variable}`}>
+      <div className={`${inter.variable} ${jetbrainsMono.variable} ${cairo.variable} ${bricolage.variable}`}>
         <Component {...pageProps} />
       </div>
     </>
